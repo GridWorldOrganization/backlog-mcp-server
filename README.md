@@ -199,8 +199,6 @@ Create a new pull request from branch "feature/new-feature" to "main" in the rep
 Show me all items I'm watching 
 ```
 
-# `.backlog-mcp-serverrc.json` for backlog-mcp-server
-
 ## i18n / Overriding Descriptions
 
 You can override the descriptions of tools by creating a `.backlog-mcp-serverrc.json` file in your **home directory**.
@@ -242,12 +240,7 @@ translationConfig/.backlog-mcp-serverrc.json.example
 
 To use it, copy it to your home directory as .backlog-mcp-serverrc.json:
 
-```bash
-mv translationConfig/.backlog-mcp-serverrc.json.example ~/.backlog-mcp-serverrc.json
-```
-
-You can then edit this file to customize the descriptions as needed.
-
+You can then edit the file to customize the descriptions as needed.
 
 ### Using Environment Variables
 Alternatively, you can override tool descriptions via environment variables.
@@ -274,7 +267,7 @@ or
       "env": {
         "BACKLOG_DOMAIN": "",
         "BACKLOG_API_KEY": ""
-        "BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION": "課題に新しいコメントを追加します。"
+        "BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION": "An alternative description"
       }
     }
   }
