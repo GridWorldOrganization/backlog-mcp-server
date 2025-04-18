@@ -66,17 +66,23 @@ Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` wi
    ```bash
    npm run build
    ```
-
-4. Create a `.env` file with your Backlog credentials:
-   ```
-   BACKLOG_DOMAIN=your-domain.backlog.com
-   BACKLOG_API_KEY=your-api-key
-   ```
-
-5. Start the server:
-   ```bash
-   npm start
-   ```
+4. Set your json to use as MCP
+  ```json
+  {
+    "mcpServers": {
+      "backlog": {
+        "command": "node",
+        "args": [
+          "your-repojitory-location/build/index.js"
+        ],
+        "env": {
+          "BACKLOG_DOMAIN": "your-domain.backlog.com",
+          "BACKLOG_API_KEY": "your-api-key"
+        }
+      }
+    }
+  }
+  ```
 
 ## Available Tools
 
