@@ -33,10 +33,15 @@ The easiest way to use this MCP server is through Claude's MCP configuration:
 {
   "mcpServers": {
     "backlog": {
-      "command": "npx",
+      "command": "docker",
       "args": [
-        "-y",
-        "github:nulab/backlog-mcp-server"
+        "run",
+        "-i",
+        "--rm",
+        "-e", "BACKLOG_DOMAIN",
+        "-e", "BACKLOG_API_KEY",
+        "-v", "/yourcurrentdir/.backlog-mcp-serverrc.json:/root/.backlog-mcp-serverrc.json:ro",
+        "ghcr.io/nulab/backlog-mcp-server"
       ],
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
@@ -53,7 +58,7 @@ Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` wi
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/trknhr/backlog-mcp-server.git
+   git clone https://github.com/nulab/backlog-mcp-server.git
    cd backlog-mcp-server
    ```
 
@@ -241,6 +246,31 @@ When the server starts, it determines the final description for each tool based 
 2. Entries in `.backlog-mcp-serverrc.json` - Supported configuration file formats: .json, .yaml, .yml
 3. Built-in fallback values (English)
 
+Sample config: 
+
+```json
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e", "BACKLOG_DOMAIN",
+        "-e", "BACKLOG_API_KEY",
+        "-v", "/yourcurrentdir/.backlog-mcp-serverrc.json:/root/.backlog-mcp-serverrc.json:ro",
+        "ghcr.io/nulab/backlog-mcp-server"
+      ],
+      "env": {
+        "BACKLOG_DOMAIN": "your-domain.backlog.com",
+        "BACKLOG_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
 ### Exporting Current Translations
 
 You can export the current default translations (including any overrides) by running the binary with the --export-translations flag.
@@ -248,6 +278,12 @@ You can export the current default translations (including any overrides) by run
 This will print all tool descriptions to stdout, including any customizations you have made.
 
 Example:
+
+```bash
+docker run -i --rm ghcr.io/nulab/backlog-mcp-server node build/index.js --export-translations
+```
+
+or 
 
 ```bash
 npx github:nulab/backlog-mcp-server --export-translations
