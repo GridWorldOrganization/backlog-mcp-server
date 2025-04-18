@@ -88,6 +88,17 @@ Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` wi
 
 The server provides the following tools for interacting with Backlog:
 
+### Space Tools
+
+| Tool Name | Description |
+|-----------|-------------|
+| `get_space` | Returns information about the Backlog space |
+| `get_users` | Returns list of users in the Backlog space |
+| `get_myself` | Returns information about the authenticated user |
+| `get_priorities` | Returns list of priorities |
+| `get_resolutions` | Returns list of issue resolutions |
+| `get_issue_types` | Returns list of issue types for a project |
+
 ### Project Tools
 
 | Tool Name | Description |
@@ -123,6 +134,11 @@ The server provides the following tools for interacting with Backlog:
 | `get_wiki_pages` | Returns list of Wiki pages |
 | `get_wikis_count` | Returns count of wiki pages in a project |
 | `get_wiki` | Returns information about a specific wiki page |
+
+### Category Tools
+
+| Tool Name | Description |
+|-----------|-------------|
 | `get_categories` | Returns list of categories for a project |
 
 ### Notification Tools
