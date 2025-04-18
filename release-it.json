@@ -1,0 +1,14 @@
+{
+    "git": {
+      "tagName": "v${version}",
+      "commitMessage": "Release v${version}",
+      "requireCleanWorkingDir": true
+    },
+    "github": {
+      "release": true
+    },
+    "hooks": {
+      "after:bump": "docker buildx build --platform linux/amd64,linux/arm64 --build-arg VERSION=${version} -t ghcr.io/nulab/backlog-mcp-server:v${version} -t ghcr.io/nulab/backlog-mcp-server:latest --push ."
+    }
+  }
+  
