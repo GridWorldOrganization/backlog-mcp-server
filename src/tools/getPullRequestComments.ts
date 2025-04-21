@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
 
 const getPullRequestCommentsSchema = buildToolSchema(t => ({
@@ -13,17 +15,12 @@ const getPullRequestCommentsSchema = buildToolSchema(t => ({
   order: z.enum(["asc", "desc"]).optional().describe(t("TOOL_GET_PULL_REQUEST_COMMENTS_ORDER", "Sort order")),
 }));
 
-export const getPullRequestCommentsTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getPullRequestCommentsSchema>, Output> => {
+export const getPullRequestCommentsTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getPullRequestCommentsSchema>, CallToolResult> => {
   return {
     name: "get_pull_request_comments",
     description: t("TOOL_GET_PULL_REQUEST_COMMENTS_DESCRIPTION", "Returns list of comments for a pull request"),
     schema: z.object(getPullRequestCommentsSchema(t)),
-    handler: async ({ projectIdOrKey, repoIdOrName, number, ...params }) => {
-      const comments = await backlog.getPullRequestComments(projectIdOrKey, repoIdOrName, number, params);
-      
-      return {
-        content: [{ type: "text", text: JSON.stringify(comments, null, 2) }]
-      };
-    }
+    handler: async ({ projectIdOrKey, repoIdOrName, number, ...params }) => 
+      withErrorHandling(() => backlog.getPullRequestComments(projectIdOrKey, repoIdOrName, number, params))
   };
 };

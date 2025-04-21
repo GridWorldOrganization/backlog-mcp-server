@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
 
 const getWikiPagesSchema = buildToolSchema(t => ({
@@ -8,20 +10,15 @@ const getWikiPagesSchema = buildToolSchema(t => ({
   keyword: z.string().optional().describe(t("TOOL_GET_WIKI_PAGES_KEYWORD", "Keyword to search for in Wiki pages")),
 }));
 
-export const getWikiPagesTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getWikiPagesSchema>, Output> => {
+export const getWikiPagesTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getWikiPagesSchema>, CallToolResult> => {
   return {
     name: "get_wiki_pages",
     description: t("TOOL_GET_WIKI_PAGES_DESCRIPTION", "Returns list of Wiki pages"),
     schema: z.object(getWikiPagesSchema(t)),
-    handler: async ({ projectIdOrKey, keyword }) => {
-      const wikiPages = await backlog.getWikis({
+    handler: async ({ projectIdOrKey, keyword }) => 
+      withErrorHandling(() => backlog.getWikis({
         projectIdOrKey,
         keyword
-      });
-      
-      return {
-        content: [{ type: "text", text: JSON.stringify(wikiPages, null, 2) }]
-      };
-    }
+      }))
   };
 };

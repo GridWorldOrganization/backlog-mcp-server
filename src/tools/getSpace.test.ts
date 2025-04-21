@@ -35,4 +35,15 @@ describe("getSpaceTool", () => {
     
     expect(mockBacklog.getSpace).toHaveBeenCalled();
   });
+
+  it("returns an error result when the API fails", async () => {
+    const tool = getSpaceTool({
+      getSpace: () => Promise.reject(new Error("simulated error"))
+    } as Backlog, mockTranslationHelper);
+  
+    const result = await tool.handler({});
+  
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("error");
+  });
 });

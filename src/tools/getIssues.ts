@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 
 const getIssuesSchema = buildToolSchema(t => ({
   projectId: z.array(z.number()).optional().describe(t("TOOL_GET_ISSUES_PROJECT_ID", "Project IDs")),
@@ -30,17 +32,14 @@ const getIssuesSchema = buildToolSchema(t => ({
   count: z.number().optional().describe(t("TOOL_GET_ISSUES_COUNT", "Number of issues to retrieve")),
 }));
 
-export const getIssuesTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getIssuesSchema>, Output> => {
+export const getIssuesTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getIssuesSchema>, CallToolResult> => {
   return {
     name: "get_issues",
     description: t("TOOL_GET_ISSUES_DESCRIPTION", "Returns list of issues"),
     schema: z.object(getIssuesSchema(t)),
-    handler: async (params) => {
-      const issues = await backlog.getIssues(params);
-      
-      return {
-        content: [{ type: "text", text: JSON.stringify(issues, null, 2) }]
-      };
-    }
+    handler: async (params) => 
+      withErrorHandling(() =>
+        backlog.getIssues(params)
+      )
   };
 };

@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
 
 const addProjectSchema = buildToolSchema(t => ({
@@ -12,24 +14,19 @@ const addProjectSchema = buildToolSchema(t => ({
   textFormattingRule: z.enum(["backlog", "markdown"]).optional().describe(t("TOOL_ADD_PROJECT_TEXT_FORMATTING", "Text formatting rule (default: 'backlog')")),
 }));
 
-export const addProjectTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addProjectSchema>, Output> => {
+export const addProjectTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addProjectSchema>, CallToolResult> => {
   return {
     name: "add_project",
     description: t("TOOL_ADD_PROJECT_DESCRIPTION", "Creates a new project"),
     schema: z.object(addProjectSchema(t)),
-    handler: async ({ name, key, chartEnabled, subtaskingEnabled, projectLeaderCanEditProjectLeader, textFormattingRule }) => {
-      const project = await backlog.postProject({
+    handler: async ({ name, key, chartEnabled, subtaskingEnabled, projectLeaderCanEditProjectLeader, textFormattingRule }) => 
+      withErrorHandling(() => backlog.postProject({
         name,
         key,
         chartEnabled: chartEnabled ?? false,
         subtaskingEnabled: subtaskingEnabled ?? false,
         projectLeaderCanEditProjectLeader: projectLeaderCanEditProjectLeader ?? false,
         textFormattingRule: textFormattingRule ?? "backlog"
-      });
-
-      return {
-        content: [{ type: "text", text: JSON.stringify(project, null, 2) }]
-      };
-    }
+      }))
   };
 };

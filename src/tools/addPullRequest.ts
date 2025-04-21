@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
 
 const addPullRequestSchema = buildToolSchema(t => ({
@@ -15,17 +17,14 @@ const addPullRequestSchema = buildToolSchema(t => ({
   notifiedUserId: z.array(z.number()).optional().describe(t("TOOL_ADD_PULL_REQUEST_NOTIFIED_USER_ID", "User IDs to notify")),
 }));
 
-export const addPullRequestTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addPullRequestSchema>, Output> => {
+export const addPullRequestTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addPullRequestSchema>, CallToolResult> => {
   return {
     name: "add_pull_request",
     description: t("TOOL_ADD_PULL_REQUEST_DESCRIPTION", "Creates a new pull request"),
     schema: z.object(addPullRequestSchema(t)),
-    handler: async ({ projectIdOrKey, repoIdOrName, ...params }) => {
-      const pullRequest = await backlog.postPullRequest(projectIdOrKey, repoIdOrName, params);
-      
-      return {
-        content: [{ type: "text", text: JSON.stringify(pullRequest, null, 2) }]
-      };
-    }
+    handler: async ({ projectIdOrKey, repoIdOrName, ...params }) =>
+      withErrorHandling(() =>
+        backlog.postPullRequest(projectIdOrKey, repoIdOrName, params)
+      )
   };
 };

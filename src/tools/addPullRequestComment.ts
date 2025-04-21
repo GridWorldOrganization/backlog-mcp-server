@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
 
 const addPullRequestCommentSchema = buildToolSchema(t => ({
@@ -11,17 +13,12 @@ const addPullRequestCommentSchema = buildToolSchema(t => ({
   notifiedUserId: z.array(z.number()).optional().describe(t("TOOL_ADD_PULL_REQUEST_COMMENT_NOTIFIED_USER_ID", "User IDs to notify")),
 }));
 
-export const addPullRequestCommentTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addPullRequestCommentSchema>, Output> => {
+export const addPullRequestCommentTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addPullRequestCommentSchema>, CallToolResult> => {
   return {
     name: "add_pull_request_comment",
     description: t("TOOL_ADD_PULL_REQUEST_COMMENT_DESCRIPTION", "Adds a comment to a pull request"),
     schema: z.object(addPullRequestCommentSchema(t)),
-    handler: async ({ projectIdOrKey, repoIdOrName, number, ...params }) => {
-      const comment = await backlog.postPullRequestComments(projectIdOrKey, repoIdOrName, number, params);
-      
-      return {
-        content: [{ type: "text", text: JSON.stringify(comment, null, 2) }]
-      };
-    }
-  };
+    handler: async ({ projectIdOrKey, repoIdOrName, number, ...params }) => 
+       withErrorHandling(() => backlog.postPullRequestComments(projectIdOrKey, repoIdOrName, number, params))
+  }
 };

@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
 
 const countIssuesSchema = buildToolSchema(t => ({
@@ -26,17 +28,12 @@ const countIssuesSchema = buildToolSchema(t => ({
   updatedUntil: z.string().optional().describe(t("TOOL_COUNT_ISSUES_UPDATED_UNTIL", "Updated until (yyyy-MM-dd)")),
 }));
 
-export const countIssuesTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof countIssuesSchema>, Output> => {
+export const countIssuesTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof countIssuesSchema>, CallToolResult> => {
   return {
     name: "count_issues",
     description: t("TOOL_COUNT_ISSUES_DESCRIPTION", "Returns count of issues"),
     schema: z.object(countIssuesSchema(t)),
-    handler: async (params) => {
-      const count = await backlog.getIssuesCount(params);
-      
-      return {
-        content: [{ type: "text", text: JSON.stringify(count, null, 2) }]
-      };
-    }
+    handler: async (params) =>
+      withErrorHandling(() => backlog.getIssuesCount(params))
   };
 };

@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 
 const addIssueSchema = buildToolSchema(t => ({
   projectId: z.number().describe(t("TOOL_ADD_ISSUE_PROJECT_ID", "Project ID")),
@@ -24,7 +26,7 @@ const addIssueSchema = buildToolSchema(t => ({
   customFieldValue: z.array(z.string()).optional().describe(t("TOOL_ADD_ISSUE_CUSTOM_FIELD_VALUE", "Values for custom fields")),
 }));
 
-export const addIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addIssueSchema>, Output> => {
+export const addIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addIssueSchema>, CallToolResult> => {
   return {
     name: "add_issue",
     description: t("TOOL_ADD_ISSUE_DESCRIPTION", "Creates a new issue in the specified project."),
@@ -48,31 +50,28 @@ export const addIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDe
       parentIssueId,
       customFieldId,
       customFieldValue
-    }) => {
-      const issue = await backlog.postIssue({
-        projectId,
-        summary,
-        issueTypeId,
-        priorityId,
-        description,
-        startDate,
-        dueDate,
-        estimatedHours,
-        actualHours,
-        categoryId,
-        versionId,
-        milestoneId,
-        assigneeId,
-        notifiedUserId,
-        attachmentId,
-        parentIssueId,
-        customFieldId,
-        customFieldValue
-      });
-
-      return {
-        content: [{ type: "text", text: JSON.stringify(issue, null, 2) }]
-      };
-    }
+    }) => 
+      withErrorHandling(() =>
+        backlog.postIssue({
+          projectId,
+          summary,
+          issueTypeId,
+          priorityId,
+          description,
+          startDate,
+          dueDate,
+          estimatedHours,
+          actualHours,
+          categoryId,
+          versionId,
+          milestoneId,
+          assigneeId,
+          notifiedUserId,
+          attachmentId,
+          parentIssueId,
+          customFieldId,
+          customFieldValue
+        })
+      )
   };
 };

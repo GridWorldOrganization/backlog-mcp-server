@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
 
 const updateProjectSchema = buildToolSchema(t => ({
@@ -14,13 +16,13 @@ const updateProjectSchema = buildToolSchema(t => ({
   archived: z.boolean().optional().describe(t("TOOL_UPDATE_PROJECT_ARCHIVED", "Whether to archive the project")),
 }));
 
-export const updateProjectTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof updateProjectSchema>, Output> => {
+export const updateProjectTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof updateProjectSchema>, CallToolResult> => {
   return {
     name: "update_project",
     description: t("TOOL_UPDATE_PROJECT_DESCRIPTION", "Updates an existing project"),
     schema: z.object(updateProjectSchema(t)),
-    handler: async ({ projectIdOrKey, name, key, chartEnabled, subtaskingEnabled, projectLeaderCanEditProjectLeader, textFormattingRule, archived }) => {
-      const project = await backlog.patchProject(projectIdOrKey, {
+    handler: async ({ projectIdOrKey, name, key, chartEnabled, subtaskingEnabled, projectLeaderCanEditProjectLeader, textFormattingRule, archived }) =>
+      withErrorHandling(() => backlog.patchProject(projectIdOrKey, {
         name,
         key,
         chartEnabled,
@@ -28,11 +30,6 @@ export const updateProjectTool = (backlog: Backlog, { t }: TranslationHelper): T
         projectLeaderCanEditProjectLeader,
         textFormattingRule,
         archived
-      });
-
-      return {
-        content: [{ type: "text", text: JSON.stringify(project, null, 2) }]
-      };
-    }
+      }))
   };
 };

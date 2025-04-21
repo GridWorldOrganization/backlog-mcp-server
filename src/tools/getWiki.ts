@@ -1,24 +1,23 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
 
 const getWikiSchema = buildToolSchema(t => ({
   wikiId: z.union([z.string(), z.number()]).describe(t("TOOL_GET_WIKI_ID", "Wiki ID")),
 }));
 
-export const getWikiTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getWikiSchema>, Output> => {
+export const getWikiTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getWikiSchema>, CallToolResult> => {
   return {
     name: "get_wiki",
     description: t("TOOL_GET_WIKI_DESCRIPTION", "Returns information about a specific wiki page"),
     schema: z.object(getWikiSchema(t)),
-    handler: async ({ wikiId }) => {
-      const wikiIdNumber = typeof wikiId === 'string' ? parseInt(wikiId, 10) : wikiId;
-      const wiki = await backlog.getWiki(wikiIdNumber);
-      
-      return {
-        content: [{ type: "text", text: JSON.stringify(wiki, null, 2) }]
-      };
-    }
+    handler: async ({ wikiId }) => 
+      withErrorHandling(() => {
+        const wikiIdNumber = typeof wikiId === 'string' ? parseInt(wikiId, 10) : wikiId;
+        return backlog.getWiki(wikiIdNumber);
+      })
   };
 };

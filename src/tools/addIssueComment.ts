@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
 
 const addIssueCommentSchema = buildToolSchema(t => ({
@@ -10,21 +12,16 @@ const addIssueCommentSchema = buildToolSchema(t => ({
   attachmentId: z.array(z.number()).optional().describe(t("TOOL_ADD_ISSUE_COMMENT_ATTACHMENT_ID", "Attachment IDs")),
 }));
 
-export const addIssueCommentTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addIssueCommentSchema>, Output> => {
+export const addIssueCommentTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addIssueCommentSchema>, CallToolResult> => {
   return {
     name: "add_issue_comment",
     description: t("TOOL_ADD_ISSUE_COMMENT_DESCRIPTION", "Adds a comment to an issue"),
     schema: z.object(addIssueCommentSchema(t)),
-    handler: async ({ issueIdOrKey, content, notifiedUserId, attachmentId }) => {
-      const comment = await backlog.postIssueComments(issueIdOrKey, {
+    handler: async ({ issueIdOrKey, content, notifiedUserId, attachmentId }) => 
+      withErrorHandling(() => backlog.postIssueComments(issueIdOrKey, {
         content,
         notifiedUserId,
         attachmentId
-      });
-      
-      return {
-        content: [{ type: "text", text: JSON.stringify(comment, null, 2) }]
-      };
+      }))
     }
-  };
 };

@@ -2,6 +2,9 @@ import { z } from "zod";
 import { Backlog } from 'backlog-js';
 import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { handleBacklogError } from "../utils/handleBacklogError.js";
+import { withErrorHandling } from "../utils/withErrorHandling.js";
 
 const getProjectListSchema = buildToolSchema(t => ({
   archived: z
@@ -14,21 +17,14 @@ const getProjectListSchema = buildToolSchema(t => ({
     .describe(t("TOOL_GET_PROJECT_LIST_ALL", "Only applies to administrators. If ‘true,’ it returns all projects. If ‘false,’ it returns only projects they have joined.")),
 }))
 
-export const getProjectListTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getProjectListSchema>, Output> => {
+export const getProjectListTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getProjectListSchema>, CallToolResult> => {
   return {
     name: "get_project_list",
     description: t("TOOL_GET_PROJECT_LIST_DESCRIPTION", "Returns list of projects"),
     schema: z.object(getProjectListSchema(t)),
-    handler: async ({ archived, all }) => {
-      const projects = await backlog.getProjects(
-        {
-          archived,
-          all
-        }
+    handler: async ({ archived, all }) => 
+      withErrorHandling(() =>
+        backlog.getProjects({ archived, all })
       )
-      return {
-        content: [{ type: "text", text: JSON.stringify(projects, null, 2) }]
-      };
-    }
   }
 }
