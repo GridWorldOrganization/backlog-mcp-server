@@ -1,6 +1,6 @@
 # Backlog MCP Server
 
-A Model Context Protocol (MCP) server for interacting with the Backlog API. This server provides tools for managing projects, issues, wiki pages, and more in Backlog through Claude.
+A Model Context Protocol (MCP) server for interacting with the Backlog API. This server provides tools for managing projects, issues, wiki pages, and more in Backlog through AI agents like Claude / Cline / Cursor etc.
 
 ## Features
 
@@ -40,7 +40,6 @@ The easiest way to use this MCP server is through Claude's MCP configuration:
         "--rm",
         "-e", "BACKLOG_DOMAIN",
         "-e", "BACKLOG_API_KEY",
-        "-v", "/yourcurrentdir/.backlog-mcp-serverrc.json:/root/.backlog-mcp-serverrc.json:ro",
         "ghcr.io/nulab/backlog-mcp-server"
       ],
       "env": {
@@ -308,23 +307,23 @@ The environment variable names are based on the tool keys, prefixed with BACKLOG
 Example:
 To override the TOOL_ADD_ISSUE_COMMENT_DESCRIPTION:
 
-```bash
-export BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION="An alternative description"
-```
-
-or 
-
 ```json
 {
   "mcpServers": {
     "backlog": {
-      "command": "npx",
+      "command": "docker",
       "args": [
-        "github:nulab/backlog-mcp-server"
+        "run",
+        "-i",
+        "--rm",
+        "-e", "BACKLOG_DOMAIN",
+        "-e", "BACKLOG_API_KEY",
+        "-e", "BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION"
+        "ghcr.io/nulab/backlog-mcp-server"
       ],
       "env": {
-        "BACKLOG_DOMAIN": "",
-        "BACKLOG_API_KEY": ""
+        "BACKLOG_DOMAIN": "your-domain.backlog.com",
+        "BACKLOG_API_KEY": "your-api-key",
         "BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION": "An alternative description"
       }
     }
@@ -353,4 +352,9 @@ npm test
 
 ## License
 
-MIT
+This project is licensed under the [MIT License](./LICENSE).
+
+Please note: This tool is provided under the MIT License **without any warranty or official support**.  
+Use it at your own risk after reviewing the contents and determining its suitability for your needs.  
+If you encounter any issues, please report them via [GitHub Issues](../../issues).
+

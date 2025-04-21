@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// Copyright (c) 2025 Nulab inc.
+// Licensed under the MIT License.
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
