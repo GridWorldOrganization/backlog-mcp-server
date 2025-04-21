@@ -1,6 +1,12 @@
 # Backlog MCP Server
 
-A Model Context Protocol (MCP) server for interacting with the Backlog API. This server provides tools for managing projects, issues, wiki pages, and more in Backlog through AI agents like Claude / Cline / Cursor etc.
+![MIT License](https://img.shields.io/badge/license-MIT-green.svg)
+![Build](https://github.com/nulab/backlog-mcp-server/actions/workflows/ci.yml/badge.svg)
+![Last Commit](https://img.shields.io/github/last-commit/nulab/backlog-mcp-server.svg)
+
+[📘 日本語でのご利用ガイド](./README.ja.md) 
+
+A Model Context Protocol (MCP) server for interacting with the Backlog API. This server provides tools for managing projects, issues, wiki pages, and more in Backlog through AI agents like Claude Desktop / Cline / Cursor etc.
 
 ## Features
 
@@ -15,17 +21,17 @@ A Model Context Protocol (MCP) server for interacting with the Backlog API. This
 
 ## Requirements
 
-- Node.js (v16 or higher)
+- Docker
 - A Backlog account with API access
 - API key from your Backlog account
 
 ## Installation
 
-### Option 1: Install via npx
+### Option 1: Install via Docker
 
-The easiest way to use this MCP server is through Claude's MCP configuration:
+The easiest way to use this MCP server is through MCP configuration for Claude Desktop or Cline :
 
-1. Open Claude settings
+1. Open Claude Desktop or Cline settings
 2. Navigate to the MCP configuration section
 3. Add the following configuration:
 
@@ -183,7 +189,7 @@ The server provides the following tools for interacting with Backlog:
 
 ## Usage Examples
 
-Once the MCP server is configured in Claude, you can use the tools directly in your conversations. Here are some examples:
+Once the MCP server is configured in AI agents, you can use the tools directly in your conversations. Here are some examples:
 
 ### Listing Projects
 
@@ -357,4 +363,3 @@ This project is licensed under the [MIT License](./LICENSE).
 Please note: This tool is provided under the MIT License **without any warranty or official support**.  
 Use it at your own risk after reviewing the contents and determining its suitability for your needs.  
 If you encounter any issues, please report them via [GitHub Issues](../../issues).
-
