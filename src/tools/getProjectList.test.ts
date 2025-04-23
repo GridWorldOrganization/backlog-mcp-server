@@ -1,8 +1,7 @@
 import { getProjectListTool } from "./getProjectList.js";
-import { jest, describe, it, expect, beforeEach } from '@jest/globals'; 
-import type { Backlog, Entity, Option } from "backlog-js";
+import { jest, describe, it, expect } from '@jest/globals'; 
+import type { Backlog, Entity } from "backlog-js";
 import { createTranslationHelper } from "../createTranslationHelper.js"; 
-import * as errorHandlingModule from "../utils/withErrorHandling.js";
 
 describe("getProjectListTool", () => {
   const mockBacklog: Partial<Backlog> = {
@@ -75,6 +74,7 @@ describe("getProjectListTool", () => {
     expect(shape.archived.description).toBe(t("TOOL_GET_PROJECT_LIST_ARCHIVED", ""));
     expect(shape.all.description).toBe(t("TOOL_GET_PROJECT_LIST_ALL", ""));
   });
+
   it("returns an error result when the API fails", async () => {
     const tool = getProjectListTool({
       getProjects: () => Promise.reject(new Error("simulated error"))
@@ -83,6 +83,6 @@ describe("getProjectListTool", () => {
     const result = await tool.handler({});
   
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("error");
+    expect(result.content[0].text).toContain("simulated error");
   });
 });

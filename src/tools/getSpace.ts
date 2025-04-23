@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, Output, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { withErrorHandling } from "../utils/withErrorHandling.js";

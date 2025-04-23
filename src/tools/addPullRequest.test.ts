@@ -93,4 +93,15 @@ describe("addPullRequestTool", () => {
       notifiedUserId: [2, 3]
     });
   });
+
+  it("returns an error result when the API fails", async () => {
+    const tool = addPullRequestTool({
+      postPullRequest: () => Promise.reject(new Error("simulated error"))
+    } as unknown as Backlog, mockTranslationHelper);
+
+    const result = await tool.handler({} as any);
+  
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("simulated error");
+  });
 });

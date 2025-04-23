@@ -1,6 +1,4 @@
-import { Error as BacklogError } from 'backlog-js';
-import { Output } from '../toolDefinition.js';
-import { CallToolResult, McpError } from '@modelcontextprotocol/sdk/types.js';
+import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 /**
  * Converts a BacklogError (or unknown error) into Output format for MCP response

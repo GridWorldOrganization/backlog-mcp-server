@@ -3,15 +3,13 @@ import { TranslationHelper } from "./createTranslationHelper.js";
 
 export type ToolDefinition<
   Shape extends z.ZodRawShape,
-  Output
+  CallToolResult
 > = {
   name: string;
   description: string;
   schema: z.ZodObject<Shape>;
-  handler: (input: z.infer<z.ZodObject<Shape>>) => Promise<Output>;
+  handler: (input: z.infer<z.ZodObject<Shape>>) => Promise<CallToolResult>;
 };
-
-export type Output = { content: { type: "text"; text: string }[] };
 
 export const buildToolSchema = <
   T extends z.ZodRawShape
