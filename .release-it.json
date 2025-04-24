@@ -2,6 +2,7 @@
     "git": {
       "tagName": "v${version}",
       "commitMessage": "Release v${version}",
+      "tagMatch": "v*",
       "requireCleanWorkingDir": true
     },
     "github": {
