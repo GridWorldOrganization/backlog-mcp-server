@@ -144,6 +144,7 @@ The server provides the following tools for interacting with Backlog:
 | `get_wiki_pages` | Returns list of Wiki pages |
 | `get_wikis_count` | Returns count of wiki pages in a project |
 | `get_wiki` | Returns information about a specific wiki page |
+| `add_wiki` | Creates a new wiki page |
 
 ### Category Tools
 

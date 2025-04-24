@@ -29,6 +29,7 @@ import { deleteProjectTool } from "./deleteProject.js";
 import { getWikiPagesTool } from "./getWikiPages.js";
 import { getWikisCountTool } from "./getWikisCount.js";
 import { getWikiTool } from "./getWiki.js";
+import { addWikiTool } from "./addWiki.js";
 import { getCategoriesTool } from "./getCategories.js";
 import { getIssueTool } from "./getIssue.js";
 import { getIssuesTool } from "./getIssues.js";
@@ -96,6 +97,7 @@ export const allTools = (backlog: Backlog, helper: TranslationHelper) => [
   getWikiPagesTool(backlog, helper),
   getWikisCountTool(backlog, helper),
   getWikiTool(backlog, helper),
+  addWikiTool(backlog, helper),
   
   // Category tools
   getCategoriesTool(backlog, helper),
