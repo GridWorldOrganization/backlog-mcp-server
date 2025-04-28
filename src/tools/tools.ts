@@ -43,36 +43,36 @@ import { TranslationHelper } from "../createTranslationHelper.js";
 
 export const allTools = (backlog: Backlog, helper: TranslationHelper) => [
   // Space tools
-  getSpaceTool(backlog, helper),
-  getUsersTool(backlog, helper),
-  getMyselfTool(backlog, helper),
-  getPrioritiesTool(backlog, helper),
-  getResolutionsTool(backlog, helper),
-  getIssueTypesTool(backlog, helper),
+  // getSpaceTool(backlog, helper),
+  // getUsersTool(backlog, helper),
+  // getMyselfTool(backlog, helper),
+  // getPrioritiesTool(backlog, helper),
+  // getResolutionsTool(backlog, helper),
+  // getIssueTypesTool(backlog, helper),
   
   // Notification tools
-  getNotificationsTool(backlog, helper),
-  getNotificationsCountTool(backlog, helper),
-  resetUnreadNotificationCountTool(backlog, helper),
-  markNotificationAsReadTool(backlog, helper),
+  // getNotificationsTool(backlog, helper),
+  // getNotificationsCountTool(backlog, helper),
+  // resetUnreadNotificationCountTool(backlog, helper),
+  // markNotificationAsReadTool(backlog, helper),
   
   // Git tools
-  getGitRepositoriesTool(backlog, helper),
-  getGitRepositoryTool(backlog, helper),
+  // getGitRepositoriesTool(backlog, helper),
+  // getGitRepositoryTool(backlog, helper),
   
   // Pull Request tools
-  getPullRequestsTool(backlog, helper),
-  getPullRequestsCountTool(backlog, helper),
-  getPullRequestTool(backlog, helper),
-  addPullRequestTool(backlog, helper),
-  updatePullRequestTool(backlog, helper),
-  getPullRequestCommentsTool(backlog, helper),
-  addPullRequestCommentTool(backlog, helper),
-  updatePullRequestCommentTool(backlog, helper),
+  // getPullRequestsTool(backlog, helper),
+  // getPullRequestsCountTool(backlog, helper),
+  // getPullRequestTool(backlog, helper),
+  // addPullRequestTool(backlog, helper),
+  // updatePullRequestTool(backlog, helper),
+  // getPullRequestCommentsTool(backlog, helper),
+  // addPullRequestCommentTool(backlog, helper),
+  // updatePullRequestCommentTool(backlog, helper),
   
   // Watching tools
-  getWatchingListItemsTool(backlog, helper),
-  getWatchingListCountTool(backlog, helper),
+  // getWatchingListItemsTool(backlog, helper),
+  // getWatchingListCountTool(backlog, helper),
   
   // // Project tools
   getProjectListTool(backlog, helper),
@@ -90,15 +90,15 @@ export const allTools = (backlog: Backlog, helper: TranslationHelper) => [
   deleteIssueTool(backlog, helper),
   
   // Comment tools
-  getIssueCommentsTool(backlog, helper),
-  addIssueCommentTool(backlog, helper),
+  // getIssueCommentsTool(backlog, helper),
+  // addIssueCommentTool(backlog, helper),
   
   // Wiki tools
-  getWikiPagesTool(backlog, helper),
-  getWikisCountTool(backlog, helper),
-  getWikiTool(backlog, helper),
-  addWikiTool(backlog, helper),
+  // getWikiPagesTool(backlog, helper),
+  // getWikisCountTool(backlog, helper),
+  // getWikiTool(backlog, helper),
+  // addWikiTool(backlog, helper),
   
   // Category tools
-  getCategoriesTool(backlog, helper),
+  // getCategoriesTool(backlog, helper),
 ];
