@@ -21,15 +21,13 @@ describe("deleteProjectTool", () => {
   const mockTranslationHelper = createTranslationHelper();
   const tool = deleteProjectTool(mockBacklog as Backlog, mockTranslationHelper);
 
-  it("returns deleted project information as formatted JSON text", async () => {
+  it("returns deleted project information", async () => {
     const result = await tool.handler({
       projectIdOrKey: "TEST"
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Test Project");
-    expect(result.content[0].text).toContain("TEST");
+    expect(result).toHaveProperty("projectKey", "TEST");
+    expect(result).toHaveProperty("name", "Test Project");
   });
 
   it("calls backlog.deleteProject with correct params when using project key", async () => {
@@ -46,16 +44,5 @@ describe("deleteProjectTool", () => {
     });
     
     expect(mockBacklog.deleteProject).toHaveBeenCalledWith(1);
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = deleteProjectTool({
-      deleteProject: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

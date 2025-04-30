@@ -74,10 +74,11 @@ describe("getIssueTool", () => {
       issueIdOrKey: "TEST-1"
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Test Issue");
-    expect(result.content[0].text).toContain("This is a test issue");
+    if (Array.isArray(result)) {
+      throw new Error("Unexpected array result");
+    }
+    expect(result.summary).toEqual("Test Issue");
+    expect(result.description).toEqual("This is a test issue");
   });
 
   it("calls backlog.getIssue with correct params when using issue key", async () => {
@@ -94,16 +95,5 @@ describe("getIssueTool", () => {
     });
     
     expect(mockBacklog.getIssue).toHaveBeenCalledWith(1);
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getIssueTool({
-      getIssue: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

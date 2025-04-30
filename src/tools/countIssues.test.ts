@@ -13,14 +13,12 @@ describe("countIssuesTool", () => {
   const mockTranslationHelper = createTranslationHelper();
   const tool = countIssuesTool(mockBacklog as Backlog, mockTranslationHelper);
 
-  it("returns issue count as formatted JSON text", async () => {
+  it("returns issue count", async () => {
     const result = await tool.handler({
       projectId: [100]
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("42");
+    expect(result).toHaveProperty("count", 42);
   });
 
   it("calls backlog.getIssuesCount with correct params", async () => {
@@ -45,16 +43,5 @@ describe("countIssuesTool", () => {
       createdSince: "2023-01-01",
       createdUntil: "2023-01-31"
     });
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = countIssuesTool({
-      getIssuesCount: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

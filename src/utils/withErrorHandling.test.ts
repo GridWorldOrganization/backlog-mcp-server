@@ -1,8 +1,6 @@
 import { withErrorHandling } from "./withErrorHandling.js";
 import { beforeEach, jest, describe, it, expect } from '@jest/globals'; 
 
-// jest.mock("../handleBacklogError.js");
-
 describe("withErrorHandling", () => {
   beforeEach(() => {
     jest.clearAllMocks();

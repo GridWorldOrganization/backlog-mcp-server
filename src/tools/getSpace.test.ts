@@ -24,37 +24,16 @@ describe("getSpaceTool", () => {
   it("returns space information as formatted JSON text", async () => {
     const result = await tool.handler({});
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Demo Space");
-    expect(result.content[0].text).toContain("demo");
+    if (Array.isArray(result)) {
+      throw new Error("Unexpected array result");
+    }
+    expect(result.name).toEqual("Demo Space");
+    expect(result.spaceKey).toEqual("demo");
   });
 
   it("calls backlog.getSpace", async () => {
     await tool.handler({});
     
     expect(mockBacklog.getSpace).toHaveBeenCalled();
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getSpaceTool({
-      getSpace: () => Promise.reject(new Error("simulated error"))
-    } as Backlog, mockTranslationHelper);
-  
-    const result = await tool.handler({});
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("error");
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getSpaceTool({
-      getSpace: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

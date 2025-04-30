@@ -14,19 +14,18 @@ dotenv.config();
 const domain = process.env.BACKLOG_DOMAIN || ""
 const backlog = new backlogjs.Backlog({ host: domain, apiKey: process.env.BACKLOG_API_KEY });
 
+const useFields = process.argv.includes("--optimize-response");
 const server = new McpServer({
   name: "backlog",
-  version: "1.0.0",
-  capabilities: {
-    resources: {},
-    tools: {},
-  },
+  description: useFields ? `You can include only the fields you need using GraphQL-style syntax.
+Start with the example above and customize freely.` : undefined,
+  version: "0.0.2"
 });
 
 const transHelper = createTranslationHelper()
 
 // Register all tools
-registerTools(server, backlog, transHelper);
+registerTools(server, backlog, transHelper,{useFields: useFields});
 
 if (process.argv.includes("--export-translations")) {
   const data = transHelper.dump();

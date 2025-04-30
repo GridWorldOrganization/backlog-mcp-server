@@ -63,10 +63,11 @@ describe("getNotificationsTool", () => {
   it("returns notifications list as formatted JSON text", async () => {
     const result = await tool.handler({});
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Test Issue");
-    expect(result.content[0].text).toContain("Another Issue");
+    if (!Array.isArray(result)) {
+      throw new Error("Unexpected non array result");
+    }
+    expect(result[0].issue?.summary).toContain("Test Issue");
+    expect(result[1].issue?.summary).toContain("Another Issue");
   });
 
   it("calls backlog.getNotifications with correct params", async () => {
@@ -75,23 +76,10 @@ describe("getNotificationsTool", () => {
       maxId: 200,
       count: 20,
       order: "desc" as const,
-      alreadyRead: true,
-      resourceAlreadyRead: false
     };
     
     await tool.handler(params);
     
     expect(mockBacklog.getNotifications).toHaveBeenCalledWith(params);
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getNotificationsTool({
-      getNotifications: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

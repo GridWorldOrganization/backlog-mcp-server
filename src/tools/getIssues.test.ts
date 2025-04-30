@@ -73,10 +73,13 @@ describe("getIssuesTool", () => {
       projectId: [100]
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Test Issue 1");
-    expect(result.content[0].text).toContain("Test Issue 2");
+    if (!Array.isArray(result)) {
+      throw new Error("Unexpected non array result");
+    }
+
+    expect(result).toHaveLength(2);
+    expect(result[0].summary).toEqual("Test Issue 1");
+    expect(result[1].summary).toEqual("Test Issue 2");
   });
 
   it("calls backlog.getIssues with correct params", async () => {
@@ -101,16 +104,5 @@ describe("getIssuesTool", () => {
     expect(mockBacklog.getIssues).toHaveBeenCalledWith({
       keyword: "bug"
     });
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getIssuesTool({
-      getIssues: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

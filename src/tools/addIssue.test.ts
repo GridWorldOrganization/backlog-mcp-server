@@ -81,11 +81,12 @@ describe("addIssueTool", () => {
       estimatedHours: 10,
       actualHours: 5
     });
+    if (Array.isArray(result)) {
+      throw new Error("Unexpected array result");
+    }
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Test Issue");
-    expect(result.content[0].text).toContain("This is a test issue");
+    expect(result.summary).toContain("Test Issue");
+    expect(result.description).toContain("This is a test issue");
   });
 
   it("calls backlog.postIssue with correct params", async () => {
@@ -112,16 +113,5 @@ describe("addIssueTool", () => {
       estimatedHours: 10,
       actualHours: 5
     });
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = addIssueTool({
-      postIssue: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

@@ -23,3 +23,25 @@ export async function withErrorHandling<T>(
     return handleBacklogError(err);
   }
 }
+
+export function withErrorHandlingT<I, O>(
+  fn: (input: I) => Promise<O>
+): (input: I) => Promise<CallToolResult> {
+  return async (input: I) => {
+    try {
+      const result = await fn(input);
+      return {
+        content: [
+          {
+            type: "text",
+            text: typeof result === "string"
+              ? result
+              : JSON.stringify(result, null, 2)
+          }
+        ]
+      };
+    } catch (err) {
+      return handleBacklogError(err);
+    }
+  };
+}

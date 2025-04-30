@@ -1,9 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
+import { PullRequestCountSchema } from "../backlogOutputDefinition.js";
 
 const getPullRequestsCountSchema = buildToolSchema(t => ({
   projectIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_GET_PULL_REQUESTS_COUNT_PROJECT_ID_OR_KEY", "Project ID or project key")),
@@ -14,12 +13,12 @@ const getPullRequestsCountSchema = buildToolSchema(t => ({
   createdUserId: z.array(z.number()).optional().describe(t("TOOL_GET_PULL_REQUESTS_COUNT_CREATED_USER_ID", "Created user IDs")),
 }));
 
-export const getPullRequestsCountTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getPullRequestsCountSchema>, CallToolResult> => {
+export const getPullRequestsCountTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getPullRequestsCountSchema>, typeof PullRequestCountSchema["shape"]> => {
   return {
     name: "get_pull_requests_count",
     description: t("TOOL_GET_PULL_REQUESTS_COUNT_DESCRIPTION", "Returns count of pull requests for a repository"),
     schema: z.object(getPullRequestsCountSchema(t)),
-    handler: async ({ projectIdOrKey, repoIdOrName, ...params }) => 
-      withErrorHandling(() => backlog.getPullRequestsCount(projectIdOrKey, repoIdOrName, params))
+    outputSchema: PullRequestCountSchema,
+    handler: async ({ projectIdOrKey, repoIdOrName, ...params }) => backlog.getPullRequestsCount(projectIdOrKey, repoIdOrName, params)
   };
 };

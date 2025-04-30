@@ -44,15 +44,18 @@ describe("getIssueCommentsTool", () => {
   const mockTranslationHelper = createTranslationHelper();
   const tool = getIssueCommentsTool(mockBacklog as Backlog, mockTranslationHelper);
 
-  it("returns issue comments as formatted JSON text", async () => {
+  it("returns issue comments", async () => {
     const result = await tool.handler({
       issueIdOrKey: "TEST-1"
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("This is the first comment");
-    expect(result.content[0].text).toContain("This is the second comment");
+    if (!Array.isArray(result)) {
+      throw new Error("Unexpected non array result");
+    }
+
+    expect(result).toHaveLength(2);
+    expect(result[0]).toHaveProperty("content", "This is the first comment");
+    expect(result[1]).toHaveProperty("content", "This is the second comment");
   });
 
   it("calls backlog.getIssueComments with correct params when using issue key", async () => {
@@ -79,16 +82,5 @@ describe("getIssueCommentsTool", () => {
       minId: 100,
       maxId: 200
     });
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getIssueCommentsTool({
-      getIssueComments: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

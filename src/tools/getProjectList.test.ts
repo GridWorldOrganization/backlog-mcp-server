@@ -51,10 +51,12 @@ describe("getProjectListTool", () => {
   it("returns project list as formatted JSON text", async () => {
     const result = await tool.handler({ archived: false, all: true });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Project A");
-    expect(result.content[0].text).toContain("Project B");
+    if (!Array.isArray(result)) {
+      throw new Error("Unexpected non array result");
+    }
+    expect(result).toHaveLength(2);
+    expect(result[0].name).toContain("Project A");
+    expect(result[1].name).toContain("Project B");
   });
 
   it("calls backlog.getProjects with correct params", async () => {
@@ -73,16 +75,5 @@ describe("getProjectListTool", () => {
     const shape = tool.schema.shape;
     expect(shape.archived.description).toBe(t("TOOL_GET_PROJECT_LIST_ARCHIVED", ""));
     expect(shape.all.description).toBe(t("TOOL_GET_PROJECT_LIST_ALL", ""));
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getProjectListTool({
-      getProjects: () => Promise.reject(new Error("simulated error"))
-    } as Backlog, { t, dump });
-  
-    const result = await tool.handler({});
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

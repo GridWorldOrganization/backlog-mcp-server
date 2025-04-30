@@ -69,17 +69,16 @@ describe("updateIssueTool", () => {
   const mockTranslationHelper = createTranslationHelper();
   const tool = updateIssueTool(mockBacklog as Backlog, mockTranslationHelper);
 
-  it("returns updated issue as formatted JSON text", async () => {
+  it("returns updated issue", async () => {
     const result = await tool.handler({
       issueIdOrKey: "TEST-1",
       summary: "Updated Issue",
       description: "This is an updated issue"
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Updated Issue");
-    expect(result.content[0].text).toContain("This is an updated issue");
+    expect(result).toHaveProperty("summary", "Updated Issue");
+    expect(result).toHaveProperty("description", "This is an updated issue");
+    expect(result).toHaveProperty("issueKey", "TEST-1");
   });
 
   it("calls backlog.patchIssue with correct params when using issue key", async () => {
@@ -110,16 +109,5 @@ describe("updateIssueTool", () => {
       actualHours: 8,
       comment: "Updated the estimated and actual hours"
     });
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = updateIssueTool({
-      patchIssue: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

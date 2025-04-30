@@ -40,17 +40,19 @@ describe("getPullRequestCommentsTool", () => {
   const mockTranslationHelper = createTranslationHelper();
   const tool = getPullRequestCommentsTool(mockBacklog as Backlog, mockTranslationHelper);
 
-  it("returns pull request comments as formatted JSON text", async () => {
+  it("returns pull request comments", async () => {
     const result = await tool.handler({
       projectIdOrKey: "TEST",
       repoIdOrName: "test-repo",
       number: 1
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("This looks good to me!");
-    expect(result.content[0].text).toContain("I found a small issue in the code.");
+    if (!Array.isArray(result)) {
+      throw new Error("Unexpected non array result");
+    }
+    expect(result).toHaveLength(2);
+    expect(result[0]).toHaveProperty("content", "This looks good to me!");
+    expect(result[1]).toHaveProperty("content", "I found a small issue in the code.");
   });
 
   it("calls backlog.getPullRequestComments with correct params", async () => {
@@ -72,16 +74,5 @@ describe("getPullRequestCommentsTool", () => {
       count: 20,
       order: "desc"
     });
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getPullRequestCommentsTool({
-      getPullRequestComments: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

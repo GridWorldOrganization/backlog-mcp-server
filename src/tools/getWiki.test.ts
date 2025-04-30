@@ -35,10 +35,11 @@ describe("getWikiTool", () => {
       wikiId: 1234
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Sample Wiki");
-    expect(result.content[0].text).toContain("Sample Wiki Content");
+    if (Array.isArray(result)) {
+      throw new Error("Unexpected array result");
+    }
+    expect(result.name).toEqual("Sample Wiki");
+    expect(result.content).toContain("Sample Wiki Content");
   });
 
   it("calls backlog.getWiki with correct params when using number ID", async () => {
@@ -55,16 +56,5 @@ describe("getWikiTool", () => {
     });
     
     expect(mockBacklog.getWiki).toHaveBeenCalledWith(1234);
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getWikiTool({
-      getWiki: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

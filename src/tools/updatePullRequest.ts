@@ -1,9 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
+import { PullRequestSchema } from "../backlogOutputDefinition.js";
 
 const updatePullRequestSchema = buildToolSchema(t => ({
   projectIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_UPDATE_PULL_REQUEST_PROJECT_ID_OR_KEY", "Project ID or project key")),
@@ -17,12 +16,12 @@ const updatePullRequestSchema = buildToolSchema(t => ({
   statusId: z.number().optional().describe(t("TOOL_UPDATE_PULL_REQUEST_STATUS_ID", "Status ID")),
 }));
 
-export const updatePullRequestTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof updatePullRequestSchema>, CallToolResult> => {
+export const updatePullRequestTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof updatePullRequestSchema>, typeof PullRequestSchema["shape"]> => {
   return {
     name: "update_pull_request",
     description: t("TOOL_UPDATE_PULL_REQUEST_DESCRIPTION", "Updates an existing pull request"),
     schema: z.object(updatePullRequestSchema(t)),
-    handler: async ({ projectIdOrKey, repoIdOrName, number, ...params }) => 
-      withErrorHandling(() => backlog.patchPullRequest(projectIdOrKey, repoIdOrName, number, params))
+    outputSchema: PullRequestSchema,
+    handler: async ({ projectIdOrKey, repoIdOrName, number, ...params }) => backlog.patchPullRequest(projectIdOrKey, repoIdOrName, number, params)
   };
 };

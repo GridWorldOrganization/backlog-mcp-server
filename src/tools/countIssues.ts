@@ -1,9 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
+import { IssueCountSchema } from "../backlogOutputDefinition.js";
 
 const countIssuesSchema = buildToolSchema(t => ({
   projectId: z.array(z.number()).optional().describe(t("TOOL_COUNT_ISSUES_PROJECT_ID", "Project IDs")),
@@ -28,12 +27,13 @@ const countIssuesSchema = buildToolSchema(t => ({
   updatedUntil: z.string().optional().describe(t("TOOL_COUNT_ISSUES_UPDATED_UNTIL", "Updated until (yyyy-MM-dd)")),
 }));
 
-export const countIssuesTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof countIssuesSchema>, CallToolResult> => {
+export const countIssuesTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof countIssuesSchema>, typeof IssueCountSchema["shape"]> => {
   return {
     name: "count_issues",
     description: t("TOOL_COUNT_ISSUES_DESCRIPTION", "Returns count of issues"),
     schema: z.object(countIssuesSchema(t)),
+    outputSchema: IssueCountSchema,
     handler: async (params) =>
-      withErrorHandling(() => backlog.getIssuesCount(params))
+      backlog.getIssuesCount(params)
   };
 };

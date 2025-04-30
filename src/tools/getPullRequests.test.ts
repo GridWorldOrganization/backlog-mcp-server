@@ -98,10 +98,12 @@ describe("getPullRequestsTool", () => {
       repoIdOrName: "test-repo"
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Fix bug in login");
-    expect(result.content[0].text).toContain("Add new feature");
+    if (!Array.isArray(result)) {
+      throw new Error("Unexpected non array result");
+    }
+    expect(result).toHaveLength(2);
+    expect(result[0].summary).toEqual("Fix bug in login");
+    expect(result[1].summary).toEqual("Add new feature");
   });
 
   it("calls backlog.getPullRequests with correct params", async () => {
@@ -120,16 +122,5 @@ describe("getPullRequestsTool", () => {
       assigneeId: [1],
       count: 20
     });
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getPullRequestsTool({
-      getPullRequests: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

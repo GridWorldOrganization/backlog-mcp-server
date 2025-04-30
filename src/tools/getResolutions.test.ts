@@ -31,28 +31,19 @@ describe("getResolutionsTool", () => {
   it("returns resolutions list as formatted JSON text", async () => {
     const result = await tool.handler({});
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Fixed");
-    expect(result.content[0].text).toContain("Won't Fix");
-    expect(result.content[0].text).toContain("Invalid");
-    expect(result.content[0].text).toContain("Duplicate");
+    if (!Array.isArray(result)) {
+      throw new Error("Unexpected non array result");
+    }
+    expect(result).toHaveLength(4);
+    expect(result[0].name).toContain("Fixed");
+    expect(result[1].name).toContain("Won't Fix");
+    expect(result[2].name).toContain("Invalid");
+    expect(result[3].name).toContain("Duplicate");
   });
 
   it("calls backlog.getResolutions", async () => {
     await tool.handler({});
     
     expect(mockBacklog.getResolutions).toHaveBeenCalled();
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getResolutionsTool({
-      getResolutions: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

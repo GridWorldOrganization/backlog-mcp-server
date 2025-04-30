@@ -1,9 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import { withErrorHandling } from "../utils/withErrorHandling.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
+import { IssueSchema } from "../backlogOutputDefinition.js";
 
 const updateIssueSchema = buildToolSchema(t => ({
   issueIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_UPDATE_ISSUE_ISSUE_ID_OR_KEY", "Issue ID or issue key")),
@@ -26,12 +25,13 @@ const updateIssueSchema = buildToolSchema(t => ({
   comment: z.string().optional().describe(t("TOOL_UPDATE_ISSUE_COMMENT", "Comment to add when updating the issue")),
 }));
 
-export const updateIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof updateIssueSchema>, CallToolResult> => {
+export const updateIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof updateIssueSchema>, typeof IssueSchema["shape"]> => {
   return {
     name: "update_issue",
     description: t("TOOL_UPDATE_ISSUE_DESCRIPTION", "Updates an existing issue"),
     schema: z.object(updateIssueSchema(t)),
+    outputSchema: IssueSchema,
     handler: async ({ issueIdOrKey, ...params }) => 
-      withErrorHandling(() => backlog.patchIssue(issueIdOrKey, params))
+      backlog.patchIssue(issueIdOrKey, params)
   };
 };

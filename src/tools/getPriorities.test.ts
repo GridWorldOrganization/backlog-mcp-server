@@ -27,27 +27,19 @@ describe("getPrioritiesTool", () => {
   it("returns priorities list as formatted JSON text", async () => {
     const result = await tool.handler({});
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("High");
-    expect(result.content[0].text).toContain("Normal");
-    expect(result.content[0].text).toContain("Low");
+    if (!Array.isArray(result)) {
+      throw new Error("Unexpected non array result");
+    }
+
+    expect(result).toHaveLength(3);
+    expect(result[0].name).toContain("High");
+    expect(result[1].name).toContain("Normal");
+    expect(result[2].name).toContain("Low");
   });
 
   it("calls backlog.getPriorities", async () => {
     await tool.handler({});
     
     expect(mockBacklog.getPriorities).toHaveBeenCalled();
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getPrioritiesTool({
-      getPriorities: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

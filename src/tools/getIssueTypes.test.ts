@@ -35,11 +35,13 @@ describe("getIssueTypesTool", () => {
       projectIdOrKey: "TEST"
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Bug");
-    expect(result.content[0].text).toContain("Task");
-    expect(result.content[0].text).toContain("Request");
+    if (!Array.isArray(result)) {
+      throw new Error("Unexpected non array result");
+    }
+    expect(result).toHaveLength(3);
+    expect(result[0].name).toContain("Bug");
+    expect(result[1].name).toContain("Task");
+    expect(result[2].name).toContain("Request");
   });
 
   it("calls backlog.getIssueTypes with correct params when using project key", async () => {
@@ -56,16 +58,5 @@ describe("getIssueTypesTool", () => {
     });
     
     expect(mockBacklog.getIssueTypes).toHaveBeenCalledWith(100);
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getIssueTypesTool({
-      getIssueTypes: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

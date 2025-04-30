@@ -33,37 +33,17 @@ describe("getUsersTool", () => {
   it("returns users list as formatted JSON text", async () => {
     const result = await tool.handler({});
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Admin User");
-    expect(result.content[0].text).toContain("Regular User");
+    if (!Array.isArray(result)) {
+      throw new Error("Unexpected array result");
+    }
+    expect(result).toHaveLength(2);
+    expect(result[0].name).toContain("Admin User");
+    expect(result[1].name).toContain("Regular User");
   });
 
   it("calls backlog.getUsers", async () => {
     await tool.handler({});
     
     expect(mockBacklog.getUsers).toHaveBeenCalled();
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getUsersTool({
-      getUsers: () => Promise.reject(new Error("simulated error"))
-    } as Backlog, mockTranslationHelper);
-  
-    const result = await tool.handler({});
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("error");
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getUsersTool({
-      getUsers: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

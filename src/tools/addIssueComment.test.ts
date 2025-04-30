@@ -32,9 +32,11 @@ describe("addIssueCommentTool", () => {
       content: "This is a new comment"
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("This is a new comment");
+    if (Array.isArray(result)) {
+      throw new Error("Unexpected array result");
+    }
+
+    expect(result.content).toContain("This is a new comment");
   });
 
   it("calls backlog.postIssueComments with correct params when using issue key", async () => {
@@ -76,16 +78,5 @@ describe("addIssueCommentTool", () => {
       notifiedUserId: undefined,
       attachmentId: [1, 2]
     });
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = addIssueCommentTool({
-      postIssueComments: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

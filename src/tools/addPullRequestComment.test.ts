@@ -32,9 +32,10 @@ describe("addPullRequestCommentTool", () => {
       content: "This looks good to me!"
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("This looks good to me!");
+    if (Array.isArray(result)) {
+      throw new Error("Unexpected array result");
+    }
+    expect(result.content).toContain("This looks good to me!");
   });
 
   it("calls backlog.postPullRequestComments with correct params", async () => {
@@ -52,16 +53,5 @@ describe("addPullRequestCommentTool", () => {
       content: "This looks good to me!",
       notifiedUserId: [2, 3]
     });
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = addPullRequestCommentTool({
-      postPullRequestComments: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

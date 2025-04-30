@@ -74,7 +74,7 @@ export const allTools = (backlog: Backlog, helper: TranslationHelper) => [
   getWatchingListItemsTool(backlog, helper),
   getWatchingListCountTool(backlog, helper),
   
-  // Project tools
+  // // Project tools
   getProjectListTool(backlog, helper),
   addProjectTool(backlog, helper),
   getProjectTool(backlog, helper),

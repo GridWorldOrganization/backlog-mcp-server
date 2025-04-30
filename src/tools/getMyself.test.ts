@@ -27,26 +27,17 @@ describe("getMyselfTool", () => {
   it("returns current user information as formatted JSON text", async () => {
     const result = await tool.handler({});
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("Current User");
-    expect(result.content[0].text).toContain("current@example.com");
+    if (Array.isArray(result)) {
+      throw new Error("Unexpected array result");
+    }
+
+    expect(result.name).toContain("Current User");
+    expect(result.mailAddress).toContain("current@example.com");
   });
 
   it("calls backlog.getMyself", async () => {
     await tool.handler({});
     
     expect(mockBacklog.getMyself).toHaveBeenCalled();
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getMyselfTool({
-      getMyself: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

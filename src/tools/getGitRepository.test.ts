@@ -39,10 +39,12 @@ describe("getGitRepositoryTool", () => {
       repoIdOrName: "test-repo"
     });
 
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("test-repo");
-    expect(result.content[0].text).toContain("Test repository");
+    if (Array.isArray(result)) {
+      throw new Error("Unexpected array result");
+    }
+
+    expect(result.name).toContain("test-repo");
+    expect(result.description).toContain("Test repository");
   });
 
   it("calls backlog.getGitRepository with correct params when using project key", async () => {
@@ -61,16 +63,5 @@ describe("getGitRepositoryTool", () => {
     });
     
     expect(mockBacklog.getGitRepository).toHaveBeenCalledWith(100, "test-repo");
-  });
-
-  it("returns an error result when the API fails", async () => {
-    const tool = getGitRepositoryTool({
-      getGitRepository: () => Promise.reject(new Error("simulated error"))
-    } as unknown as Backlog, mockTranslationHelper);
-
-    const result = await tool.handler({} as any);
-  
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("simulated error");
   });
 });

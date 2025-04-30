@@ -2,8 +2,7 @@ import { z } from "zod";
 import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import { withErrorHandling } from "../utils/withErrorHandling.js";
+import { IssueSchema } from "../backlogOutputDefinition.js";
 
 const addIssueSchema = buildToolSchema(t => ({
   projectId: z.number().describe(t("TOOL_ADD_ISSUE_PROJECT_ID", "Project ID")),
@@ -26,11 +25,13 @@ const addIssueSchema = buildToolSchema(t => ({
   customFieldValue: z.array(z.string()).optional().describe(t("TOOL_ADD_ISSUE_CUSTOM_FIELD_VALUE", "Values for custom fields")),
 }));
 
-export const addIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addIssueSchema>, CallToolResult> => {
+export const addIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addIssueSchema>, typeof IssueSchema["shape"]> => {
   return {
     name: "add_issue",
     description: t("TOOL_ADD_ISSUE_DESCRIPTION", "Creates a new issue in the specified project."),
     schema: z.object(addIssueSchema(t)),
+    outputSchema: IssueSchema,
+    importantFields: ["summary", "issueKey", "description", "createdUser"],
     handler: async ({
       projectId,
       summary,
@@ -51,7 +52,6 @@ export const addIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDe
       customFieldId,
       customFieldValue
     }) => 
-      withErrorHandling(() =>
         backlog.postIssue({
           projectId,
           summary,
@@ -72,6 +72,5 @@ export const addIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDe
           customFieldId,
           customFieldValue
         })
-      )
   };
 };
