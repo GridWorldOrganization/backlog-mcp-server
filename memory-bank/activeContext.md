@@ -35,6 +35,7 @@ Currently, the Backlog MCP Server implements tools corresponding to the followin
    - Retrieving Wiki page lists
    - Retrieving Wiki page counts
    - Retrieving Wiki information
+   - Creating Wiki pages
 
 6. **Category-related Tools**
    - Retrieving category lists
@@ -65,47 +66,60 @@ Currently, the Backlog MCP Server implements tools corresponding to the followin
 
 ## Recent Changes
 
-1. **Addition of Pull Request-related Tools**
-   - Implemented pull request creation, update, and comment functionality
-   - Added corresponding tests
+1. **Token Limiting Implementation**
+   - Added token limiting functionality to prevent large responses from exceeding token limits
+   - Implemented streaming for large responses with automatic truncation
+   - Added configurable maximum token limit via environment variables or CLI arguments
 
-2. **Addition of Watch-related Tools**
-   - Implemented functionality to retrieve watched item lists and counts
-   - Added corresponding tests
+2. **Field Picking Optimization**
+   - Added GraphQL-style field selection to allow clients to request only specific fields
+   - Implemented field picking transformer to optimize response size
+   - Added field description generation for better documentation
 
-3. **README Updates**
-   - Updated the "Available Tools" section to properly categorize all tools
-   - Added the "Space Tools" section
-   - Made the "Category Tools" section independent
+3. **Error Handling Improvements**
+   - Enhanced Backlog API error parsing and handling
+   - Added more descriptive error messages for different error types
+   - Implemented unified error handling system
 
-4. **Enhanced Multi-language Support**
-   - Created Japanese translation file (`.backlog-mcp-serverrc.json.ja.json`)
-   - Organized and unified translation keys
+4. **Documentation Updates**
+   - Updated README with new features and usage examples
+   - Added Japanese translation of documentation
+   - Improved installation and configuration instructions
 
-5. **Build and Deploy Improvements**
-   - Added support for multi-architecture (amd64, arm64) Docker image builds
-   - Configured automatic publishing to GitHub Container Registry
+5. **Build and Infrastructure**
+   - Updated Docker configuration to use Node.js 22
+   - Improved multi-stage Docker build for smaller image size
+   - Updated dependencies to latest versions
 
 ## Active Decisions and Considerations
 
-1. **API Endpoint Coverage**
+1. **Response Optimization**
+   - Implementing GraphQL-style field selection to reduce response size
+   - Adding token limiting to prevent large responses from causing issues
+   - Balancing between comprehensive data and performance
+
+2. **API Endpoint Coverage**
    - Prioritizing implementation of API endpoints listed in URLlist.md
    - Gradually adding unimplemented endpoints
+   - Focusing on most commonly used endpoints first
 
-2. **Test Strategy**
+3. **Test Strategy**
    - Creating unit tests corresponding to each tool
    - Using mocks to isolate Backlog API dependencies
    - Focusing on validating input parameters and output format
+   - Testing error handling and edge cases
 
-3. **Multi-language Support**
+4. **Multi-language Support**
    - Using English as the default language, with support for other languages like Japanese
    - Providing customization possibilities through translation files
    - Supporting translation overrides through environment variables
+   - Maintaining consistent translation keys across the system
 
-4. **Deployment Options**
+5. **Deployment Options**
    - Prioritizing easy deployment via Docker
    - Also supporting direct Node.js execution
    - Customization through mounted configuration files
+   - Supporting environment variable configuration for flexibility
 
 ## Important Patterns and Design Principles
 
@@ -113,19 +127,29 @@ Currently, the Backlog MCP Server implements tools corresponding to the followin
    - Each tool has the same structure (name, description, schema, handler)
    - Input validation using Zod schemas
    - Unified response format
+   - Consistent error handling
 
-2. **Translation System**
+2. **Handler Composition Pattern**
+   - Using function composition for tool handlers
+   - Applying transformers in a specific order (error handling → field picking → token limiting → result formatting)
+   - Separation of concerns through transformer functions
+
+3. **Translation System**
    - Key-based translation system
    - Priority: environment variables → configuration file → default value
    - Tracking of all translation keys used
+   - Support for multiple languages through configuration
 
-3. **Error Handling**
+4. **Error Handling**
    - Appropriate handling of API errors and meaningful error messages
    - Clear reporting of input validation errors
+   - Categorization of errors (authentication, API, unexpected, unknown)
+   - Consistent error response format
 
-4. **Testability**
+5. **Testability**
    - Ease of testing through dependency injection
    - Isolation of external dependencies using mocks
+   - Unit tests for each component and transformer
 
 ## Learnings and Project Insights
 
@@ -133,13 +157,22 @@ Currently, the Backlog MCP Server implements tools corresponding to the followin
    - Importance of tool naming conventions and parameters
    - Improved usability through appropriate descriptions
    - Importance of schema validation
+   - Balancing between comprehensive data and token limits
 
-2. **Backlog API-specific Considerations**
+2. **Response Optimization Techniques**
+   - GraphQL-style field selection for targeted data retrieval
+   - Token counting and limiting for large responses
+   - Streaming large responses in chunks
+   - Balancing between data completeness and performance
+
+3. **Backlog API-specific Considerations**
    - Flexibility to support both IDs and keys
    - Permission requirements for some API endpoints
    - Handling differences in response formats
+   - Error handling for various API response scenarios
 
-3. **Multi-language Support Challenges**
+4. **Multi-language Support Challenges**
    - Management and consistency of translation keys
    - Importance of default values
    - Maintainability of translation files
+   - Balancing between translation flexibility and complexity

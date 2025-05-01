@@ -4,7 +4,7 @@
 
 ### Languages and Runtime
 - **TypeScript**: Static typing for improved safety and development efficiency
-- **Node.js**: Server-side JavaScript runtime (v16 or higher required)
+- **Node.js**: Server-side JavaScript runtime (v22 or higher recommended)
 
 ### Key Libraries
 - **@modelcontextprotocol/sdk**: Implementation of MCP (Model Context Protocol) server
@@ -12,6 +12,7 @@
 - **zod**: Provides schema validation and type safety
 - **cosmiconfig**: Configuration file loading and management
 - **dotenv**: Environment variable management
+- **graphql**: Used for field selection parsing and processing
 
 ### Development Tools
 - **Jest**: Testing framework
@@ -20,13 +21,13 @@
 - **release-it**: Release management automation
 
 ### Containerization
-- **Docker**: Application containerization
+- **Docker**: Application containerization with multi-stage builds
 - **GitHub Container Registry**: Container image distribution
 
 ## Development Environment Setup
 
 ### Prerequisites
-- Node.js v16 or higher
+- Node.js v22 or higher (recommended)
 - npm or yarn
 - Git
 
@@ -56,15 +57,18 @@ BACKLOG_API_KEY=your-api-key
 - Be mindful of API rate limits
 - Some APIs require specific permissions
 - API keys are issued per user and operate with that user's permissions
+- Large responses may need pagination or token limiting
 
 ### MCP Protocol
 - Communicates through standard input/output (stdio)
 - Tool inputs and outputs must follow specific formats
 - Requires support for asynchronous processing
+- Response size should be managed to avoid token limit issues
 
 ### Containerization
 - Multi-stage builds used to maintain lightweight container images
 - Supports cross-architecture builds (amd64, arm64)
+- Environment variables must be properly passed to containers
 
 ## Build and Deploy
 
@@ -123,6 +127,9 @@ npm test -- -t "getSpace"
 - Minimizing API requests
 - Appropriate error handling and retry strategies
 - Pagination handling when dealing with large amounts of data
+- Token limiting for large responses
+- Field selection to reduce response size
+- Streaming large responses in chunks
 
 ## Security Considerations
 
@@ -130,6 +137,7 @@ npm test -- -t "getSpace"
 - Injection of sensitive information through environment variables
 - Principle of least privilege in containers
 - Input validation to prevent injection attacks
+- GraphQL field selection validation to prevent injection
 
 ## Multi-language Support
 
@@ -137,3 +145,24 @@ npm test -- -t "getSpace"
 - Translation overrides through environment variables
 - Translation customization through configuration files
 - Fallback to default language (English)
+- Translation key tracking for consistency
+
+## Response Optimization
+
+### Field Selection
+- GraphQL-style field selection syntax
+- Allows clients to request only needed fields
+- Reduces response size and processing time
+- Example: `{ id name description }`
+
+### Token Limiting
+- Configurable maximum token limit (default: 50,000)
+- Can be set via environment variable or CLI argument
+- Automatically truncates large responses
+- Streaming implementation for efficient processing
+
+### Error Handling
+- Categorized error types (authentication, API, unexpected, unknown)
+- Consistent error response format
+- Detailed error messages for debugging
+- Backlog API-specific error parsing

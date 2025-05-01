@@ -178,7 +178,7 @@
 
 ## Current Status
 
-Currently, the Backlog MCP Server has basic functionality implemented, covering API endpoints in the following categories:
+Currently, the Backlog MCP Server has comprehensive functionality implemented, covering API endpoints in the following categories:
 
 - Space information
 - Project management
@@ -190,7 +190,24 @@ Currently, the Backlog MCP Server has basic functionality implemented, covering 
 - Pull request management
 - Watch management (partial)
 
-This allows access to Backlog's main features from Claude.
+This allows access to Backlog's main features from Claude, with optimizations for response size and token limits.
+
+## Recent Improvements
+
+1. **Response Optimization**
+   - Added GraphQL-style field selection to reduce response size
+   - Implemented token limiting to prevent large responses from exceeding limits
+   - Added streaming for large responses with automatic truncation
+
+2. **Error Handling**
+   - Enhanced error handling with categorized error types
+   - Improved error messages for better debugging
+   - Added Backlog API-specific error parsing
+
+3. **Documentation**
+   - Updated README with new features and usage examples
+   - Added Japanese translation of documentation
+   - Improved installation and configuration instructions
 
 ## Future Plans
 
@@ -203,22 +220,27 @@ This allows access to Backlog's main features from Claude.
    - Custom field-related features
    - Version/milestone-related features
    - Webhook-related features
+   - Further performance optimizations
 
 3. **Long-term Goals**
    - Cover all Backlog API endpoints
-   - Performance optimization
-   - More advanced error handling
+   - Advanced pagination handling
+   - More sophisticated error handling and recovery
+   - Enhanced field selection capabilities
 
 ## Known Issues
 
 1. **Large Data Processing**
-   - Pagination handling for retrieving large numbers of issues or comments is not optimized
+   - While token limiting helps, pagination handling for retrieving large numbers of issues or comments could be further optimized
+   - Some complex nested objects may not be optimally handled by field selection
 
-2. **Error Messages**
-   - Error messages for some API errors are generic and make it difficult to identify specific problems
+2. **Error Handling Edge Cases**
+   - Some rare API error scenarios may not be handled specifically
+   - Error messages for certain edge cases could be improved
 
 3. **Permission Checking**
    - Some API endpoints may be restricted by user permissions, but pre-checking is insufficient
+   - Better feedback for permission-related errors would be helpful
 
 ## Evolution of Project Decisions
 
@@ -229,7 +251,19 @@ This allows access to Backlog's main features from Claude.
 2. **Response Format**
    - Initially returned Backlog API responses directly, but changed to a more structured format
    - Returning as JSON strings made it easier for Claude to parse
+   - Added field selection to allow clients to request only needed fields
 
 3. **Multi-language Support**
    - Initially only supported English, but added multi-language support through configuration files
    - Provided Japanese translation files to improve usability in Japanese environments
+   - Implemented translation key tracking for consistency
+
+4. **Handler Architecture**
+   - Initially had simple handlers, but evolved to a composed handler pattern
+   - Added transformers for error handling, field picking, token limiting, and result formatting
+   - Implemented a pipeline pattern for response processing
+
+5. **Response Size Management**
+   - Initially returned full responses, but added field selection for targeted data retrieval
+   - Implemented token counting and limiting for large responses
+   - Added streaming for efficient processing of large responses

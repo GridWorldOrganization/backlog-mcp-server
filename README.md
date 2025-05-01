@@ -17,6 +17,9 @@ A Model Context Protocol (MCP) server for interacting with the Backlog API. This
 - Pull request management (create, update, list, comment)
 - Notification management
 - Watching list management
+- GraphQL-style field selection for optimized responses
+- Token limiting for large responses
+- Enhanced error handling
 - And more Backlog API integrations
 
 ## Requirements
@@ -29,7 +32,7 @@ A Model Context Protocol (MCP) server for interacting with the Backlog API. This
 
 ### Option 1: Install via Docker
 
-The easiest way to use this MCP server is through MCP configuration for Claude Desktop or Cline :
+The easiest way to use this MCP server is through MCP configuration for Claude Desktop or Cline:
 
 1. Open Claude Desktop or Cline settings
 2. Navigate to the MCP configuration section
@@ -59,6 +62,41 @@ The easiest way to use this MCP server is through MCP configuration for Claude D
 
 Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` with your Backlog API key.
 
+#### Advanced Configuration Options
+
+This is an experimental approach, and not the standard way to reduce the size of the context window.
+If you're having trouble using this MCP with any AI agents, please try adjusting the following settings.
+You can add additional options to customize the server behavior:
+
+```json
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e", "BACKLOG_DOMAIN",
+        "-e", "BACKLOG_API_KEY",
+        "-e", "MAX_TOKENS",
+        "-e", "OPTIMIZE_RESPONSE",
+        "ghcr.io/nulab/backlog-mcp-server"
+      ],
+      "env": {
+        "BACKLOG_DOMAIN": "your-domain.backlog.com",
+        "BACKLOG_API_KEY": "your-api-key",
+        "MAX_TOKENS": "100000",
+        "OPTIMIZE_RESPONSE": "true"
+      }
+    }
+  }
+}
+```
+
+- `MAX_TOKENS`: Maximum number of tokens allowed in responses (default: 50000)
+- `OPTIMIZE_RESPONSE`: Enable GraphQL-style field selection to optimize response size (default: false)
+
 ### Option 2: Manual Installation
 
 1. Clone the repository:
@@ -83,7 +121,7 @@ Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` wi
       "backlog": {
         "command": "node",
         "args": [
-          "your-repojitory-location/build/index.js"
+          "your-repository-location/build/index.js"
         ],
         "env": {
           "BACKLOG_DOMAIN": "your-domain.backlog.com",
@@ -232,7 +270,55 @@ Create a new pull request from branch "feature/new-feature" to "main" in the rep
 Show me all items I'm watching 
 ```
 
-## i18n / Overriding Descriptions
+### Using Field Selection
+
+When the `OPTIMIZE_RESPONSE` option is enabled, you can specify which fields you want to retrieve using GraphQL-style syntax:
+
+```
+Show me the details of the PROJECT-KEY project, but only include the name, key, and description fields
+```
+
+The AI will use field selection to optimize the response:
+
+```
+get_project(projectIdOrKey: "PROJECT-KEY", fields: "{ name key description }")
+```
+
+This reduces response size and processing time, especially for large objects.
+
+## Advanced Features
+
+### Response Optimization
+
+#### Field Selection
+
+When enabled with `OPTIMIZE_RESPONSE=true`, you can use GraphQL-style syntax to select specific fields:
+
+```
+{
+  id
+  name
+  description
+  users {
+    id
+    name
+  }
+}
+```
+
+This allows you to:
+- Reduce response size by requesting only needed fields
+- Focus on specific data points
+- Improve performance for large responses
+
+#### Token Limiting
+
+Large responses are automatically limited to prevent exceeding token limits:
+- Default limit: 50,000 tokens
+- Configurable via `MAX_TOKENS` environment variable
+- Responses exceeding the limit are truncated with a message
+
+### i18n / Overriding Descriptions
 
 You can override the descriptions of tools by creating a `.backlog-mcp-serverrc.json` file in your **home directory**.
 
@@ -356,6 +442,19 @@ npm test
 2. Create a corresponding test file
 3. Add the new tool to `src/tools/tools.ts`
 4. Build and test your changes
+
+### Command Line Options
+
+The server supports several command line options:
+
+- `--export-translations`: Export all translation keys and values
+- `--optimize-response`: Enable GraphQL-style field selection
+- `--max-tokens=NUMBER`: Set maximum token limit for responses
+
+Example:
+```bash
+node build/index.js --optimize-response --max-tokens=100000
+```
 
 ## License
 

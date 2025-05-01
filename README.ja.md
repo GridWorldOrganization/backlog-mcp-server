@@ -15,6 +15,9 @@ Backlog API とやり取りするための Model Context Protocol（MCP）サー
 - プルリクエスト管理（作成、更新、一覧、コメント）
 - 通知管理
 - ウォッチリスト管理
+- GraphQLスタイルのフィールド選択による最適化されたレスポンス
+- 大きなレスポンスに対するトークン制限
+- 強化されたエラーハンドリング
 - その他多数の Backlog API 機能に対応
 
 ## 必要条件
@@ -57,6 +60,39 @@ Claude Desktop または Cline の MCP 設定から以下を行ってくださ�
 
 `your-domain.backlog.com` と `your-api-key` を実際の値に置き換えてください。
 
+#### 高度な設定オプション
+
+サーバーの動作をカスタマイズするための追加オプションを設定できます：
+
+```json
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e", "BACKLOG_DOMAIN",
+        "-e", "BACKLOG_API_KEY",
+        "-e", "MAX_TOKENS",
+        "-e", "OPTIMIZE_RESPONSE",
+        "ghcr.io/nulab/backlog-mcp-server"
+      ],
+      "env": {
+        "BACKLOG_DOMAIN": "your-domain.backlog.com",
+        "BACKLOG_API_KEY": "your-api-key",
+        "MAX_TOKENS": "100000",
+        "OPTIMIZE_RESPONSE": "true"
+      }
+    }
+  }
+}
+```
+
+- `MAX_TOKENS`: レスポンスで許可される最大トークン数（デフォルト: 50000）
+- `OPTIMIZE_RESPONSE`: レスポンスサイズを最適化するためのGraphQLスタイルのフィールド選択を有効にする（デフォルト: false）
+
 ### オプション2: 手動インストール
 
 1. リポジトリをクローン：
@@ -83,7 +119,7 @@ npm run build
     "backlog": {
       "command": "node",
       "args": [
-        "your-repojitory-location/build/index.js"
+        "your-repository-location/build/index.js"
       ],
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
@@ -110,7 +146,55 @@ MCP サーバーを Claude や Cline などの AI エージェントに設定す
 - `repo-name のオープン中のプルリクエストを一覧表示して`
 - `feature/new-feature ブランチから main ブランチへのプルリクを作成して`
 
-## i18n / 説明文の上書き
+### フィールド選択の使用
+
+`OPTIMIZE_RESPONSE` オプションが有効になっている場合、GraphQLスタイルの構文を使用して取得したいフィールドを指定できます：
+
+```
+PROJECT-KEYプロジェクトの詳細を表示して、ただし名前、キー、説明フィールドのみを含めて
+```
+
+AIはレスポンスを最適化するためにフィールド選択を使用します：
+
+```
+get_project(projectIdOrKey: "PROJECT-KEY", fields: "{ name key description }")
+```
+
+これにより、特に大きなオブジェクトの場合、レスポンスサイズと処理時間が削減されます。
+
+## 高度な機能
+
+### レスポンスの最適化
+
+#### フィールド選択
+
+`OPTIMIZE_RESPONSE=true` で有効にすると、GraphQLスタイルの構文を使用して特定のフィールドを選択できます：
+
+```
+{
+  id
+  name
+  description
+  users {
+    id
+    name
+  }
+}
+```
+
+これにより以下が可能になります：
+- 必要なフィールドのみをリクエストしてレスポンスサイズを削減
+- 特定のデータポイントに焦点を当てる
+- 大きなレスポンスのパフォーマンスを向上
+
+#### トークン制限
+
+大きなレスポンスは、トークン制限を超えないように自動的に制限されます：
+- デフォルト制限：50,000トークン
+- `MAX_TOKENS`環境変数で設定可能
+- 制限を超えるレスポンスはメッセージとともに切り捨てられます
+
+### i18n / 説明文の上書き
 
 ツールの説明文は、ホームディレクトリに `.backlog-mcp-serverrc.json` を作成することで上書きできます。
 
@@ -206,6 +290,19 @@ npm test
 2. 対応するテストを作成  
 3. `src/tools/tools.ts` に追加  
 4. ビルドとテストを実行  
+
+### コマンドラインオプション
+
+サーバーはいくつかのコマンドラインオプションをサポートしています：
+
+- `--export-translations`: すべての翻訳キーと値をエクスポート
+- `--optimize-response`: GraphQLスタイルのフィールド選択を有効にする
+- `--max-tokens=NUMBER`: レスポンスの最大トークン制限を設定
+
+例：
+```bash
+node build/index.js --optimize-response --max-tokens=100000
+```
 
 ## ライセンス
 
