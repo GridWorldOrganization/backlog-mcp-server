@@ -20,7 +20,7 @@ const server = new McpServer({
   name: "backlog",
   description: useFields ? `You can include only the fields you need using GraphQL-style syntax.
 Start with the example above and customize freely.` : undefined,
-  version: "0.0.2"
+  version: "0.1.0"
 });
 
 const transHelper = createTranslationHelper()
