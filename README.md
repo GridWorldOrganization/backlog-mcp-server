@@ -86,7 +86,7 @@ You can add additional options to customize the server behavior:
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
         "BACKLOG_API_KEY": "your-api-key",
-        "MAX_TOKENS": "100000",
+        "MAX_TOKENS": "10000",
         "OPTIMIZE_RESPONSE": "true"
       }
     }

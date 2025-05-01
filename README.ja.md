@@ -82,7 +82,7 @@ Claude Desktop または Cline の MCP 設定から以下を行ってくださ�
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
         "BACKLOG_API_KEY": "your-api-key",
-        "MAX_TOKENS": "100000",
+        "MAX_TOKENS": "10000",
         "OPTIMIZE_RESPONSE": "true"
       }
     }
