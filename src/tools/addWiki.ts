@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
-import { WikiSchema } from "../backlogOutputDefinition.js";
+import { WikiSchema } from "../types/zod/backlogOutputDefinition.js";
 
 const addWikiSchema = buildToolSchema(t => ({
   projectId: z.number().describe(t("TOOL_ADD_WIKI_PROJECT_ID", "Project ID")),

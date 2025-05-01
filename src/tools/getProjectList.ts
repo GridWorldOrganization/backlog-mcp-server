@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
-import { ProjectSchema } from "../backlogOutputDefinition.js";
+import { ProjectSchema } from "../types/zod/backlogOutputDefinition.js";
 
 
 const getProjectListSchema = buildToolSchema(t => ({

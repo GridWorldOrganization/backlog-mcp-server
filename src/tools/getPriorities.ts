@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
-import { PrioritySchema } from "../backlogOutputDefinition.js";
+import { PrioritySchema } from "../types/zod/backlogOutputDefinition.js";
 
 const getPrioritiesSchema = buildToolSchema(_t => ({}));
 

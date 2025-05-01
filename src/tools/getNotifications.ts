@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
-import { NotificationSchema } from "../backlogOutputDefinition.js";
+import { NotificationSchema } from "../types/zod/backlogOutputDefinition.js";
 
 const getNotificationsSchema = buildToolSchema(t => ({
   minId: z.number().optional().describe(t("TOOL_GET_NOTIFICATIONS_MIN_ID", "Minimum notification ID")),

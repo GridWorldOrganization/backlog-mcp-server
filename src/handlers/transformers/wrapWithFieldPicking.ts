@@ -1,22 +1,30 @@
 import { parse, SelectionSetNode } from "graphql";
+import { isErrorLike, SafeResult } from "../../types/result.js";
 
-export function withPickingFields<I extends { fields?: string }, O>(
-  fn: (input: Omit<I, "fields">) => Promise<unknown>,
-): (input: I) => Promise<unknown> {
+export function wrapWithFieldPicking<I extends { fields?: string }, O>(
+  fn: (input: I) => Promise<SafeResult<O>>,
+): (input: I) => Promise<SafeResult<O>> {
   return async (input: I) => {
     const { fields, ...rest } = input;
-    const result = await fn(rest as Omit<I, "fields">);
+    const result = await fn(rest as I);
 
-    if (!fields) {
+    if (!fields || isErrorLike(result)) {
       return result;
     }
 
     const selectionSet = parseFieldsSelection(fields);
+    const resultData = result.data
 
-    if (Array.isArray(result)) {
-      return result.map(item => pickFieldsFromData(item, selectionSet)) as unknown as O;
+    if (Array.isArray(resultData)) {
+      return {
+        kind: "ok",
+        data: resultData.map(item => pickFieldsFromData(item, selectionSet)) as unknown as O
+      }
     } else if (typeof result === "object" && result !== null) {
-      return pickFieldsFromData(result as Record<string, unknown>, selectionSet) as O;
+      return {
+        kind: "ok",
+        data: pickFieldsFromData(resultData as Record<string, unknown>, selectionSet) as O
+      }
     } else {
       return result
     }

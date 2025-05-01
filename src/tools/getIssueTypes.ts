@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
-import { IssueTypeSchema } from "../backlogOutputDefinition.js";
+import { IssueTypeSchema } from "../types/zod/backlogOutputDefinition.js";
 
 const getIssueTypesSchema = buildToolSchema(t => ({
   projectIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_GET_ISSUE_TYPES_PROJECT_ID_OR_KEY", "Project ID or project key")),

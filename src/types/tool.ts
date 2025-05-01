@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { TranslationHelper } from "./createTranslationHelper.js";
+import { TranslationHelper } from "../createTranslationHelper.js";
 
 export type ToolDefinition<
   Shape extends z.ZodRawShape,
@@ -18,7 +18,3 @@ export type ToolDefinition<
 export const buildToolSchema = <
   T extends z.ZodRawShape
 >(fn: (t: TranslationHelper["t"]) => T) => fn;
-
-export type MCPOptions = {
-  useFields: boolean
-}

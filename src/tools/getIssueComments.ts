@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
-import { IssueCommentSchema } from "../backlogOutputDefinition.js";
+import { IssueCommentSchema } from "../types/zod/backlogOutputDefinition.js";
 
 const getIssueCommentsSchema = buildToolSchema(t => ({
   issueIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_GET_ISSUE_COMMENTS_ISSUE_ID_OR_KEY", "Issue ID or issue key")),

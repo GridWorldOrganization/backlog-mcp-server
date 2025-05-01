@@ -25,7 +25,7 @@ Start with the example above and customize freely.` : undefined,
 const transHelper = createTranslationHelper()
 
 // Register all tools
-registerTools(server, backlog, transHelper,{useFields: useFields});
+registerTools(server, backlog, transHelper, { useFields: useFields,  maxTokens: 50000 });
 
 if (process.argv.includes("--export-translations")) {
   const data = transHelper.dump();

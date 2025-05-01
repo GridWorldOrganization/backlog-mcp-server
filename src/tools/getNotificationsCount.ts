@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
-import { NotificationCountSchema } from "../backlogOutputDefinition.js";
+import { NotificationCountSchema } from "../types/zod/backlogOutputDefinition.js";
 
 const getNotificationsCountSchema = buildToolSchema(t => ({
   alreadyRead: z.boolean().describe(t("TOOL_GET_NOTIFICATIONS_COUNT_ALREADY_READ", "Whether to include already read notifications")),

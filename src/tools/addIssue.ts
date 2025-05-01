@@ -1,8 +1,8 @@
-import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { z } from "zod";
 import { TranslationHelper } from "../createTranslationHelper.js";
-import { IssueSchema } from "../backlogOutputDefinition.js";
+import { IssueSchema } from "../types/zod/backlogOutputDefinition.js";
+import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 
 const addIssueSchema = buildToolSchema(t => ({
   projectId: z.number().describe(t("TOOL_ADD_ISSUE_PROJECT_ID", "Project ID")),

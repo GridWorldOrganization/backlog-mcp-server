@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
-import { WatchingListCountSchema } from "../backlogOutputDefinition.js";
+import { WatchingListCountSchema } from "../types/zod/backlogOutputDefinition.js";
 
 const getWatchingListCountSchema = buildToolSchema(t => ({
   userId: z.number().describe(t("TOOL_GET_WATCHING_LIST_COUNT_USER_ID", "User ID")),

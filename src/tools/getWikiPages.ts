@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { Backlog } from 'backlog-js';
-import { buildToolSchema, ToolDefinition } from "../toolDefinition.js";
+import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
-import { WikiListItemSchema } from "../backlogOutputDefinition.js";
+import { WikiListItemSchema } from "../types/zod/backlogOutputDefinition.js";
 
 const getWikiPagesSchema = buildToolSchema(t => ({
   projectIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_GET_WIKI_PAGES_PROJECT_ID_OR_KEY", "Project ID or project key")),
