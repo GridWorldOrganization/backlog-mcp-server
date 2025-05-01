@@ -31,7 +31,7 @@ describe("wrapWithErrorHandling", () => {
       throw new Error("original");
     };
 
-    const customHandler = (err: unknown): ErrorLike => ({
+    const customHandler = (_: unknown): ErrorLike => ({
       kind: "error",
       message: "custom error handled",
     });

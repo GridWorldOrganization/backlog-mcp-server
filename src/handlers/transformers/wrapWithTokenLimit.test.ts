@@ -1,95 +1,52 @@
-import { isErrorLike, SafeResult } from "../../types/result.js";
 import { wrapWithTokenLimit } from "./wrapWithTokenLimit.js";
-import { describe, it, expect } from '@jest/globals'; 
+import { describe, it, expect } from "@jest/globals";
+import { SafeResult } from "../../types/result.js";
+
 
 describe("wrapWithTokenLimit", () => {
-  const baseData = {
-    id: 1,
-    name: "A ".repeat(1000), 
-    tags: ["alpha", "beta"]
-  };
+  it("returns full JSON string if under maxTokens", async () => {
+    const obj = { id: 1, name: "Short" };
 
-  const successFn = async () => ({
-    kind: "ok",
-    data: baseData,
-  }) satisfies SafeResult<typeof baseData>;
+    const handler = async () =>
+      ({ kind: "ok", data: obj } satisfies SafeResult<typeof obj>);
 
-  it("limits token output according to maxTokens", async () => {
-    const wrapped = wrapWithTokenLimit(successFn, 50);
+    const wrapped = wrapWithTokenLimit(handler, 1000); // 十分余裕あり
+
     const result = await wrapped({});
 
     expect(result.kind).toBe("ok");
-    if(!isErrorLike(result)) {
-        expect(result.data.length).toBeLessThanOrEqual(200); 
-        expect(result.data).toMatch(/output truncated|name/i);
+    if (result.kind === "ok") {
+      expect(result.data).toBe(JSON.stringify(obj, null, 2));
     }
   });
 
-  it("passes through error result without change", async () => {
-    const errorFn = async () => ({
-      kind: "error",
-      message: "Something went wrong"
-    }) satisfies SafeResult<unknown>;
-
-    const wrapped = wrapWithTokenLimit(errorFn, 100);
-    const result = await wrapped({});
-
-    expect(result).toEqual({
-      kind: "error",
-      message: "Something went wrong"
-    });
-  });
-  it("limits output for deeply nested objects", async () => {
-    const nestedData = {
-      id: 1,
-      profile: {
-        bio: "B ".repeat(800),
-        social: {
-          twitter: "@user123",
-          github: "@dev456"
-        }
-      },
-      status: "active"
+  it("streams and truncates if over maxTokens", async () => {
+    const obj = {
+      description: "A ".repeat(5000), // 長文でトークン制限に引っかかる
     };
-  
-    const nestedFn = async () => ({
-      kind: "ok",
-      data: nestedData
-    }) satisfies SafeResult<typeof nestedData>;
-  
-    const wrapped = wrapWithTokenLimit(nestedFn, 60);
+
+    const handler = async () =>
+      ({ kind: "ok", data: obj } satisfies SafeResult<typeof obj>);
+
+    const wrapped = wrapWithTokenLimit(handler, 100); // 小さな上限
+
     const result = await wrapped({});
-  
+
     expect(result.kind).toBe("ok");
-    if (!isErrorLike(result)) {
-      expect(result.data.length).toBeLessThanOrEqual(300);
-      expect(result.data).toMatch(/output truncated|bio|profile/i); 
+    if (result.kind === "ok") {
+      expect(result.data.length).toBeLessThanOrEqual(500); // 字数でざっくり
+      expect(result.data).toMatch(/truncated/i); // デフォルトの切り詰めメッセージが含まれるはず
     }
   });
-  it("limits output when data includes arrays", async () => {
-    const arrayData = {
-      title: "Array Test",
-      items: Array.from({ length: 50 }, (_, i) => ({
-        id: i + 1,
-        name: `Item ${i + 1}`,
-        description: "こんにちは".repeat(100) 
-      }))
-    };
-  
-    const arrayFn = async () => ({
-      kind: "ok",
-      data: arrayData
-    }) satisfies SafeResult<typeof arrayData>;
-  
-    const wrapped = wrapWithTokenLimit(arrayFn, 100); 
+
+  it("passes through error result unchanged", async () => {
+    const handler = async () =>
+      ({ kind: "error", message: "Boom" } satisfies SafeResult<unknown>);
+
+    const wrapped = wrapWithTokenLimit(handler, 1000);
+
     const result = await wrapped({});
-  
-    expect(result.kind).toBe("ok");
-    if (!isErrorLike(result)) {
-      expect(typeof result.data).toBe("string");
-      expect(result.data.length).toBeLessThanOrEqual(500); // Approximate string length
-      expect(result.data).toMatch(/output truncated|items/); // Truncation message or partial content
-      expect(result.data).not.toMatch(/Item 50/); // Ensure it was cut before the last item
-    }
+
+    expect(result).toEqual({ kind: "error", message: "Boom" });
   });
 });

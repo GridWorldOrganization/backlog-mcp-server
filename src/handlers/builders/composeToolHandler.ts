@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { wrapWithErrorHandling } from "../transformers/wrapWithErrorHandling.js";
 import { wrapWithFieldPicking } from "../transformers/wrapWithFieldPicking.js";
 import { wrapWithTokenLimit } from "../transformers/wrapWithTokenLimit.js";
@@ -13,7 +14,7 @@ interface ComposeOptions {
     maxTokens: number;
 }
 
-export function composeToolHandler<I extends z.ZodRawShape, O extends z.ZodRawShape>(
+export function composeToolHandler(
     tool: ToolDefinition<any, any>,
     options: ComposeOptions 
 ) {

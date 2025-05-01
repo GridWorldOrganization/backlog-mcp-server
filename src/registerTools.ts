@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Backlog } from 'backlog-js';
 import { backlogErrorHandler } from "./backlog/backlogErrorHandler.js";

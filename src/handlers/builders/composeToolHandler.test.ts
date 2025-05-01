@@ -1,10 +1,10 @@
-import { jest, describe, it, expect } from "@jest/globals";
-import { z } from "zod";
-import { composeToolHandler } from "./composeToolHandler.js";
-import { ToolDefinition } from "../../types/tool.js";
-import { ErrorLike } from "../../types/result.js";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { describe, expect, it, jest } from "@jest/globals";
 import { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { z } from "zod";
+import { ErrorLike } from "../../types/result.js";
+import { ToolDefinition } from "../../types/tool.js";
+import { composeToolHandler } from "./composeToolHandler.js";
 
 const dummyErrorHandler = (err: unknown): ErrorLike => ({
   kind: "error",
@@ -12,7 +12,7 @@ const dummyErrorHandler = (err: unknown): ErrorLike => ({
 });
 
 const dummyExtra: RequestHandlerExtra = {
-    signal: new AbortController().signal
+    signal: {} as unknown as any
   };
 
 describe("composeToolHandler", () => {

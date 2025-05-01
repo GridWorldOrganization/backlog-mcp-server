@@ -1,6 +1,6 @@
-import { ErrorLike, isErrorLike, SafeResult } from "../types/result.js";
+import { describe, expect, it } from '@jest/globals';
+import { ErrorLike, isErrorLike } from "../types/result.js";
 import { runToolSafely } from "./runToolSafely.js";
-import { describe, it, expect } from '@jest/globals'; 
 
 describe("runToolSafely", () => {
   it("returns ok result when handler succeeds", async () => {
