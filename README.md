@@ -97,6 +97,47 @@ You can add additional options to customize the server behavior:
 - `MAX_TOKENS`: Maximum number of tokens allowed in responses (default: 50000)
 - `OPTIMIZE_RESPONSE`: Enable GraphQL-style field selection to optimize response size (default: false)
 
+### Keeping the Docker Image Up-to-Date
+
+By default, Docker will use a locally cached image if it has already been pulled before.
+To ensure you're always using the latest version of `ghcr.io/nulab/backlog-mcp-server`, consider one of the following methods:
+
+#### Option 1: Use `--pull always` (recommended)
+
+If you are using Docker 20.10 or later, you can modify the `args` array to include the `--pull always` flag:
+
+```json
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--pull", "always",
+        "-i",
+        "--rm",
+        "-e", "BACKLOG_DOMAIN",
+        "-e", "BACKLOG_API_KEY",
+        "ghcr.io/nulab/backlog-mcp-server"
+      ],
+      "env": {
+        "BACKLOG_DOMAIN": "your-domain.backlog.com",
+        "BACKLOG_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+This ensures that Docker always pulls the latest image from GitHub Container Registry before running.
+
+#### Option 2: Manually pull the latest image
+If your Docker version does not support --pull always, you can manually pull the latest image before running the server:
+
+```
+docker pull ghcr.io/nulab/backlog-mcp-server:latest
+```
+
 ### Option 2: Manual Installation
 
 1. Clone the repository:

@@ -62,6 +62,8 @@ Claude Desktop または Cline の MCP 設定から以下を行ってくださ�
 
 #### 高度な設定オプション
 
+これは実験的なアプローチであり、コンテキストウィンドウのサイズを削減するための標準的な方法ではありません。
+AIエージェントでこのMCPの使用に問題がある場合は、以下の設定を調整してみてください。
 サーバーの動作をカスタマイズするための追加オプションを設定できます：
 
 ```json
@@ -93,6 +95,47 @@ Claude Desktop または Cline の MCP 設定から以下を行ってくださ�
 - `MAX_TOKENS`: レスポンスで許可される最大トークン数（デフォルト: 50000）
 - `OPTIMIZE_RESPONSE`: レスポンスサイズを最適化するためのGraphQLスタイルのフィールド選択を有効にする（デフォルト: false）
 
+### Dockerイメージを最新に保つ
+
+デフォルトでは、Dockerは既にプルされている場合、ローカルにキャッシュされたイメージを使用します。
+`ghcr.io/nulab/backlog-mcp-server`の最新バージョンを常に使用するには、以下のいずれかの方法を検討してください：
+
+#### オプション1: `--pull always`を使用する（推奨）
+
+Docker 20.10以降を使用している場合は、`args`配列に`--pull always`フラグを含めるように変更できます：
+
+```json
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--pull", "always",
+        "-i",
+        "--rm",
+        "-e", "BACKLOG_DOMAIN",
+        "-e", "BACKLOG_API_KEY",
+        "ghcr.io/nulab/backlog-mcp-server"
+      ],
+      "env": {
+        "BACKLOG_DOMAIN": "your-domain.backlog.com",
+        "BACKLOG_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+これにより、実行前に常にGitHub Container Registryから最新のイメージをプルすることが保証されます。
+
+#### オプション2: 手動で最新のイメージをプルする
+Dockerのバージョンが--pull alwaysをサポートしていない場合は、サーバーを実行する前に手動で最新のイメージをプルできます：
+
+```
+docker pull ghcr.io/nulab/backlog-mcp-server:latest
+```
+
 ### オプション2: 手動インストール
 
 1. リポジトリをクローン：
@@ -123,7 +166,9 @@ npm run build
       ],
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key"
+        "BACKLOG_API_KEY": "your-api-key",
+        "MAX_TOKENS": "100000",
+        "OPTIMIZE_RESPONSE": "true"
       }
     }
   }
