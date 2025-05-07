@@ -91,9 +91,9 @@ describe("getIssueTool", () => {
 
   it("calls backlog.getIssue with correct params when using issue ID", async () => {
     await tool.handler({
-      issueIdOrKey: 1
+      issueIdOrKey: "1"
     });
     
-    expect(mockBacklog.getIssue).toHaveBeenCalledWith(1);
+    expect(mockBacklog.getIssue).toHaveBeenCalledWith("1");
   });
 });
