@@ -16,6 +16,25 @@
   "files": [
     "build"
   ],
+  "release-it": {
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": "conventionalcommits",
+        "infile": "CHANGELOG.md",
+        "changelogHeader": "# Changelog"
+      }
+    },
+    "git": {
+      "tagName": "v${version}",
+      "requireCleanWorkingDir": true,
+      "commitMessage": "chore(bump): v${version}"
+    },
+    "github": {
+      "release": true,
+      "releaseName": "v${version}",
+      "tokenRef": "GITHUB_TOKEN"
+    }
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.9.0",
     "backlog-js": "^0.13.4",
@@ -27,6 +46,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.24.0",
+    "@release-it/conventional-changelog": "^10.0.1",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.14.1",
     "@typescript-eslint/eslint-plugin": "^8.30.1",
