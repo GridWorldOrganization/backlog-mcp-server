@@ -18,7 +18,7 @@
   ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.9.0",
-    "backlog-js": "^0.13.3",
+    "backlog-js": "^0.13.4",
     "cosmiconfig": "^9.0.0",
     "dotenv": "^16.5.0",
     "graphql": "^16.11.0",
