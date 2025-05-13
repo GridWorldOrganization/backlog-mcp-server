@@ -197,6 +197,7 @@ The server provides the following tools for interacting with Backlog:
 | `get_project` | Returns information about a specific project |
 | `update_project` | Updates an existing project |
 | `delete_project` | Deletes a project |
+| `get_custom_fields` | Returns list of custom fields for a project |
 
 ### Issue Tools
 
