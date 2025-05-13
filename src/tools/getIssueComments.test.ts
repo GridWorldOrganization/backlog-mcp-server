@@ -46,7 +46,7 @@ describe("getIssueCommentsTool", () => {
 
   it("returns issue comments", async () => {
     const result = await tool.handler({
-      issueIdOrKey: "TEST-1"
+      issueKey: "TEST-1"
     });
 
     if (!Array.isArray(result)) {
@@ -60,7 +60,7 @@ describe("getIssueCommentsTool", () => {
 
   it("calls backlog.getIssueComments with correct params when using issue key", async () => {
     await tool.handler({
-      issueIdOrKey: "TEST-1",
+      issueKey: "TEST-1",
       count: 10,
       order: "desc"
     });
@@ -73,14 +73,20 @@ describe("getIssueCommentsTool", () => {
 
   it("calls backlog.getIssueComments with correct params when using issue ID and min/max IDs", async () => {
     await tool.handler({
-      issueIdOrKey: 1,
+      issueId: 1,
       minId: 100,
       maxId: 200
     });
     
-    expect(mockBacklog.getIssueComments).toHaveBeenCalledWith(1, {
+    expect(mockBacklog.getIssueComments).toHaveBeenCalledWith("1", {
       minId: 100,
       maxId: 200
     });
+  });
+
+  it("throws an error if neither issueId nor issueKey is provided", async () => {
+    await expect(
+      tool.handler({ })
+    ).rejects.toThrow(Error);
   });
 });

@@ -71,7 +71,7 @@ describe("getIssueTool", () => {
 
   it("returns issue information as formatted JSON text", async () => {
     const result = await tool.handler({
-      issueIdOrKey: "TEST-1"
+      issueKey: "TEST-1"
     });
 
     if (Array.isArray(result)) {
@@ -83,7 +83,7 @@ describe("getIssueTool", () => {
 
   it("calls backlog.getIssue with correct params when using issue key", async () => {
     await tool.handler({
-      issueIdOrKey: "TEST-1"
+      issueKey: "TEST-1"
     });
     
     expect(mockBacklog.getIssue).toHaveBeenCalledWith("TEST-1");
@@ -91,9 +91,15 @@ describe("getIssueTool", () => {
 
   it("calls backlog.getIssue with correct params when using issue ID", async () => {
     await tool.handler({
-      issueIdOrKey: "1"
+      issueId: 1
     });
     
     expect(mockBacklog.getIssue).toHaveBeenCalledWith("1");
+  });
+
+  it("throws an error if neither issueId nor issueKey is provided", async () => {
+    await expect(
+      tool.handler({ })
+    ).rejects.toThrow(Error);
   });
 });

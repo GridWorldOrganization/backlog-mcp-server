@@ -3,9 +3,27 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { IssueSchema } from "../types/zod/backlogOutputDefinition.js";
+import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
 
 const updateIssueSchema = buildToolSchema(t => ({
-  issueIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_UPDATE_ISSUE_ISSUE_ID_OR_KEY", "Issue ID or issue key")),
+  issueId: z
+    .number()
+    .optional()
+    .describe(
+      t(
+        "TOOL_UPDATE_ISSUE_ISSUE_ID",
+        "The numeric ID of the issue (e.g., 12345)"
+      )
+    ),
+  issueKey: z
+    .string()
+    .optional()
+    .describe(
+      t(
+        "TOOL_UPDATE_ISSUE_ISSUE_KEY",
+        "The key of the issue (e.g., 'PROJ-123')"
+      )
+    ),
   summary: z.string().optional().describe(t("TOOL_UPDATE_ISSUE_SUMMARY", "Summary of the issue")),
   issueTypeId: z.number().optional().describe(t("TOOL_UPDATE_ISSUE_ISSUE_TYPE_ID", "Issue type ID")),
   priorityId: z.number().optional().describe(t("TOOL_UPDATE_ISSUE_PRIORITY_ID", "Priority ID")),
@@ -31,7 +49,12 @@ export const updateIssueTool = (backlog: Backlog, { t }: TranslationHelper): Too
     description: t("TOOL_UPDATE_ISSUE_DESCRIPTION", "Updates an existing issue"),
     schema: z.object(updateIssueSchema(t)),
     outputSchema: IssueSchema,
-    handler: async ({ issueIdOrKey, ...params }) => 
-      backlog.patchIssue(issueIdOrKey, params)
+    handler: async ({ issueId, issueKey, ...params }) => {
+      const result = resolveIdOrKey("issue", { id: issueId, key: issueKey }, t);
+      if (!result.ok) {
+        throw result.error;
+      }
+      return backlog.patchIssue(result.value, params)
+    }
   };
 };

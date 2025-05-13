@@ -40,7 +40,7 @@ describe("deleteIssueTool", () => {
 
   it("returns deleted issue information", async () => {
     const result = await tool.handler({
-      issueIdOrKey: "TEST-1"
+      issueKey: "TEST-1"
     });
 
     expect(result).toHaveProperty("issueKey", "TEST-1");
@@ -49,7 +49,7 @@ describe("deleteIssueTool", () => {
 
   it("calls backlog.deleteIssue with correct params when using issue key", async () => {
     await tool.handler({
-      issueIdOrKey: "TEST-1"
+      issueKey: "TEST-1"
     });
     
     expect(mockBacklog.deleteIssue).toHaveBeenCalledWith("TEST-1");
@@ -57,9 +57,15 @@ describe("deleteIssueTool", () => {
 
   it("calls backlog.deleteIssue with correct params when using issue ID", async () => {
     await tool.handler({
-      issueIdOrKey: 1
+      issueId: 1
     });
     
-    expect(mockBacklog.deleteIssue).toHaveBeenCalledWith(1);
+    expect(mockBacklog.deleteIssue).toHaveBeenCalledWith("1");
+  });
+
+  it("throws an error if neither issueId nor issueKey is provided", async () => {
+    await expect(
+      tool.handler({ })
+    ).rejects.toThrow(Error);
   });
 });

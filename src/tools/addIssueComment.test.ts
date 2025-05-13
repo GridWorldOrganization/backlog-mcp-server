@@ -28,7 +28,7 @@ describe("addIssueCommentTool", () => {
 
   it("returns created comment as formatted JSON text", async () => {
     const result = await tool.handler({
-      issueIdOrKey: "TEST-1",
+      issueKey: "TEST-1",
       content: "This is a new comment"
     });
 
@@ -41,7 +41,7 @@ describe("addIssueCommentTool", () => {
 
   it("calls backlog.postIssueComments with correct params when using issue key", async () => {
     await tool.handler({
-      issueIdOrKey: "TEST-1",
+      issueKey: "TEST-1",
       content: "This is a new comment"
     });
     
@@ -54,12 +54,12 @@ describe("addIssueCommentTool", () => {
 
   it("calls backlog.postIssueComments with correct params when using issue ID and notifications", async () => {
     await tool.handler({
-      issueIdOrKey: 1,
+      issueId: 1,
       content: "This is a new comment with notifications",
       notifiedUserId: [2, 3]
     });
     
-    expect(mockBacklog.postIssueComments).toHaveBeenCalledWith(1, {
+    expect(mockBacklog.postIssueComments).toHaveBeenCalledWith("1", {
       content: "This is a new comment with notifications",
       notifiedUserId: [2, 3],
       attachmentId: undefined
@@ -68,7 +68,7 @@ describe("addIssueCommentTool", () => {
 
   it("calls backlog.postIssueComments with correct params when using attachments", async () => {
     await tool.handler({
-      issueIdOrKey: "TEST-1",
+      issueKey: "TEST-1",
       content: "This is a new comment with attachments",
       attachmentId: [1, 2]
     });
@@ -78,5 +78,13 @@ describe("addIssueCommentTool", () => {
       notifiedUserId: undefined,
       attachmentId: [1, 2]
     });
+  });
+
+  it("throws an error if neither issueId nor issueKey is provided", async () => {
+    await expect(
+      tool.handler({
+        content: "This should fail due to missing issue identifier"
+      })
+    ).rejects.toThrow(Error);
   });
 });

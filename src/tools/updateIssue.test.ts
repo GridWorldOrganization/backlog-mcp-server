@@ -71,7 +71,7 @@ describe("updateIssueTool", () => {
 
   it("returns updated issue", async () => {
     const result = await tool.handler({
-      issueIdOrKey: "TEST-1",
+      issueKey: "TEST-1",
       summary: "Updated Issue",
       description: "This is an updated issue"
     });
@@ -83,7 +83,7 @@ describe("updateIssueTool", () => {
 
   it("calls backlog.patchIssue with correct params when using issue key", async () => {
     await tool.handler({
-      issueIdOrKey: "TEST-1",
+      issueKey: "TEST-1",
       summary: "Updated Issue",
       priorityId: 2,
       statusId: 2
@@ -98,16 +98,22 @@ describe("updateIssueTool", () => {
 
   it("calls backlog.patchIssue with correct params when using issue ID", async () => {
     await tool.handler({
-      issueIdOrKey: 1,
+      issueId: 1,
       estimatedHours: 15,
       actualHours: 8,
       comment: "Updated the estimated and actual hours"
     });
     
-    expect(mockBacklog.patchIssue).toHaveBeenCalledWith(1, {
+    expect(mockBacklog.patchIssue).toHaveBeenCalledWith("1", {
       estimatedHours: 15,
       actualHours: 8,
       comment: "Updated the estimated and actual hours"
     });
+  });
+
+  it("throws an error if neither issueId nor issueKey is provided", async () => {
+    await expect(
+      tool.handler({ })
+    ).rejects.toThrow(Error);
   });
 });
