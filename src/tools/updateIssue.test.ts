@@ -116,4 +116,31 @@ describe("updateIssueTool", () => {
       tool.handler({ })
     ).rejects.toThrow(Error);
   });
+
+  it("transforms customFields to proper customField_{id} format", async () => {
+    await tool.handler({
+      issueKey: "TEST-1",
+      summary: "Custom Field Test",
+      issueTypeId: 2,
+      priorityId: 3,
+      customFields: [
+        { id: 123, value: "テキスト" },
+        { id: 456, value: 42 },
+        { id: 789, value: ["OptionA", "OptionB"], otherValue: "詳細説明" }
+      ]
+    });
+
+    expect(mockBacklog.patchIssue).toHaveBeenCalledWith(
+      "TEST-1",
+      expect.objectContaining({
+        summary: "Custom Field Test",
+        issueTypeId: 2,
+        priorityId: 3,
+        customField_123: "テキスト",
+        customField_456: 42,
+        customField_789: ["OptionA", "OptionB"],
+        customField_789_otherValue: "詳細説明"
+      })
+    );
+  });
 });

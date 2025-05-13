@@ -4,6 +4,7 @@ import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { IssueSchema } from "../types/zod/backlogOutputDefinition.js";
 import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
+import { customFieldsToPayload } from "../backlog/customFields.js";
 
 const updateIssueSchema = buildToolSchema(t => ({
   issueId: z
@@ -41,6 +42,31 @@ const updateIssueSchema = buildToolSchema(t => ({
   notifiedUserId: z.array(z.number()).optional().describe(t("TOOL_UPDATE_ISSUE_NOTIFIED_USER_ID", "User IDs to notify")),
   attachmentId: z.array(z.number()).optional().describe(t("TOOL_UPDATE_ISSUE_ATTACHMENT_ID", "Attachment IDs")),
   comment: z.string().optional().describe(t("TOOL_UPDATE_ISSUE_COMMENT", "Comment to add when updating the issue")),
+  customFields: z.array(
+    z.object({
+      id: z.number().describe(
+        t(
+          "TOOL_UPDATE_ISSUE_CUSTOM_FIELD_ID",
+          "The ID of the custom field (e.g., 12345)"
+        )
+      ),
+      value: z
+        .union([
+          z.string().max(255),
+          z.number(),
+          z.array(z.string()),
+        ]),
+      otherValue: z
+        .string()
+        .optional()
+        .describe(
+          t("TOOL_UPDATE_ISSUE_CUSTOM_FIELD_OTHER_VALUE", "Other value for list type fields")
+        ),
+    })
+  ).optional()
+    .describe(
+      t("TOOL_UPDATE_ISSUE_CUSTOM_FIELDS", "List of custom fields to set on the issue")
+    )
 }));
 
 export const updateIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof updateIssueSchema>, typeof IssueSchema["shape"]> => {
@@ -49,12 +75,18 @@ export const updateIssueTool = (backlog: Backlog, { t }: TranslationHelper): Too
     description: t("TOOL_UPDATE_ISSUE_DESCRIPTION", "Updates an existing issue"),
     schema: z.object(updateIssueSchema(t)),
     outputSchema: IssueSchema,
-    handler: async ({ issueId, issueKey, ...params }) => {
+    handler: async ({ issueId, issueKey, customFields, ...params }) => {
       const result = resolveIdOrKey("issue", { id: issueId, key: issueKey }, t);
       if (!result.ok) {
         throw result.error;
       }
-      return backlog.patchIssue(result.value, params)
+      const customFieldPayload = customFieldsToPayload(customFields);
+
+      const finalPayload = {
+        ...params,
+        ...customFieldPayload,
+      };
+      return backlog.patchIssue(result.value, finalPayload)
     }
   };
 };

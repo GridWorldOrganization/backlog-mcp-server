@@ -31,6 +31,7 @@ import { getWikisCountTool } from "./getWikisCount.js";
 import { getWikiTool } from "./getWiki.js";
 import { addWikiTool } from "./addWiki.js";
 import { getCategoriesTool } from "./getCategories.js";
+import { getCustomFieldsTool } from "./getCustomFields.js";
 import { getIssueTool } from "./getIssue.js";
 import { getIssuesTool } from "./getIssues.js";
 import { countIssuesTool } from "./countIssues.js";
@@ -80,6 +81,7 @@ export const allTools = (backlog: Backlog, helper: TranslationHelper) => [
   getProjectTool(backlog, helper),
   updateProjectTool(backlog, helper),
   deleteProjectTool(backlog, helper),
+  getCustomFieldsTool(backlog, helper), // Added here
   
   // Issue tools
   getIssueTool(backlog, helper),

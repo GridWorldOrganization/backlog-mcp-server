@@ -160,7 +160,7 @@ export const CustomFieldSchema = z.object({
     description: z.string(),
     required: z.boolean(),
     applicableIssueTypes: z.array(z.number()),
-}).passthrough(); 
+}) 
 
 export const SharedFileSchema = z.object({
     id: z.number(),

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { IssueSchema } from "../types/zod/backlogOutputDefinition.js";
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
+import { customFieldsToPayload } from '../backlog/customFields.js';
 
 const addIssueSchema = buildToolSchema(t => ({
   projectId: z.number().describe(t("TOOL_ADD_ISSUE_PROJECT_ID", "Project ID")),
@@ -21,8 +22,31 @@ const addIssueSchema = buildToolSchema(t => ({
   notifiedUserId: z.array(z.number()).optional().describe(t("TOOL_ADD_ISSUE_NOTIFIED_USER_ID", "User IDs to notify")),
   attachmentId: z.array(z.number()).optional().describe(t("TOOL_ADD_ISSUE_ATTACHMENT_ID", "Attachment IDs")),
   parentIssueId: z.number().optional().describe(t("TOOL_ADD_ISSUE_PARENT_ISSUE_ID", "Parent issue ID")),
-  customFieldId: z.array(z.number()).optional().describe(t("TOOL_ADD_ISSUE_CUSTOM_FIELD_ID", "Custom field IDs")),
-  customFieldValue: z.array(z.string()).optional().describe(t("TOOL_ADD_ISSUE_CUSTOM_FIELD_VALUE", "Values for custom fields")),
+  customFields: z.array(
+    z.object({
+      id: z.number().describe(
+        t(
+          "TOOL_ADD_ISSUE_CUSTOM_FIELD_ID",
+          "The ID of the custom field (e.g., 12345)"
+        )
+      ),
+      value: z
+        .union([
+          z.string().max(255),
+          z.number(),
+          z.array(z.string()),
+        ]),
+      otherValue: z
+        .string()
+        .optional()
+        .describe(
+          t("TOOL_ADD_ISSUE_CUSTOM_FIELD_OTHER_VALUE", "Other value for list type fields")
+        ),
+    })
+  ).optional()
+    .describe(
+      t("TOOL_ADD_ISSUE_CUSTOM_FIELDS", "List of custom fields to set on the issue")
+    )
 }));
 
 export const addIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof addIssueSchema>, typeof IssueSchema["shape"]> => {
@@ -33,44 +57,18 @@ export const addIssueTool = (backlog: Backlog, { t }: TranslationHelper): ToolDe
     outputSchema: IssueSchema,
     importantFields: ["summary", "issueKey", "description", "createdUser"],
     handler: async ({
-      projectId,
-      summary,
-      issueTypeId,
-      priorityId,
-      description,
-      startDate,
-      dueDate,
-      estimatedHours,
-      actualHours,
-      categoryId,
-      versionId,
-      milestoneId,
-      assigneeId,
-      notifiedUserId,
-      attachmentId,
-      parentIssueId,
-      customFieldId,
-      customFieldValue
-    }) => 
-        backlog.postIssue({
-          projectId,
-          summary,
-          issueTypeId,
-          priorityId,
-          description,
-          startDate,
-          dueDate,
-          estimatedHours,
-          actualHours,
-          categoryId,
-          versionId,
-          milestoneId,
-          assigneeId,
-          notifiedUserId,
-          attachmentId,
-          parentIssueId,
-          customFieldId,
-          customFieldValue
-        })
+      customFields,
+      ...params
+    }) => {
+      const customFieldPayload = customFieldsToPayload(customFields);
+
+      const finalPayload = {
+        ...params,
+        ...customFieldPayload,
+      };
+
+      return backlog.postIssue(finalPayload)
+
+    }
   };
 };
