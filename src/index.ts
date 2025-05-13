@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import * as backlogjs from 'backlog-js';
 import { registerTools } from "./registerTools.js";
 import { createTranslationHelper } from "./createTranslationHelper.js";
+import { VERSION } from "./version.js"; // ← 相対パス注意！
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ const server = new McpServer({
   name: "backlog",
   description: useFields ? `You can include only the fields you need using GraphQL-style syntax.
 Start with the example above and customize freely.` : undefined,
-  version: "0.1.0"
+  version: VERSION
 });
 
 const transHelper = createTranslationHelper()

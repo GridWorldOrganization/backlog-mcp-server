@@ -1,16 +1,25 @@
 {
-    "git": {
-      "tagName": "v${version}",
-      "commitMessage": "Release v${version}",
-      "tagMatch": "v*",
-      "requireCleanWorkingDir": true
-    },
-    "github": {
-      "release": true
-    },
-    "npm": false,
-    "hooks": {
-      "after:bump": "docker buildx build --platform linux/amd64,linux/arm64 --provenance=false --sbom=false --build-arg VERSION=${version} -t ghcr.io/nulab/backlog-mcp-server:v${version} -t ghcr.io/nulab/backlog-mcp-server:latest --push ."
+  "git": {
+    "tagName": "${version}",
+    "commitMessage": "chore(bump): ${version}",
+    "tagMatch": "*",
+    "requireCleanWorkingDir": true
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": "conventionalcommits",
+      "infile": "CHANGELOG.md",
+      "changelogHeader": "# Changelog"
     }
+  },
+  "github": {
+    "release": true,
+    "releaseName": "${version}",
+    "tokenRef": "GITHUB_TOKEN"
+  },
+  "npm": false,
+  "bumpFiles": ["package.json"],
+  "hooks": {
+    "after:bump": "docker buildx build --platform linux/amd64,linux/arm64 --provenance=false --sbom=false --build-arg VERSION=${version} -t ghcr.io/nulab/backlog-mcp-server:v${version} -t ghcr.io/nulab/backlog-mcp-server:latest --push ."
   }
-  
+}
