@@ -3,7 +3,7 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { PullRequestSchema } from "../types/zod/backlogOutputDefinition.js";
-import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
+import { resolveIdOrKey, resolveIdOrName } from "../utils/resolveIdOrKey.js";
 
 const addPullRequestSchema = buildToolSchema(t => ({
   projectId: z
@@ -24,7 +24,8 @@ const addPullRequestSchema = buildToolSchema(t => ({
         "The key of the project (e.g., 'PROJECT')"
       )
     ),
-  repoIdOrName: z.string().describe(t("TOOL_ADD_PULL_REQUEST_REPO_ID_OR_NAME", "Repository ID or name")),
+  repoId: z.number().optional().describe(t("TOOL_ADD_PULL_REQUEST_REPO_ID", "Repository ID")),
+  repoName: z.string().optional().describe(t("TOOL_ADD_PULL_REQUEST_REPO_NAME", "Repository name")), 
   summary: z.string().describe(t("TOOL_ADD_PULL_REQUEST_SUMMARY", "Summary of the pull request")),
   description: z.string().describe(t("TOOL_ADD_PULL_REQUEST_DESCRIPTION", "Description of the pull request")),
   base: z.string().describe(t("TOOL_ADD_PULL_REQUEST_BASE", "Base branch name")),
@@ -40,11 +41,15 @@ export const addPullRequestTool = (backlog: Backlog, { t }: TranslationHelper): 
     description: t("TOOL_ADD_PULL_REQUEST_DESCRIPTION", "Creates a new pull request"),
     schema: z.object(addPullRequestSchema(t)),
     outputSchema: PullRequestSchema,
-    handler: async ({ projectId, projectKey, repoIdOrName, ...params }) => {
-      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+    handler: async ({ projectId, projectKey, repoId, repoName, ...params }) => {
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }
-      return backlog.postPullRequest(result.value, repoIdOrName, params)}
+      const repoRes = resolveIdOrName("repository", { id: repoId, name: repoName }, t);
+      if (!repoRes.ok) {
+        throw repoRes.error;
+      }
+      return backlog.postPullRequest(result.value, String(repoRes.value), params)}
   };
 };

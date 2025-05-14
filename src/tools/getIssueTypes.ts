@@ -34,7 +34,7 @@ export const getIssueTypesTool = (backlog: Backlog, { t }: TranslationHelper): T
     outputSchema: IssueTypeSchema,
     importantFields: ["id", "name"],
     handler: async ({ projectId, projectKey }) => {
-      const result = resolveIdOrKey("issueType", { id: projectId, key: projectKey }, t);
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }

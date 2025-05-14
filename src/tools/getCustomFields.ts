@@ -45,7 +45,7 @@ export const getCustomFieldsTool = (
     outputSchema: CustomFieldSchema, 
     importantFields: ["id", "name", "typeId", "required", "applicableIssueTypes"],
     handler: async ({ projectId, projectKey }) => {
-      const result = resolveIdOrKey("customField", { id: projectId, key: projectKey }, t);
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }

@@ -53,7 +53,7 @@ describe("updatePullRequestTool", () => {
   it("returns updated pull request", async () => {
     const result = await tool.handler({
       projectKey: "TEST",
-      repoIdOrName: "test-repo",
+      repoName: "test-repo", // Changed
       number: 1,
       summary: "Updated PR title",
       description: "Updated PR description",
@@ -69,10 +69,10 @@ describe("updatePullRequestTool", () => {
     expect(result.status).toHaveProperty("name", "Closed");
   });
 
-  it("calls backlog.patchPullRequest with correct params", async () => {
+  it("calls backlog.patchPullRequest with correct params when using repoName", async () => {
     const params = {
       projectKey: "TEST",
-      repoIdOrName: "test-repo",
+      repoName: "test-repo", // Changed
       number: 1,
       summary: "Updated PR title",
       description: "Updated PR description",
@@ -92,25 +92,61 @@ describe("updatePullRequestTool", () => {
     });
   });
 
-  it("calls backlog.patchPullRequest with correct params when using projectId", async () => {
+  it("calls backlog.patchPullRequest with correct params when using projectId and repoName", async () => {
     const params = {
-      projectId: 100, // Use projectId
-      repoIdOrName: "test-repo",
+      projectId: 100, 
+      repoName: "test-repo", // Changed
       number: 1,
       summary: "Updated PR title via projectId",
     };
 
     await tool.handler(params);
 
-    expect(mockBacklog.patchPullRequest).toHaveBeenCalledWith(100, "test-repo", 1, { // Expect numeric ID
+    expect(mockBacklog.patchPullRequest).toHaveBeenCalledWith(100, "test-repo", 1, { 
       summary: "Updated PR title via projectId",
+      description: undefined,
+      issueId: undefined,
+      assigneeId: undefined,
+      statusId: undefined,
+      notifiedUserId: undefined,
+    });
+  });
+  
+  it("calls backlog.patchPullRequest with correct params when using projectId and repoId", async () => {
+    const params = {
+      projectId: 100,
+      repoId: 200, // Added repoId
+      number: 1,
+      summary: "Updated PR title via repoId",
+    };
+
+    await tool.handler(params);
+
+    expect(mockBacklog.patchPullRequest).toHaveBeenCalledWith(100, "200", 1, {
+      summary: "Updated PR title via repoId",
+      description: undefined,
+      issueId: undefined,
+      assigneeId: undefined,
+      statusId: undefined,
+      notifiedUserId: undefined,
     });
   });
 
   it("throws an error if neither projectId nor projectKey is provided", async () => {
     const params = {
       // projectId and projectKey are missing
-      repoIdOrName: "test-repo",
+      repoName: "test-repo", // Changed
+      number: 1,
+      summary: "Test Summary",
+    };
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
+  });
+
+  it("throws an error if neither repoId nor repoName is provided", async () => {
+    const params = {
+      projectKey: "TEST",
+      // repoId and repoName are missing
       number: 1,
       summary: "Test Summary",
     };

@@ -34,7 +34,7 @@ export const getCategoriesTool = (backlog: Backlog, { t }: TranslationHelper): T
     importantFields: ["id", "projectId", "name"],
     outputSchema: CategorySchema,
     handler: async ({ projectId, projectKey }) => {
-      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }

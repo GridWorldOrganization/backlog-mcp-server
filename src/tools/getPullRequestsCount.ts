@@ -3,7 +3,7 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { PullRequestCountSchema } from "../types/zod/backlogOutputDefinition.js";
-import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
+import { resolveIdOrKey, resolveIdOrName } from "../utils/resolveIdOrKey.js";
 
 const getPullRequestsCountSchema = buildToolSchema(t => ({
   projectId: z
@@ -24,7 +24,8 @@ const getPullRequestsCountSchema = buildToolSchema(t => ({
         "The key of the project (e.g., 'PROJECT')"
       )
     ),
-  repoIdOrName: z.string().describe(t("TOOL_GET_PULL_REQUESTS_COUNT_REPO_ID_OR_NAME", "Repository ID or name")),
+  repoId: z.number().optional().describe(t("TOOL_GET_PULL_REQUESTS_COUNT_REPO_ID", "Repository ID")),
+  repoName: z.string().optional().describe(t("TOOL_GET_PULL_REQUESTS_COUNT_REPO_NAME", "Repository name")), 
   statusId: z.array(z.number()).optional().describe(t("TOOL_GET_PULL_REQUESTS_COUNT_STATUS_ID", "Status IDs")),
   assigneeId: z.array(z.number()).optional().describe(t("TOOL_GET_PULL_REQUESTS_COUNT_ASSIGNEE_ID", "Assignee user IDs")),
   issueId: z.array(z.number()).optional().describe(t("TOOL_GET_PULL_REQUESTS_COUNT_ISSUE_ID", "Issue IDs")),
@@ -37,12 +38,16 @@ export const getPullRequestsCountTool = (backlog: Backlog, { t }: TranslationHel
     description: t("TOOL_GET_PULL_REQUESTS_COUNT_DESCRIPTION", "Returns count of pull requests for a repository"),
     schema: z.object(getPullRequestsCountSchema(t)),
     outputSchema: PullRequestCountSchema,
-    handler: async ({ projectId, projectKey, repoIdOrName, ...params }) => {
-      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+    handler: async ({ projectId, projectKey, repoId, repoName, ...params }) => {
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }
-      return backlog.getPullRequestsCount(result.value, repoIdOrName, params)
+      const repoResult = resolveIdOrName("repository", { id: repoId, name: repoName }, t);
+      if (!repoResult.ok) {
+        throw repoResult.error;
+      }
+      return backlog.getPullRequestsCount(result.value, String(repoResult.value), params)
     }
   };
 };

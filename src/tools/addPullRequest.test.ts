@@ -53,7 +53,7 @@ describe("addPullRequestTool", () => {
   it("returns created pull request as formatted JSON text", async () => {
     const result = await tool.handler({
       projectKey: "TEST",
-      repoIdOrName: "test-repo",
+      repoName: "test-repo", // Changed
       summary: "Fix bug in login",
       description: "This PR fixes a bug in the login process",
       base: "main",
@@ -69,10 +69,10 @@ describe("addPullRequestTool", () => {
     expect(result.description).toEqual("This PR fixes a bug in the login process");
   });
 
-  it("calls backlog.postPullRequest with correct params", async () => {
+  it("calls backlog.postPullRequest with correct params when using repoName", async () => {
     const params = {
       projectKey: "TEST",
-      repoIdOrName: "test-repo",
+      repoName: "test-repo", // Changed
       summary: "Fix bug in login",
       description: "This PR fixes a bug in the login process",
       base: "main",
@@ -95,22 +95,73 @@ describe("addPullRequestTool", () => {
     });
   });
 
-  it("calls backlog.postPullRequest with correct params when using projectId", async () => {
+  it("calls backlog.postPullRequest with correct params when using projectId and repoName", async () => {
     const params = {
       projectId: 1, 
-      repoIdOrName: "test-repo",
+      repoName: "test-repo", // Changed
+      summary: "Summary for projectId and repoName",
+      description: "Description for projectId and repoName",
+      base: "main",
+      branch: "feature/new"
     };
 
     await tool.handler(params as any);
 
-    expect(mockBacklog.postPullRequest).toHaveBeenCalledWith(1, "test-repo", {});
+    expect(mockBacklog.postPullRequest).toHaveBeenCalledWith(1, "test-repo", {
+      summary: "Summary for projectId and repoName",
+      description: "Description for projectId and repoName",
+      base: "main",
+      branch: "feature/new",
+      issueId: undefined,
+      assigneeId: undefined,
+      notifiedUserId: undefined
+    });
+  });
+
+  it("calls backlog.postPullRequest with correct params when using projectId and repoId", async () => {
+    const params = {
+      projectId: 1,
+      repoId: 200, // Added repoId
+      summary: "Summary for projectId and repoId",
+      description: "Description for projectId and repoId",
+      base: "main",
+      branch: "feature/new-id"
+    };
+
+    await tool.handler(params as any);
+
+    expect(mockBacklog.postPullRequest).toHaveBeenCalledWith(1, "200", {
+      summary: "Summary for projectId and repoId",
+      description: "Description for projectId and repoId",
+      base: "main",
+      branch: "feature/new-id",
+      issueId: undefined,
+      assigneeId: undefined,
+      notifiedUserId: undefined
+    });
   });
 
   it("throws an error if neither projectId nor projectKey is provided", async () => {
-    const params = {};
+    const params = {
+      repoName: "test-repo",
+      summary: "Summary",
+      description: "Description",
+      base: "main",
+      branch: "branch"
+    };
 
-    expect(tool.handler(params as any)).rejects.toThrow(
-      Error
-    );
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
+  });
+
+  it("throws an error if neither repoId nor repoName is provided", async () => {
+    const params = {
+      projectKey: "TEST",
+      summary: "Summary",
+      description: "Description",
+      base: "main",
+      branch: "branch"
+    };
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
   });
 });

@@ -3,7 +3,7 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { PullRequestCommentSchema } from "../types/zod/backlogOutputDefinition.js";
-import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
+import { resolveIdOrKey, resolveIdOrName } from "../utils/resolveIdOrKey.js";
 
 const updatePullRequestCommentSchema = buildToolSchema(t => ({
   projectId: z
@@ -24,7 +24,8 @@ const updatePullRequestCommentSchema = buildToolSchema(t => ({
         "The key of the project (e.g., 'PROJECT')"
       )
     ),
-  repoIdOrName: z.string().describe(t("TOOL_UPDATE_PULL_REQUEST_COMMENT_REPO_ID_OR_NAME", "Repository ID or name")),
+  repoId: z.number().optional().describe(t("TOOL_UPDATE_PULL_REQUEST_COMMENT_REPO_ID", "Repository ID")),
+  repoName: z.string().optional().describe(t("TOOL_UPDATE_PULL_REQUEST_COMMENT_REPO_NAME", "Repository name")), 
   number: z.number().describe(t("TOOL_UPDATE_PULL_REQUEST_COMMENT_NUMBER", "Pull request number")),
   commentId: z.number().describe(t("TOOL_UPDATE_PULL_REQUEST_COMMENT_COMMENT_ID", "Comment ID")),
   content: z.string().describe(t("TOOL_UPDATE_PULL_REQUEST_COMMENT_CONTENT", "Comment content")),
@@ -37,12 +38,16 @@ export const updatePullRequestCommentTool = (backlog: Backlog, { t }: Translatio
     schema: z.object(updatePullRequestCommentSchema(t)),
     outputSchema: PullRequestCommentSchema,
     importantFields: ["id", "content", "createdUser", "updated"],
-    handler: async ({ projectId, projectKey, repoIdOrName, number, commentId, content }) => {
-      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+    handler: async ({ projectId, projectKey, repoId, repoName, number, commentId, content }) => {
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }
-      return backlog.patchPullRequestComments(result.value, repoIdOrName, number, commentId, { content })
+      const repoResult = resolveIdOrName("repository", { id: repoId, name: repoName }, t);
+      if (!repoResult.ok) {
+        throw repoResult.error;
+      }
+      return backlog.patchPullRequestComments(result.value, String(repoResult.value), number, commentId, { content })
     }
   };
 };

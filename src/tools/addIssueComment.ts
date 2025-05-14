@@ -36,7 +36,7 @@ export const addIssueCommentTool = (backlog: Backlog, { t }: TranslationHelper):
     schema: z.object(addIssueCommentSchema(t)),
     outputSchema: IssueCommentSchema,
     handler: async ({ issueId, issueKey, content, notifiedUserId, attachmentId }) => {
-      const result = resolveIdOrKey("issueComment", { id: issueId, key: issueKey }, t);
+      const result = resolveIdOrKey("issue", { id: issueId, key: issueKey }, t);
       if (!result.ok) {
         throw result.error;
       }

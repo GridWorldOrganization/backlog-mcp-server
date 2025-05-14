@@ -95,7 +95,7 @@ describe("getPullRequestsTool", () => {
   it("returns pull requests list as formatted JSON text", async () => {
     const result = await tool.handler({
       projectKey: "TEST",
-      repoIdOrName: "test-repo"
+      repoName: "test-repo"
     });
 
     if (!Array.isArray(result)) {
@@ -106,10 +106,10 @@ describe("getPullRequestsTool", () => {
     expect(result[1].summary).toEqual("Add new feature");
   });
 
-  it("calls backlog.getPullRequests with correct params", async () => {
+  it("calls backlog.getPullRequests with correct params when using repoName", async () => {
     const params = {
       projectKey: "TEST",
-      repoIdOrName: "test-repo",
+      repoName: "test-repo", // Changed
       statusId: [1, 2],
       assigneeId: [1],
       count: 20
@@ -124,16 +124,35 @@ describe("getPullRequestsTool", () => {
     });
   });
 
-  it("calls backlog.getPullRequests with correct params when using projectId", async () => {
+  it("calls backlog.getPullRequests with correct params when using projectId and repoName", async () => {
     const params = {
-      projectId: 100, // Use projectId
-      repoIdOrName: "test-repo",
+      projectId: 100, 
+      repoName: "test-repo", // Changed
       statusId: [1],
     };
     
     await tool.handler(params);
     
-    expect(mockBacklog.getPullRequests).toHaveBeenCalledWith(100, "test-repo", { // Expect numeric ID
+    expect(mockBacklog.getPullRequests).toHaveBeenCalledWith(100, "test-repo", { 
+      statusId: [1],
+      assigneeId: undefined,
+      count: undefined,
+      createdUserId: undefined,
+      issueId: undefined,
+      offset: undefined,
+    });
+  });
+
+  it("calls backlog.getPullRequests with correct params when using projectId and repoId", async () => {
+    const params = {
+      projectId: 100,
+      repoId: 200, // Added repoId
+      statusId: [1],
+    };
+    
+    await tool.handler(params);
+    
+    expect(mockBacklog.getPullRequests).toHaveBeenCalledWith(100, "200", {
       statusId: [1],
       assigneeId: undefined,
       count: undefined,
@@ -146,7 +165,16 @@ describe("getPullRequestsTool", () => {
   it("throws an error if neither projectId nor projectKey is provided", async () => {
     const params = {
       // projectId and projectKey are missing
-      repoIdOrName: "test-repo"
+      repoName: "test-repo"
+    };
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
+  });
+
+  it("throws an error if neither repoId nor repoName is provided", async () => {
+    const params = {
+      projectKey: "TEST",
+      // repoId and repoName are missing
     };
     
     await expect(tool.handler(params as any)).rejects.toThrow(Error);

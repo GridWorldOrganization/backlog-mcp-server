@@ -3,7 +3,7 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { PullRequestCommentSchema } from "../types/zod/backlogOutputDefinition.js";
-import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
+import { resolveIdOrKey, resolveIdOrName } from "../utils/resolveIdOrKey.js";
 
 const getPullRequestCommentsSchema = buildToolSchema(t => ({
   projectId: z
@@ -24,7 +24,8 @@ const getPullRequestCommentsSchema = buildToolSchema(t => ({
         "The key of the project (e.g., 'PROJECT')"
       )
     ),
-  repoIdOrName: z.string().describe(t("TOOL_GET_PULL_REQUEST_COMMENTS_REPO_ID_OR_NAME", "Repository ID or name")),
+  repoId: z.number().optional().describe(t("TOOL_GET_PULL_REQUEST_COMMENTS_REPO_ID_OR_NAME", "Repository ID")),
+  repoName: z.string().optional().describe(t("TOOL_GET_PULL_REQUEST_COMMENTS_REPO_ID_OR_NAME", "Repository name")),
   number: z.number().describe(t("TOOL_GET_PULL_REQUEST_COMMENTS_NUMBER", "Pull request number")),
   minId: z.number().optional().describe(t("TOOL_GET_PULL_REQUEST_COMMENTS_MIN_ID", "Minimum comment ID")),
   maxId: z.number().optional().describe(t("TOOL_GET_PULL_REQUEST_COMMENTS_MAX_ID", "Maximum comment ID")),
@@ -38,12 +39,16 @@ export const getPullRequestCommentsTool = (backlog: Backlog, { t }: TranslationH
     description: t("TOOL_GET_PULL_REQUEST_COMMENTS_DESCRIPTION", "Returns list of comments for a pull request"),
     schema: z.object(getPullRequestCommentsSchema(t)),
     outputSchema: PullRequestCommentSchema,
-    handler: async ({ projectId, projectKey, repoIdOrName, number, ...params }) => {
-      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+    handler: async ({ projectId, projectKey, repoId, repoName, number, ...params }) => {
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }
-      return backlog.getPullRequestComments(result.value, repoIdOrName, number, params)
+      const repoResult = resolveIdOrName("repository", { id: repoId, name: repoName }, t);
+      if (!repoResult.ok) {
+        throw repoResult.error;
+      }
+      return backlog.getPullRequestComments(result.value, String(repoResult.value), number, params)
     }
   };
 };

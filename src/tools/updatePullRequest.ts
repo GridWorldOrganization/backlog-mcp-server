@@ -24,7 +24,8 @@ const updatePullRequestSchema = buildToolSchema(t => ({
         "The key of the project (e.g., 'PROJECT')"
       )
     ),
-  repoIdOrName: z.string().describe(t("TOOL_UPDATE_PULL_REQUEST_REPO_ID_OR_NAME", "Repository ID or name")),
+  repoId: z.number().optional().describe(t("TOOL_UPDATE_PULL_REQUEST_REPO_ID", "Repository ID")),
+  repoName: z.string().optional().describe(t("TOOL_UPDATE_PULL_REQUEST_REPO_NAME", "Repository name")), 
   number: z.number().describe(t("TOOL_UPDATE_PULL_REQUEST_NUMBER", "Pull request number")),
   summary: z.string().optional().describe(t("TOOL_UPDATE_PULL_REQUEST_SUMMARY", "Summary of the pull request")),
   description: z.string().optional().describe(t("TOOL_UPDATE_PULL_REQUEST_DESCRIPTION", "Description of the pull request")),
@@ -40,12 +41,16 @@ export const updatePullRequestTool = (backlog: Backlog, { t }: TranslationHelper
     description: t("TOOL_UPDATE_PULL_REQUEST_DESCRIPTION", "Updates an existing pull request"),
     schema: z.object(updatePullRequestSchema(t)),
     outputSchema: PullRequestSchema,
-    handler: async ({ projectId, projectKey, repoIdOrName, number, ...params }) => {
-      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+    handler: async ({ projectId, projectKey, repoId, repoName, number, ...params }) => {
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }
-      return backlog.patchPullRequest(result.value, repoIdOrName, number, params)
+      const resultRepo = resolveIdOrKey("repository", { id: repoId, key: repoName }, t);
+      if (!resultRepo.ok) {
+        throw resultRepo.error;
+      }
+      return backlog.patchPullRequest(result.value, String(resultRepo.value), number, params)
     }
   };
 };

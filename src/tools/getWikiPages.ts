@@ -35,7 +35,7 @@ export const getWikiPagesTool = (backlog: Backlog, { t }: TranslationHelper): To
     outputSchema: WikiListItemSchema,
     importantFields: ["projectId", "name", "tags"],
     handler: async ({ projectId, projectKey, keyword }) => {
-      const result = resolveIdOrKey("wiki", { id: projectId, key: projectKey }, t);
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }

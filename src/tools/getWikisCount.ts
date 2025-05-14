@@ -33,7 +33,7 @@ export const getWikisCountTool = (backlog: Backlog, { t }: TranslationHelper): T
     schema: z.object(getWikisCountSchema(t)),
     outputSchema: WikiCountSchema,
     handler: async ({ projectId, projectKey }) => {
-      const result = resolveIdOrKey("wiki", { id: projectId, key: projectKey }, t);
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }

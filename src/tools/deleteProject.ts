@@ -33,7 +33,7 @@ export const deleteProjectTool = (backlog: Backlog, { t }: TranslationHelper): T
     schema: z.object(deleteProjectSchema(t)),
     outputSchema: ProjectSchema,
     handler: async ({ projectId, projectKey }) => {
-      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }

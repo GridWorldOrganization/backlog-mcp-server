@@ -1,50 +1,68 @@
 import { TranslationHelper } from "../createTranslationHelper.js";
 
-export type EntityName = "issue" | "project" | "issueComment" | "pullRequest" | "customField" | "git" | "issueType" | "wiki";
+export type EntityName = 
+  | "issue" 
+  | "project" 
+  | "repository";
 
 type ResolveResult = { ok: true; value: string | number } | { ok: false; error: Error };
 
-type IdOrKey = {
-    id?: number;
-    key?: string;
+type ResolveIdOrFieldInput<F extends string> = {
+  id?: number;
+} & {
+  [K in F]?: string;
 };
 
 /**
- * Resolves either the ID or the key of a given entity.
- * Returns a Result-like object with either the resolved value or an error.
- * Does not throw directly; allows handler-level error control.
+ * Generic resolver for entity identification by ID or named field (e.g., key, name, slug).
+ * @param entity - The entity name, e.g., "project"
+ * @param fieldName - The name of the alternative to `id`, e.g., "key", "name", "slug"
+ * @param values - An object with `id?: number` and `[fieldName]?: string`
+ * @param t - Translator
  */
-export function resolveIdOrKey<E extends EntityName>(
-    entity: E,
-    values: { id?: number; key?: string },
-    t: TranslationHelper["t"]
+function resolveIdOrField<
+  E extends EntityName,
+  F extends string
+>(
+  entity: E,
+  fieldName: F,
+  values: ResolveIdOrFieldInput<F>,
+  t: TranslationHelper["t"]
 ): ResolveResult {
-    const idOrKey = tryResolveIdOrKey(values);
-    if (idOrKey === undefined) { // Check for undefined explicitly
-        return {
-            ok: false,
-            error: new Error(
-                t(
-                    `TOOL_${entity.toUpperCase()}_ID_OR_KEY_REQUIRED`,
-                    `${capitalize(entity)} ID or key is required`
-                )
-            ),
-        };
-    }
+  const value = tryResolveIdOrField(fieldName, values);
+  if (value === undefined) {
+    return {
+      ok: false,
+      error: new Error(
+        t(
+          `${entity.toUpperCase()}_ID_OR_${fieldName.toUpperCase()}_REQUIRED`,
+          `${capitalize(entity)} ID or ${fieldName} is required`
+        )
+      ),
+    };
+  }
 
-    return { ok: true, value: idOrKey };
+  return { ok: true, value };
 }
 
-/**
- * Resolves the ID or key from a given object.
- * Returns the ID (as a number) if present, otherwise the key (as a string).
- * Returns undefined if neither is present.
- */
-function tryResolveIdOrKey(values: IdOrKey): string | number | undefined {
-    return values.id !== undefined
-        ? values.id // Return number directly
-        : values.key;
+function tryResolveIdOrField<F extends string>(
+  fieldName: F,
+  values: ResolveIdOrFieldInput<F>
+): string | number | undefined {
+  return values.id !== undefined ? values.id : values[fieldName];
 }
+
+export const resolveIdOrKey = <E extends EntityName>(
+  entity: E,
+  values: { id?: number; key?: string },
+  t: TranslationHelper["t"]
+): ResolveResult => resolveIdOrField(entity, "key", values, t);
+
+export const resolveIdOrName = <E extends EntityName>(
+  entity: E,
+  values: { id?: number; name?: string },
+  t: TranslationHelper["t"]
+): ResolveResult => resolveIdOrField(entity, "name", values, t);
 
 function capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);

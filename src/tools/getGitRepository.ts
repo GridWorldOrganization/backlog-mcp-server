@@ -3,7 +3,7 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { GitRepositorySchema } from "../types/zod/backlogOutputDefinition.js";
-import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
+import { resolveIdOrKey, resolveIdOrName } from "../utils/resolveIdOrKey.js";
 
 const getGitRepositorySchema = buildToolSchema(t => ({
   projectId: z
@@ -24,7 +24,8 @@ const getGitRepositorySchema = buildToolSchema(t => ({
         "The key of the project (e.g., 'PROJECT')"
       )
     ),
-  repoIdOrName: z.string().describe(t("TOOL_GET_GIT_REPOSITORY_REPO_ID_OR_NAME", "Repository ID or name")),
+  repoId: z.number().optional().describe(t("TOOL_GET_GIT_REPOSITORY_REPO_ID", "Repository ID")),
+  repoName: z.string().optional().describe(t("TOOL_GET_GIT_REPOSITORY_REPO_NAME", "Repository name")), 
 }));
 
 export const getGitRepositoryTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getGitRepositorySchema>, typeof GitRepositorySchema["shape"]> => {
@@ -33,12 +34,16 @@ export const getGitRepositoryTool = (backlog: Backlog, { t }: TranslationHelper)
     description: t("TOOL_GET_GIT_REPOSITORY_DESCRIPTION", "Returns information about a specific Git repository"),
     schema: z.object(getGitRepositorySchema(t)),
     outputSchema: GitRepositorySchema,
-    handler: async ({ projectId, projectKey, repoIdOrName }) => {
-      const result = resolveIdOrKey("git", { id: projectId, key: projectKey }, t);
+    handler: async ({ projectId, projectKey, repoId, repoName }) => {
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }
-      return backlog.getGitRepository(result.value, repoIdOrName)
+      const repoResult = resolveIdOrName("repository", { id: repoId, name: repoName }, t);
+      if (!repoResult.ok) {
+        throw repoResult.error;
+      }
+      return backlog.getGitRepository(result.value, String(repoResult.value))
     }
   };
 };

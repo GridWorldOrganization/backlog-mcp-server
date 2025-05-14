@@ -33,7 +33,7 @@ export const getGitRepositoriesTool = (backlog: Backlog, { t }: TranslationHelpe
     schema: z.object(getGitRepositoriesSchema(t)),
     outputSchema: GitRepositorySchema,
     handler: async ({  projectId, projectKey  }) => {
-      const result = resolveIdOrKey("git", { id: projectId, key: projectKey }, t);
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }

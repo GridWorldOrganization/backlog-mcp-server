@@ -3,7 +3,7 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { PullRequestSchema } from "../types/zod/backlogOutputDefinition.js";
-import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
+import { resolveIdOrKey, resolveIdOrName } from "../utils/resolveIdOrKey.js";
 
 const getPullRequestSchema = buildToolSchema(t => ({
   projectId: z
@@ -24,7 +24,8 @@ const getPullRequestSchema = buildToolSchema(t => ({
         "The key of the project (e.g., 'PROJECT')"
       )
     ),
-  repoIdOrName: z.string().describe(t("TOOL_GET_PULL_REQUEST_REPO_ID_OR_NAME", "Repository ID or name")),
+  repoId: z.number().optional().describe(t("TOOL_GET_PULL_REQUEST_REPO_ID", "Repository ID")),
+  repoName: z.string().optional().describe(t("TOOL_GET_PULL_REQUEST_REPO_NAME", "Repository name")), 
   number: z.number().describe(t("TOOL_GET_PULL_REQUEST_NUMBER", "Pull request number")),
 }));
 
@@ -34,12 +35,16 @@ export const getPullRequestTool = (backlog: Backlog, { t }: TranslationHelper): 
     description: t("TOOL_GET_PULL_REQUEST_DESCRIPTION", "Returns information about a specific pull request"),
     schema: z.object(getPullRequestSchema(t)),
     outputSchema: PullRequestSchema,
-    handler: async ({ projectId, projectKey, repoIdOrName, number }) => {
-      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+    handler: async ({ projectId, projectKey, repoId, repoName, number }) => {
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
       if (!result.ok) {
         throw result.error;
       }
-      return backlog.getPullRequest(result.value, repoIdOrName, number)
+      const repoRes = resolveIdOrName("repository", { id: repoId, name: repoName }, t);
+      if (!repoRes.ok) {
+        throw repoRes.error;
+      }
+      return backlog.getPullRequest(result.value, String(repoRes.value), number)
     },
   };
 };

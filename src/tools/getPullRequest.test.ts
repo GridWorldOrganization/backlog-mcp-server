@@ -53,7 +53,7 @@ describe("getPullRequestTool", () => {
   it("returns pull request information as formatted JSON text", async () => {
     const result = await tool.handler({
       projectKey: "TEST",
-      repoIdOrName: "test-repo",
+      repoName: "test-repo", // Changed from repoIdOrName
       number: 1
     });
 
@@ -65,30 +65,50 @@ describe("getPullRequestTool", () => {
     expect(result.description).toContain("This PR fixes a bug in the login process");
   });
 
-  it("calls backlog.getPullRequest with correct params", async () => {
+  it("calls backlog.getPullRequest with correct params when using repoName", async () => {
     await tool.handler({
       projectKey: "TEST",
-      repoIdOrName: "test-repo",
+      repoName: "test-repo", // Changed from repoIdOrName
       number: 1
     });
     
     expect(mockBacklog.getPullRequest).toHaveBeenCalledWith("TEST", "test-repo", 1);
   });
 
-  it("calls backlog.getPullRequest with correct params when using projectId", async () => {
+  it("calls backlog.getPullRequest with correct params when using projectId and repoName", async () => {
     await tool.handler({
-      projectId: 100, // Use projectId
-      repoIdOrName: "test-repo",
+      projectId: 100, 
+      repoName: "test-repo", // Changed from repoIdOrName
       number: 1
     });
     
-    expect(mockBacklog.getPullRequest).toHaveBeenCalledWith(100, "test-repo", 1); // Expect numeric ID
+    expect(mockBacklog.getPullRequest).toHaveBeenCalledWith(100, "test-repo", 1); 
+  });
+
+  it("calls backlog.getPullRequest with correct params when using projectId and repoId", async () => {
+    await tool.handler({
+      projectId: 100,
+      repoId: 200, // Added repoId
+      number: 1
+    });
+    
+    expect(mockBacklog.getPullRequest).toHaveBeenCalledWith(100, "200", 1); 
   });
 
   it("throws an error if neither projectId nor projectKey is provided", async () => {
     const params = {
       // projectId and projectKey are missing
-      repoIdOrName: "test-repo",
+      repoName: "test-repo",
+      number: 1
+    };
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
+  });
+
+  it("throws an error if neither repoId nor repoName is provided", async () => {
+    const params = {
+      projectKey: "TEST",
+      // repoId and repoName are missing
       number: 1
     };
     
