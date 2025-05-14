@@ -9,11 +9,11 @@ export type CustomFieldInput = {
    */
   export function customFieldsToPayload(
     customFields: CustomFieldInput[] | undefined
-  ): Record<string, any> {
+  ): Record<string, string | number | string[] | undefined>  {
     if(customFields == null) {
         return {}
     }
-    const result: Record<string, any> = {};
+    const result: Record<string, string | number | string[] | undefined>  = {};
   
     for (const field of customFields) {
       result[`customField_${field.id}`] = field.value;

@@ -4,9 +4,9 @@ import plugin from '@typescript-eslint/eslint-plugin';
 
 /** @type {import("eslint").Linter.FlatConfig[]} */
 export default [
-    {
-        ignores: ['build/**', 'node_modules/**'],
-      },
+  {
+    ignores: ['build/**', 'node_modules/**'],
+  },
   js.configs.recommended,
   {
     files: ['**/*.ts'],
@@ -17,7 +17,7 @@ export default [
         sourceType: 'module',
       },
       globals: {
-        process: 'readonly', 
+        process: 'readonly',
         console: 'readonly',
       },
     },
@@ -36,5 +36,15 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off', // テストでは許可
     },
   },
+  {
+    files: ['**/*.js'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        console: 'readonly',
+      },
+    },
+  }
 
 ];
