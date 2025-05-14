@@ -1,7 +1,7 @@
 {
   "git": {
-    "tagName": "${version}",
-    "commitMessage": "chore(bump): ${version}",
+    "tagName": "v${version}",
+    "commitMessage": "chore(bump): v${version}",
     "tagMatch": "*",
     "requireCleanWorkingDir": true
   },
@@ -14,7 +14,7 @@
   },
   "github": {
     "release": true,
-    "releaseName": "${version}",
+    "releaseName": "v${version}",
     "tokenRef": "GITHUB_TOKEN"
   },
   "npm": false,
