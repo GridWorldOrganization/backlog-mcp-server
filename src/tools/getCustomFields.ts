@@ -3,15 +3,26 @@ import { z } from "zod";
 import { ToolDefinition, buildToolSchema } from "../types/tool.js";
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { CustomFieldSchema } from "../types/zod/backlogOutputDefinition.js";
+import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
 
 const getCustomFieldsInputSchema = buildToolSchema((t) => ({
-  projectIdOrKey: z
-    .union([z.string(), z.number()])
+  projectId: z
+    .number()
+    .optional()
     .describe(
       t(
-        "TOOL_GET_CUSTOM_FIELDS_PROJECT_ID_OR_KEY",
-        "Project ID or project key",
-      ),
+        "TOOL_GET_CUSTOM_FIELDS_PROJECT_ID",
+        "The numeric ID of the project (e.g., 12345)"
+      )
+    ),
+  projectKey: z
+    .string()
+    .optional()
+    .describe(
+      t(
+        "TOOL_GET_CUSTOM_FIELDS_PROJECT_KEY",
+        "The key of the project (e.g., 'PROJECT')"
+      )
     ),
 }));
 
@@ -33,8 +44,12 @@ export const getCustomFieldsTool = (
     schema: inputSchemaObject, 
     outputSchema: CustomFieldSchema, 
     importantFields: ["id", "name", "typeId", "required", "applicableIssueTypes"],
-    handler: async ({ projectIdOrKey }) => {
-      return backlog.getCustomFields(projectIdOrKey);
+    handler: async ({ projectId, projectKey }) => {
+      const result = resolveIdOrKey("customField", { id: projectId, key: projectKey }, t);
+      if (!result.ok) {
+        throw result.error;
+      }
+      return backlog.getCustomFields(result.value);
     },
   };
 };

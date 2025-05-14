@@ -3,9 +3,27 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { PullRequestCommentSchema } from "../types/zod/backlogOutputDefinition.js";
+import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
 
 const updatePullRequestCommentSchema = buildToolSchema(t => ({
-  projectIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_UPDATE_PULL_REQUEST_COMMENT_PROJECT_ID_OR_KEY", "Project ID or project key")),
+  projectId: z
+    .number()
+    .optional()
+    .describe(
+      t(
+        "TOOL_UPDATE_PULL_REQUEST_COMMENT_PROJECT_ID",
+        "The numeric ID of the project (e.g., 12345)"
+      )
+    ),
+  projectKey: z
+    .string()
+    .optional()
+    .describe(
+      t(
+        "TOOL_UPDATE_PULL_REQUEST_COMMENT_PROJECT_KEY",
+        "The key of the project (e.g., 'PROJECT')"
+      )
+    ),
   repoIdOrName: z.string().describe(t("TOOL_UPDATE_PULL_REQUEST_COMMENT_REPO_ID_OR_NAME", "Repository ID or name")),
   number: z.number().describe(t("TOOL_UPDATE_PULL_REQUEST_COMMENT_NUMBER", "Pull request number")),
   commentId: z.number().describe(t("TOOL_UPDATE_PULL_REQUEST_COMMENT_COMMENT_ID", "Comment ID")),
@@ -19,6 +37,12 @@ export const updatePullRequestCommentTool = (backlog: Backlog, { t }: Translatio
     schema: z.object(updatePullRequestCommentSchema(t)),
     outputSchema: PullRequestCommentSchema,
     importantFields: ["id", "content", "createdUser", "updated"],
-    handler: async ({ projectIdOrKey, repoIdOrName, number, commentId, content }) => backlog.patchPullRequestComments(projectIdOrKey, repoIdOrName, number, commentId, { content })
+    handler: async ({ projectId, projectKey, repoIdOrName, number, commentId, content }) => {
+      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+      if (!result.ok) {
+        throw result.error;
+      }
+      return backlog.patchPullRequestComments(result.value, repoIdOrName, number, commentId, { content })
+    }
   };
 };

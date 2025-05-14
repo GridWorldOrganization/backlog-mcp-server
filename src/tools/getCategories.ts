@@ -3,9 +3,27 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { CategorySchema } from "../types/zod/backlogOutputDefinition.js";
+import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
 
 const getCategoriesSchema = buildToolSchema(t => ({
-  projectIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_GET_CATEGORIES_PROJECT_ID_OR_KEY", "Project ID or project key")),
+  projectId: z
+    .number()
+    .optional()
+    .describe(
+      t(
+        "TOOL_GET_CATEGORIES_PROJECT_ID",
+        "The numeric ID of the project (e.g., 12345)"
+      )
+    ),
+  projectKey: z
+    .string()
+    .optional()
+    .describe(
+      t(
+        "TOOL_GET_CATEGORIES_PROJECT_ID",
+        "The key of the project (e.g., 'PROJECT')"
+      )
+    ),
 }));
 
 export const getCategoriesTool = (backlog: Backlog, { t }: TranslationHelper): ToolDefinition<ReturnType<typeof getCategoriesSchema>, typeof CategorySchema["shape"]> => {
@@ -15,6 +33,12 @@ export const getCategoriesTool = (backlog: Backlog, { t }: TranslationHelper): T
     schema: z.object(getCategoriesSchema(t)),
     importantFields: ["id", "projectId", "name"],
     outputSchema: CategorySchema,
-    handler: async ({ projectIdOrKey }) => backlog.getCategories(projectIdOrKey),
+    handler: async ({ projectId, projectKey }) => {
+      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+      if (!result.ok) {
+        throw result.error;
+      }
+      return backlog.getCategories(result.value)
+    },
   };
 };

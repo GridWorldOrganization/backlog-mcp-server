@@ -32,7 +32,7 @@ describe("getIssueTypesTool", () => {
 
   it("returns issue types list as formatted JSON text", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST"
+      projectKey: "TEST"
     });
 
     if (!Array.isArray(result)) {
@@ -46,7 +46,7 @@ describe("getIssueTypesTool", () => {
 
   it("calls backlog.getIssueTypes with correct params when using project key", async () => {
     await tool.handler({
-      projectIdOrKey: "TEST"
+      projectKey: "TEST"
     });
     
     expect(mockBacklog.getIssueTypes).toHaveBeenCalledWith("TEST");
@@ -54,9 +54,15 @@ describe("getIssueTypesTool", () => {
 
   it("calls backlog.getIssueTypes with correct params when using project ID", async () => {
     await tool.handler({
-      projectIdOrKey: 100
+      projectId: 100
     });
     
     expect(mockBacklog.getIssueTypes).toHaveBeenCalledWith(100);
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {}; // No identifier provided
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
   });
 });

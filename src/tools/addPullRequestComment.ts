@@ -3,9 +3,27 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { PullRequestCommentSchema } from "../types/zod/backlogOutputDefinition.js";
+import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
 
 const addPullRequestCommentSchema = buildToolSchema(t => ({
-  projectIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_ADD_PULL_REQUEST_COMMENT_PROJECT_ID_OR_KEY", "Project ID or project key")),
+  projectId: z
+    .number()
+    .optional()
+    .describe(
+      t(
+        "TOOL_ADD_PULL_REQUEST_COMMENT_PROJECT_ID",
+        "The numeric ID of the project (e.g., 12345)"
+      )
+    ),
+  projectKey: z
+    .string()
+    .optional()
+    .describe(
+      t(
+        "TOOL_ADD_PULL_REQUEST_COMMENT_PROJECT_KEY",
+        "The key of the project (e.g., 'PROJECT')"
+      )
+    ),
   repoIdOrName: z.string().describe(t("TOOL_ADD_PULL_REQUEST_COMMENT_REPO_ID_OR_NAME", "Repository ID or name")),
   number: z.number().describe(t("TOOL_ADD_PULL_REQUEST_COMMENT_NUMBER", "Pull request number")),
   content: z.string().describe(t("TOOL_ADD_PULL_REQUEST_COMMENT_CONTENT", "Comment content")),
@@ -19,6 +37,12 @@ export const addPullRequestCommentTool = (backlog: Backlog, { t }: TranslationHe
     schema: z.object(addPullRequestCommentSchema(t)),
     outputSchema: PullRequestCommentSchema,
     importantFields: ["id", "content", "createdUser"],
-    handler: async ({ projectIdOrKey, repoIdOrName, number, ...params }) => backlog.postPullRequestComments(projectIdOrKey, repoIdOrName, number, params)
+    handler: async ({ projectId, projectKey, repoIdOrName, number, ...params }) => {
+      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+      if (!result.ok) {
+        throw result.error;
+      }
+      return backlog.postPullRequestComments(result.value, repoIdOrName, number, params)
+    }
   }
 };

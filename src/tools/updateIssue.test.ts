@@ -88,11 +88,11 @@ describe("updateIssueTool", () => {
       priorityId: 2,
       statusId: 2
     });
-    
+
     expect(mockBacklog.patchIssue).toHaveBeenCalledWith("TEST-1", {
-      summary: "Updated Issue",
       priorityId: 2,
-      statusId: 2
+      statusId: 2,
+      summary: "Updated Issue"
     });
   });
 
@@ -103,8 +103,8 @@ describe("updateIssueTool", () => {
       actualHours: 8,
       comment: "Updated the estimated and actual hours"
     });
-    
-    expect(mockBacklog.patchIssue).toHaveBeenCalledWith("1", {
+
+    expect(mockBacklog.patchIssue).toHaveBeenCalledWith(1, { // Expect number
       estimatedHours: 15,
       actualHours: 8,
       comment: "Updated the estimated and actual hours"

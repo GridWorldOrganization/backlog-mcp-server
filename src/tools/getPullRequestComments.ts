@@ -3,9 +3,27 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { PullRequestCommentSchema } from "../types/zod/backlogOutputDefinition.js";
+import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
 
 const getPullRequestCommentsSchema = buildToolSchema(t => ({
-  projectIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_GET_PULL_REQUEST_COMMENTS_PROJECT_ID_OR_KEY", "Project ID or project key")),
+  projectId: z
+    .number()
+    .optional()
+    .describe(
+      t(
+        "TOOL_GET_PROJECT_PROJECT_ID",
+        "The numeric ID of the project (e.g., 12345)"
+      )
+    ),
+  projectKey: z
+    .string()
+    .optional()
+    .describe(
+      t(
+        "TOOL_GET_PROJECT_PROJECT_KEY",
+        "The key of the project (e.g., 'PROJECT')"
+      )
+    ),
   repoIdOrName: z.string().describe(t("TOOL_GET_PULL_REQUEST_COMMENTS_REPO_ID_OR_NAME", "Repository ID or name")),
   number: z.number().describe(t("TOOL_GET_PULL_REQUEST_COMMENTS_NUMBER", "Pull request number")),
   minId: z.number().optional().describe(t("TOOL_GET_PULL_REQUEST_COMMENTS_MIN_ID", "Minimum comment ID")),
@@ -20,6 +38,12 @@ export const getPullRequestCommentsTool = (backlog: Backlog, { t }: TranslationH
     description: t("TOOL_GET_PULL_REQUEST_COMMENTS_DESCRIPTION", "Returns list of comments for a pull request"),
     schema: z.object(getPullRequestCommentsSchema(t)),
     outputSchema: PullRequestCommentSchema,
-    handler: async ({ projectIdOrKey, repoIdOrName, number, ...params }) => backlog.getPullRequestComments(projectIdOrKey, repoIdOrName, number, params)
+    handler: async ({ projectId, projectKey, repoIdOrName, number, ...params }) => {
+      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+      if (!result.ok) {
+        throw result.error;
+      }
+      return backlog.getPullRequestComments(result.value, repoIdOrName, number, params)
+    }
   };
 };

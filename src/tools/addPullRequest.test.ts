@@ -1,5 +1,5 @@
 import { addPullRequestTool } from "./addPullRequest.js";
-import { jest, describe, it, expect } from '@jest/globals'; 
+import { jest, describe, it, expect } from '@jest/globals';
 import type { Backlog } from "backlog-js";
 import { createTranslationHelper } from "../createTranslationHelper.js";
 
@@ -52,7 +52,7 @@ describe("addPullRequestTool", () => {
 
   it("returns created pull request as formatted JSON text", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo",
       summary: "Fix bug in login",
       description: "This PR fixes a bug in the login process",
@@ -71,7 +71,7 @@ describe("addPullRequestTool", () => {
 
   it("calls backlog.postPullRequest with correct params", async () => {
     const params = {
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo",
       summary: "Fix bug in login",
       description: "This PR fixes a bug in the login process",
@@ -81,9 +81,9 @@ describe("addPullRequestTool", () => {
       assigneeId: 1,
       notifiedUserId: [2, 3]
     };
-    
+
     await tool.handler(params);
-    
+
     expect(mockBacklog.postPullRequest).toHaveBeenCalledWith("TEST", "test-repo", {
       summary: "Fix bug in login",
       description: "This PR fixes a bug in the login process",
@@ -93,5 +93,24 @@ describe("addPullRequestTool", () => {
       assigneeId: 1,
       notifiedUserId: [2, 3]
     });
+  });
+
+  it("calls backlog.postPullRequest with correct params when using projectId", async () => {
+    const params = {
+      projectId: 1, 
+      repoIdOrName: "test-repo",
+    };
+
+    await tool.handler(params as any);
+
+    expect(mockBacklog.postPullRequest).toHaveBeenCalledWith(1, "test-repo", {});
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {};
+
+    expect(tool.handler(params as any)).rejects.toThrow(
+      Error
+    );
   });
 });

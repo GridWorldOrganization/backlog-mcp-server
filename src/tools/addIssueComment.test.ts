@@ -44,7 +44,7 @@ describe("addIssueCommentTool", () => {
       issueKey: "TEST-1",
       content: "This is a new comment"
     });
-    
+
     expect(mockBacklog.postIssueComments).toHaveBeenCalledWith("TEST-1", {
       content: "This is a new comment",
       notifiedUserId: undefined,
@@ -58,8 +58,8 @@ describe("addIssueCommentTool", () => {
       content: "This is a new comment with notifications",
       notifiedUserId: [2, 3]
     });
-    
-    expect(mockBacklog.postIssueComments).toHaveBeenCalledWith("1", {
+
+    expect(mockBacklog.postIssueComments).toHaveBeenCalledWith(1, { // Expect number
       content: "This is a new comment with notifications",
       notifiedUserId: [2, 3],
       attachmentId: undefined

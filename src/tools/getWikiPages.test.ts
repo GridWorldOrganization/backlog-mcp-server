@@ -66,7 +66,7 @@ describe("getWikiPagesTool", () => {
 
   it("returns wiki pages as formatted JSON text", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST"
+      projectKey: "TEST"
     });
 
     if (!Array.isArray(result)) {
@@ -79,24 +79,33 @@ describe("getWikiPagesTool", () => {
 
   it("calls backlog.getWikis with correct params when using project key", async () => {
     await tool.handler({
-      projectIdOrKey: "TEST"
+      projectKey: "TEST"
     });
     
     expect(mockBacklog.getWikis).toHaveBeenCalledWith({
-      projectIdOrKey: "TEST",
+      projectIdOrKey: "TEST", // This is correct as backlog-js expects projectIdOrKey
       keyword: undefined
     });
   });
 
   it("calls backlog.getWikis with correct params when using project ID and keyword", async () => {
     await tool.handler({
-      projectIdOrKey: 100,
+      projectId: 100,
       keyword: "api"
     });
     
     expect(mockBacklog.getWikis).toHaveBeenCalledWith({
-      projectIdOrKey: 100,
+      projectIdOrKey: 100, // This is correct as backlog-js expects projectIdOrKey
       keyword: "api"
     });
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {
+      // projectId and projectKey are missing
+      keyword: "test"
+    };
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
   });
 });

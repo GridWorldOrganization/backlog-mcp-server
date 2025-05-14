@@ -23,7 +23,7 @@ describe("getProjectTool", () => {
 
   it("returns project information as formatted JSON text", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST"
+      projectKey: "TEST"
     });
 
     if (Array.isArray(result)) {
@@ -35,7 +35,7 @@ describe("getProjectTool", () => {
 
   it("calls backlog.getProject with correct params when using project key", async () => {
     await tool.handler({
-      projectIdOrKey: "TEST"
+      projectKey: "TEST"
     });
     
     expect(mockBacklog.getProject).toHaveBeenCalledWith("TEST");
@@ -43,9 +43,15 @@ describe("getProjectTool", () => {
 
   it("calls backlog.getProject with correct params when using project ID", async () => {
     await tool.handler({
-      projectIdOrKey: 1
+      projectId: 1
     });
     
     expect(mockBacklog.getProject).toHaveBeenCalledWith(1);
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {}; // No identifier provided
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
   });
 });

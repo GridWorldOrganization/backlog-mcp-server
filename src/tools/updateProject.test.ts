@@ -23,7 +23,7 @@ describe("updateProjectTool", () => {
 
   it("returns updated project", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       name: "Updated Project",
       key: "UPDATED",
       archived: true
@@ -36,7 +36,7 @@ describe("updateProjectTool", () => {
 
   it("calls backlog.patchProject with correct params when using project key", async () => {
     await tool.handler({
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       name: "Updated Project",
       key: "UPDATED",
       textFormattingRule: "markdown",
@@ -56,7 +56,7 @@ describe("updateProjectTool", () => {
 
   it("calls backlog.patchProject with correct params when using project ID", async () => {
     await tool.handler({
-      projectIdOrKey: 1,
+      projectId: 1,
       chartEnabled: true,
       subtaskingEnabled: true
     });
@@ -70,5 +70,14 @@ describe("updateProjectTool", () => {
       textFormattingRule: undefined,
       archived: undefined
     });
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {
+      // projectId and projectKey are missing
+      name: "Test Project Name"
+    };
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
   });
 });

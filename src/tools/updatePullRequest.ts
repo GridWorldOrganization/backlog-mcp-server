@@ -3,9 +3,27 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { PullRequestSchema } from "../types/zod/backlogOutputDefinition.js";
+import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
 
 const updatePullRequestSchema = buildToolSchema(t => ({
-  projectIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_UPDATE_PULL_REQUEST_PROJECT_ID_OR_KEY", "Project ID or project key")),
+  projectId: z
+    .number()
+    .optional()
+    .describe(
+      t(
+        "TOOL_UPDATE_PULL_REQUEST_PROJECT_ID",
+        "The numeric ID of the project (e.g., 12345)"
+      )
+    ),
+  projectKey: z
+    .string()
+    .optional()
+    .describe(
+      t(
+        "TOOL_UPDATE_PULL_REQUEST_PROJECT_KEY",
+        "The key of the project (e.g., 'PROJECT')"
+      )
+    ),
   repoIdOrName: z.string().describe(t("TOOL_UPDATE_PULL_REQUEST_REPO_ID_OR_NAME", "Repository ID or name")),
   number: z.number().describe(t("TOOL_UPDATE_PULL_REQUEST_NUMBER", "Pull request number")),
   summary: z.string().optional().describe(t("TOOL_UPDATE_PULL_REQUEST_SUMMARY", "Summary of the pull request")),
@@ -22,6 +40,12 @@ export const updatePullRequestTool = (backlog: Backlog, { t }: TranslationHelper
     description: t("TOOL_UPDATE_PULL_REQUEST_DESCRIPTION", "Updates an existing pull request"),
     schema: z.object(updatePullRequestSchema(t)),
     outputSchema: PullRequestSchema,
-    handler: async ({ projectIdOrKey, repoIdOrName, number, ...params }) => backlog.patchPullRequest(projectIdOrKey, repoIdOrName, number, params)
+    handler: async ({ projectId, projectKey, repoIdOrName, number, ...params }) => {
+      const result = resolveIdOrKey("pullRequest", { id: projectId, key: projectKey }, t);
+      if (!result.ok) {
+        throw result.error;
+      }
+      return backlog.patchPullRequest(result.value, repoIdOrName, number, params)
+    }
   };
 };

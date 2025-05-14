@@ -27,7 +27,7 @@ describe("getCustomFieldsTool", () => {
     // Setup the mockResolvedValue for getCustomFields
     (mockBacklog.getCustomFields as jest.Mock<() => Promise<Entity.Project.CustomField[]>>).mockResolvedValue(mockCustomFieldsData);
 
-    const input = { projectIdOrKey: "TEST_PROJECT" };
+    const input = { projectKey: "TEST_PROJECT" };
     const result = await toolHandler(input);
 
     expect(mockBacklog.getCustomFields).toHaveBeenCalledWith("TEST_PROJECT");
@@ -36,7 +36,7 @@ describe("getCustomFieldsTool", () => {
 
   it("should call backlog.getCustomFields with correct params when using project ID", async () => {
     (mockBacklog.getCustomFields as jest.Mock<() => Promise<Entity.Project.CustomField[]>>).mockResolvedValue([]); // Return empty for this check
-    await toolHandler({ projectIdOrKey: 123 });
+    await toolHandler({ projectId: 123 });
     expect(mockBacklog.getCustomFields).toHaveBeenCalledWith(123);
   });
   
@@ -44,7 +44,7 @@ describe("getCustomFieldsTool", () => {
     const apiError = new Error("API error");
     (mockBacklog.getCustomFields as jest.Mock<() => Promise<Entity.Project.CustomField[]>>).mockRejectedValue(apiError);
 
-    const input = { projectIdOrKey: "TEST_PROJECT_FAIL" };
+    const input = { projectKey: "TEST_PROJECT_FAIL" };
     // Expect the handler to throw the error directly
     await expect(toolHandler(input)).rejects.toThrow(apiError);
     expect(mockBacklog.getCustomFields).toHaveBeenCalledWith("TEST_PROJECT_FAIL");
@@ -57,9 +57,15 @@ describe("getCustomFieldsTool", () => {
     };
     (mockBacklog.getCustomFields as jest.Mock<() => Promise<Entity.Project.CustomField[]>>).mockRejectedValue(structuredError);
 
-    const input = { projectIdOrKey: "TEST_PROJECT_STRUCTURED_ERROR" };
+    const input = { projectKey: "TEST_PROJECT_STRUCTURED_ERROR" };
     // Expect the handler to throw the structured error directly
     await expect(toolHandler(input)).rejects.toEqual(structuredError);
     expect(mockBacklog.getCustomFields).toHaveBeenCalledWith("TEST_PROJECT_STRUCTURED_ERROR");
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {}; // No identifier provided
+    
+    await expect(toolHandler(params as any)).rejects.toThrow(Error);
   });
 });

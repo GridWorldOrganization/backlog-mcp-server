@@ -64,7 +64,7 @@ describe("getIssueCommentsTool", () => {
       count: 10,
       order: "desc"
     });
-    
+
     expect(mockBacklog.getIssueComments).toHaveBeenCalledWith("TEST-1", {
       count: 10,
       order: "desc"
@@ -77,8 +77,8 @@ describe("getIssueCommentsTool", () => {
       minId: 100,
       maxId: 200
     });
-    
-    expect(mockBacklog.getIssueComments).toHaveBeenCalledWith("1", {
+
+    expect(mockBacklog.getIssueComments).toHaveBeenCalledWith(1, { // Expect number
       minId: 100,
       maxId: 200
     });

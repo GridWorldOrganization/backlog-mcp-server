@@ -42,7 +42,7 @@ describe("getPullRequestCommentsTool", () => {
 
   it("returns pull request comments", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo",
       number: 1
     });
@@ -57,7 +57,7 @@ describe("getPullRequestCommentsTool", () => {
 
   it("calls backlog.getPullRequestComments with correct params", async () => {
     const params = {
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo",
       number: 1,
       minId: 100,
@@ -74,5 +74,27 @@ describe("getPullRequestCommentsTool", () => {
       count: 20,
       order: "desc"
     });
+  });
+
+  it("calls backlog.getPullRequestComments with correct params when using projectId", async () => {
+    const params = {
+      projectId: 100, // Use projectId
+      repoIdOrName: "test-repo",
+      number: 1,
+    };
+    
+    await tool.handler(params);
+    
+    expect(mockBacklog.getPullRequestComments).toHaveBeenCalledWith(100, "test-repo", 1, {}); // Expect numeric ID
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {
+      // projectId and projectKey are missing
+      repoIdOrName: "test-repo",
+      number: 1
+    };
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
   });
 });

@@ -29,7 +29,7 @@ describe("getCategoriesTool", () => {
 
   it("returns categories list as formatted JSON text", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST"
+      projectKey: "TEST"
     });
 
     if (!Array.isArray(result)) {
@@ -44,7 +44,7 @@ describe("getCategoriesTool", () => {
 
   it("calls backlog.getCategories with correct params when using project key", async () => {
     await tool.handler({
-      projectIdOrKey: "TEST"
+      projectKey: "TEST"
     });
     
     expect(mockBacklog.getCategories).toHaveBeenCalledWith("TEST");
@@ -52,9 +52,17 @@ describe("getCategoriesTool", () => {
 
   it("calls backlog.getCategories with correct params when using project ID", async () => {
     await tool.handler({
-      projectIdOrKey: 100
+      projectId: 100
     });
     
     expect(mockBacklog.getCategories).toHaveBeenCalledWith(100);
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {}; // No identifier provided
+    
+    // Assuming resolveIdOrKey for "project" entity (as categories are project-specific)
+    // throws "Project ID or key is required"
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
   });
 });

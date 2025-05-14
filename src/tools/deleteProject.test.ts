@@ -23,7 +23,7 @@ describe("deleteProjectTool", () => {
 
   it("returns deleted project information", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST"
+      projectKey: "TEST"
     });
 
     expect(result).toHaveProperty("projectKey", "TEST");
@@ -32,7 +32,7 @@ describe("deleteProjectTool", () => {
 
   it("calls backlog.deleteProject with correct params when using project key", async () => {
     await tool.handler({
-      projectIdOrKey: "TEST"
+      projectKey: "TEST"
     });
     
     expect(mockBacklog.deleteProject).toHaveBeenCalledWith("TEST");
@@ -40,9 +40,18 @@ describe("deleteProjectTool", () => {
 
   it("calls backlog.deleteProject with correct params when using project ID", async () => {
     await tool.handler({
-      projectIdOrKey: 1
+      projectId: 1
     });
     
     expect(mockBacklog.deleteProject).toHaveBeenCalledWith(1);
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {}; // No identifier provided
+    
+    // Assuming resolveIdOrKey for "project" entity throws "Project ID or key is required"
+    await expect(tool.handler(params as any)).rejects.toThrow(
+      Error
+    );
   });
 });

@@ -26,7 +26,7 @@ describe("addPullRequestCommentTool", () => {
 
   it("returns created comment as formatted JSON text", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo",
       number: 1,
       content: "This looks good to me!"
@@ -40,7 +40,7 @@ describe("addPullRequestCommentTool", () => {
 
   it("calls backlog.postPullRequestComments with correct params", async () => {
     const params = {
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo",
       number: 1,
       content: "This looks good to me!",
@@ -53,5 +53,32 @@ describe("addPullRequestCommentTool", () => {
       content: "This looks good to me!",
       notifiedUserId: [2, 3]
     });
+  });
+
+  it("calls backlog.postPullRequestComments with correct params when using projectId", async () => {
+    const params = {
+      projectId: 100, // Use projectId
+      repoIdOrName: "test-repo",
+      number: 1,
+      content: "Comment via projectId"
+    };
+    
+    await tool.handler(params);
+    
+    expect(mockBacklog.postPullRequestComments).toHaveBeenCalledWith(100, "test-repo", 1, { // Expect numeric ID
+      content: "Comment via projectId",
+      notifiedUserId: undefined 
+    });
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {
+      // projectId and projectKey are missing
+      repoIdOrName: "test-repo",
+      number: 1,
+      content: "Test content"
+    };
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
   });
 });

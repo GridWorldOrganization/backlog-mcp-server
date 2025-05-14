@@ -35,7 +35,7 @@ describe("getGitRepositoryTool", () => {
 
   it("returns git repository information as formatted JSON text", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo"
     });
 
@@ -49,7 +49,7 @@ describe("getGitRepositoryTool", () => {
 
   it("calls backlog.getGitRepository with correct params when using project key", async () => {
     await tool.handler({
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo"
     });
     
@@ -58,10 +58,22 @@ describe("getGitRepositoryTool", () => {
 
   it("calls backlog.getGitRepository with correct params when using project ID", async () => {
     await tool.handler({
-      projectIdOrKey: 100,
+      projectId: 100,
       repoIdOrName: "test-repo"
     });
     
     expect(mockBacklog.getGitRepository).toHaveBeenCalledWith(100, "test-repo");
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {
+      // projectId and projectKey are missing
+      repoIdOrName: "test-repo"
+    };
+    
+    // Assuming resolveIdOrKey for "git" entity throws "Git ID or key is required"
+    await expect(tool.handler(params as any)).rejects.toThrow(
+      "Git ID or key is required"
+    );
   });
 });

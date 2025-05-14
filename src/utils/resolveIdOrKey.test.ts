@@ -6,7 +6,7 @@ const t = (_key: string, fallback: string) => fallback;
 describe("resolveIdOrKey", () => {
   it("resolves ID when provided", () => {
     const result = resolveIdOrKey("issue", { id: 123 }, t);
-    expect(result).toEqual({ ok: true, value: "123" });
+    expect(result).toEqual({ ok: true, value: 123 }); // Expect number
   });
 
   it("resolves key when ID is not provided", () => {

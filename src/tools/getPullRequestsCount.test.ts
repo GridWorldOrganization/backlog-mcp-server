@@ -15,7 +15,7 @@ describe("getPullRequestsCountTool", () => {
 
   it("returns pull requests count", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo"
     });
 
@@ -24,7 +24,7 @@ describe("getPullRequestsCountTool", () => {
 
   it("calls backlog.getPullRequestsCount with correct params", async () => {
     const params = {
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo",
       statusId: [1, 2],
       assigneeId: [1]
@@ -36,5 +36,31 @@ describe("getPullRequestsCountTool", () => {
       statusId: [1, 2],
       assigneeId: [1]
     });
+  });
+
+  it("calls backlog.getPullRequestsCount with correct params when using projectId", async () => {
+    const params = {
+      projectId: 100, // Use projectId
+      repoIdOrName: "test-repo",
+      statusId: [1],
+    };
+    
+    await tool.handler(params);
+    
+    expect(mockBacklog.getPullRequestsCount).toHaveBeenCalledWith(100, "test-repo", { // Expect numeric ID
+      statusId: [1],
+      assigneeId: undefined,
+      createdUserId: undefined,
+      issueId: undefined,
+    });
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {
+      // projectId and projectKey are missing
+      repoIdOrName: "test-repo"
+    };
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
   });
 });

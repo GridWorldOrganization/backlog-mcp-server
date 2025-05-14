@@ -52,7 +52,7 @@ describe("updatePullRequestTool", () => {
 
   it("returns updated pull request", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo",
       number: 1,
       summary: "Updated PR title",
@@ -71,7 +71,7 @@ describe("updatePullRequestTool", () => {
 
   it("calls backlog.patchPullRequest with correct params", async () => {
     const params = {
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo",
       number: 1,
       summary: "Updated PR title",
@@ -90,5 +90,31 @@ describe("updatePullRequestTool", () => {
       assigneeId: 2,
       statusId: 2
     });
+  });
+
+  it("calls backlog.patchPullRequest with correct params when using projectId", async () => {
+    const params = {
+      projectId: 100, // Use projectId
+      repoIdOrName: "test-repo",
+      number: 1,
+      summary: "Updated PR title via projectId",
+    };
+
+    await tool.handler(params);
+
+    expect(mockBacklog.patchPullRequest).toHaveBeenCalledWith(100, "test-repo", 1, { // Expect numeric ID
+      summary: "Updated PR title via projectId",
+    });
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {
+      // projectId and projectKey are missing
+      repoIdOrName: "test-repo",
+      number: 1,
+      summary: "Test Summary",
+    };
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
   });
 });

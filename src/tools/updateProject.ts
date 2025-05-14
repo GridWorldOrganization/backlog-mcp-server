@@ -3,9 +3,27 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from "../createTranslationHelper.js";
 import { ProjectSchema } from "../types/zod/backlogOutputDefinition.js";
+import { resolveIdOrKey } from "../utils/resolveIdOrKey.js";
 
 const updateProjectSchema = buildToolSchema(t => ({
-  projectIdOrKey: z.union([z.string(), z.number()]).describe(t("TOOL_UPDATE_PROJECT_PROJECT_ID_OR_KEY", "Project ID or project key")),
+  projectId: z
+    .number()
+    .optional()
+    .describe(
+      t(
+        "TOOL_UPDATE_PROJECT_PROJECT_ID",
+        "The numeric ID of the project (e.g., 12345)"
+      )
+    ),
+  projectKey: z
+    .string()
+    .optional()
+    .describe(
+      t(
+        "TOOL_UPDATE_PROJECT_PROJECT_KEY",
+        "The key of the project (e.g., 'PROJECT')"
+      )
+    ),
   name: z.string().optional().describe(t("TOOL_UPDATE_PROJECT_NAME", "Project name")),
   key: z.string().optional().describe(t("TOOL_UPDATE_PROJECT_KEY", "Project key")),
   chartEnabled: z.boolean().optional().describe(t("TOOL_UPDATE_PROJECT_CHART_ENABLED", "Whether to enable chart")),
@@ -21,15 +39,12 @@ export const updateProjectTool = (backlog: Backlog, { t }: TranslationHelper): T
     description: t("TOOL_UPDATE_PROJECT_DESCRIPTION", "Updates an existing project"),
     schema: z.object(updateProjectSchema(t)),
     outputSchema: ProjectSchema,
-    handler: async ({ projectIdOrKey, name, key, chartEnabled, subtaskingEnabled, projectLeaderCanEditProjectLeader, textFormattingRule, archived }) =>
-     backlog.patchProject(projectIdOrKey, {
-        name,
-        key,
-        chartEnabled,
-        subtaskingEnabled,
-        projectLeaderCanEditProjectLeader,
-        textFormattingRule,
-        archived
-      })
+    handler: async ({ projectId, projectKey, ...param }) => {
+      const result = resolveIdOrKey("project", { id: projectId, key: projectKey }, t);
+      if (!result.ok) {
+        throw result.error;
+      }
+     return backlog.patchProject(result.value, param)
+    }
   };
 };

@@ -52,7 +52,7 @@ describe("getPullRequestTool", () => {
 
   it("returns pull request information as formatted JSON text", async () => {
     const result = await tool.handler({
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo",
       number: 1
     });
@@ -67,11 +67,31 @@ describe("getPullRequestTool", () => {
 
   it("calls backlog.getPullRequest with correct params", async () => {
     await tool.handler({
-      projectIdOrKey: "TEST",
+      projectKey: "TEST",
       repoIdOrName: "test-repo",
       number: 1
     });
     
     expect(mockBacklog.getPullRequest).toHaveBeenCalledWith("TEST", "test-repo", 1);
+  });
+
+  it("calls backlog.getPullRequest with correct params when using projectId", async () => {
+    await tool.handler({
+      projectId: 100, // Use projectId
+      repoIdOrName: "test-repo",
+      number: 1
+    });
+    
+    expect(mockBacklog.getPullRequest).toHaveBeenCalledWith(100, "test-repo", 1); // Expect numeric ID
+  });
+
+  it("throws an error if neither projectId nor projectKey is provided", async () => {
+    const params = {
+      // projectId and projectKey are missing
+      repoIdOrName: "test-repo",
+      number: 1
+    };
+    
+    await expect(tool.handler(params as any)).rejects.toThrow(Error);
   });
 });

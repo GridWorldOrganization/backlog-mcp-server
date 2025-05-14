@@ -51,7 +51,7 @@ describe("deleteIssueTool", () => {
     await tool.handler({
       issueKey: "TEST-1"
     });
-    
+
     expect(mockBacklog.deleteIssue).toHaveBeenCalledWith("TEST-1");
   });
 
@@ -59,8 +59,8 @@ describe("deleteIssueTool", () => {
     await tool.handler({
       issueId: 1
     });
-    
-    expect(mockBacklog.deleteIssue).toHaveBeenCalledWith("1");
+
+    expect(mockBacklog.deleteIssue).toHaveBeenCalledWith(1); // Expect number
   });
 
   it("throws an error if neither issueId nor issueKey is provided", async () => {

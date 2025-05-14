@@ -1,8 +1,8 @@
 import { TranslationHelper } from "../createTranslationHelper.js";
 
-export type EntityName = "issue" | "project" | "issueComment";
+export type EntityName = "issue" | "project" | "issueComment" | "pullRequest" | "customField" | "git" | "issueType" | "wiki";
 
-type ResolveResult = { ok: true; value: string } | { ok: false; error: Error };
+type ResolveResult = { ok: true; value: string | number } | { ok: false; error: Error };
 
 type IdOrKey = {
     id?: number;
@@ -20,7 +20,7 @@ export function resolveIdOrKey<E extends EntityName>(
     t: TranslationHelper["t"]
 ): ResolveResult {
     const idOrKey = tryResolveIdOrKey(values);
-    if (!idOrKey) {
+    if (idOrKey === undefined) { // Check for undefined explicitly
         return {
             ok: false,
             error: new Error(
@@ -37,12 +37,12 @@ export function resolveIdOrKey<E extends EntityName>(
 
 /**
  * Resolves the ID or key from a given object.
- * Returns the stringified ID if present, otherwise the key.
+ * Returns the ID (as a number) if present, otherwise the key (as a string).
  * Returns undefined if neither is present.
  */
-function tryResolveIdOrKey(values: IdOrKey): string | undefined {
+function tryResolveIdOrKey(values: IdOrKey): string | number | undefined {
     return values.id !== undefined
-        ? String(values.id)
+        ? values.id // Return number directly
         : values.key;
 }
 
