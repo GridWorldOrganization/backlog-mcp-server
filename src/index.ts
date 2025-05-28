@@ -8,14 +8,42 @@ import dotenv from "dotenv";
 import * as backlogjs from 'backlog-js';
 import { registerTools } from "./registerTools.js";
 import { createTranslationHelper } from "./createTranslationHelper.js";
-import { VERSION } from "./version.js"; // ← 相対パス注意！
+import { VERSION } from "./version.js"; 
+import { hideBin } from 'yargs/helpers';
+import yargs from 'yargs';
+import { default as env } from 'env-var';
 
 dotenv.config();
 
-const domain = process.env.BACKLOG_DOMAIN || ""
-const backlog = new backlogjs.Backlog({ host: domain, apiKey: process.env.BACKLOG_API_KEY });
+const domain = env.get('BACKLOG_DOMAIN')
+  .required()
+  .asString();
 
-const useFields = resolveUseFields();
+const apiKey = env.get('BACKLOG_API_KEY')
+  .required()
+  .asString();
+
+const backlog = new backlogjs.Backlog({ host: domain, apiKey: apiKey });
+
+const argv = yargs(hideBin(process.argv))
+  .option('max-tokens', {
+    type: 'number',
+    describe: 'Maximum number of tokens allowed in the response',
+    default: env.get('MAX_TOKENS').default('50000').asIntPositive(),
+  })
+  .option('optimize-response', {
+    type: 'boolean',
+    describe: 'Enable GraphQL-style response optimization to include only requested fields',
+    default: env.get('OPTIMIZE_RESPONSE').default('false').asBool(),
+  })
+  .option('export-translations', {
+    type: 'boolean',
+    describe: 'Export translations and exit',
+    default: false, 
+  })
+  .parseSync();
+
+const useFields = argv.optimizeResponse;
 
 const server = new McpServer({
   name: "backlog",
@@ -26,11 +54,13 @@ Start with the example above and customize freely.` : undefined,
 
 const transHelper = createTranslationHelper()
 
-const maxTokens = resolveMaxTokens(); 
+const maxTokens = argv.maxTokens; 
+console.log(maxTokens)
+console.log(useFields)
 // Register all tools
 registerTools(server, backlog, transHelper, { useFields: useFields, maxTokens });
 
-if (process.argv.includes("--export-translations")) {
+if (argv.exportTranslations) {
   const data = transHelper.dump();
   // eslint-disable-next-line no-console
   console.log(JSON.stringify(data, null, 2));
@@ -47,38 +77,3 @@ main().catch((error) => {
   console.error("Fatal error in main():", error);
   process.exit(1);
 });
-
-export function resolveMaxTokens(defaultValue = 50000): number {
-  // Try CLI arg: --max-tokens=XXXXX
-  const cliArg = process.argv.find(arg => arg.startsWith("--max-tokens="));
-  if (cliArg) {
-    const value = parseInt(cliArg.split("=")[1], 10);
-    if (!isNaN(value)) return value;
-  }
-
-  // Try environment variable
-  const env = process.env.MAX_TOKENS;
-  if (env) {
-    const value = parseInt(env, 10);
-    if (!isNaN(value)) return value;
-  }
-
-  // Fallback to default
-  return defaultValue;
-}
-
-export function resolveUseFields(): boolean {
-  // 1. CLI優先（--optimize-response）
-  if (process.argv.includes("--optimize-response")) {
-    return true;
-  }
-
-  // 2. 環境変数での指定（OPTIMIZE_RESPONSE=true）
-  const env = process.env.OPTIMIZE_RESPONSE?.toLowerCase();
-  if (env === "true" || env === "1") {
-    return true;
-  }
-
-  // 3. デフォルトは false
-  return false;
-}
