@@ -79,13 +79,15 @@ AIエージェントでこのMCPの使用に問題がある場合は、以下の
         "-e", "BACKLOG_API_KEY",
         "-e", "MAX_TOKENS",
         "-e", "OPTIMIZE_RESPONSE",
+        "-e", "PREFIX",
         "ghcr.io/nulab/backlog-mcp-server"
       ],
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
         "BACKLOG_API_KEY": "your-api-key",
         "MAX_TOKENS": "10000",
-        "OPTIMIZE_RESPONSE": "true"
+        "OPTIMIZE_RESPONSE": "true",
+        "PREFIX": "backlog_"
       }
     }
   }
@@ -94,6 +96,7 @@ AIエージェントでこのMCPの使用に問題がある場合は、以下の
 
 - `MAX_TOKENS`: レスポンスで許可される最大トークン数（デフォルト: 50000）
 - `OPTIMIZE_RESPONSE`: レスポンスサイズを最適化するためのGraphQLスタイルのフィールド選択を有効にする（デフォルト: false）
+- `PREFIX`: 生成されるすべてのtoolの名前の先頭に付加されるオプションの文字列接頭辞（デフォルト: ""）
 
 ### Dockerイメージを最新に保つ
 
@@ -343,10 +346,11 @@ npm test
 - `--export-translations`: すべての翻訳キーと値をエクスポート
 - `--optimize-response`: GraphQLスタイルのフィールド選択を有効にする
 - `--max-tokens=NUMBER`: レスポンスの最大トークン制限を設定
+- `--prefix=STRING`: 生成されるすべての出力の先頭に付加されるオプションの文字列接頭辞
 
 例：
 ```bash
-node build/index.js --optimize-response --max-tokens=100000
+node build/index.js --optimize-response --max-tokens=100000 --prefix="[BOT] "
 ```
 
 ## ライセンス

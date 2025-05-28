@@ -23,7 +23,6 @@ export function registerTools(server: McpServer, backlog: Backlog, helper: Trans
       maxTokens
     });
 
-
-    server.tool(tool.name, tool.description, tool.schema.shape, handler);
+    server.tool(`${options.prefix}${tool.name}`, tool.description, tool.schema.shape, handler);
   }
 }

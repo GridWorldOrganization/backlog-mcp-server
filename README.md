@@ -81,13 +81,15 @@ You can add additional options to customize the server behavior:
         "-e", "BACKLOG_API_KEY",
         "-e", "MAX_TOKENS",
         "-e", "OPTIMIZE_RESPONSE",
+        "-e", "PREFIX",
         "ghcr.io/nulab/backlog-mcp-server"
       ],
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
         "BACKLOG_API_KEY": "your-api-key",
         "MAX_TOKENS": "10000",
-        "OPTIMIZE_RESPONSE": "true"
+        "OPTIMIZE_RESPONSE": "true",
+        "PREFIX": "backlog_"
       }
     }
   }
@@ -96,6 +98,7 @@ You can add additional options to customize the server behavior:
 
 - `MAX_TOKENS`: Maximum number of tokens allowed in responses (default: 50000)
 - `OPTIMIZE_RESPONSE`: Enable GraphQL-style field selection to optimize response size (default: false)
+- `PREFIX`: Optional string prefix to prepend to all tool names (default: "")
 
 ### Keeping the Docker Image Up-to-Date
 
@@ -492,10 +495,11 @@ The server supports several command line options:
 - `--export-translations`: Export all translation keys and values
 - `--optimize-response`: Enable GraphQL-style field selection
 - `--max-tokens=NUMBER`: Set maximum token limit for responses
+- `--prefix=STRING`: Optional string prefix to prepend to all generated outputs
 
 Example:
 ```bash
-node build/index.js --optimize-response --max-tokens=100000
+node build/index.js --optimize-response --max-tokens=100000 --prefix="[BOT] "
 ```
 
 ## License

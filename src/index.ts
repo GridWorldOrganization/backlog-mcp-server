@@ -26,19 +26,24 @@ const apiKey = env.get('BACKLOG_API_KEY')
 const backlog = new backlogjs.Backlog({ host: domain, apiKey: apiKey });
 
 const argv = yargs(hideBin(process.argv))
-  .option('max-tokens', {
-    type: 'number',
-    describe: 'Maximum number of tokens allowed in the response',
-    default: env.get('MAX_TOKENS').default('50000').asIntPositive(),
+  .option("max-tokens", {
+    type: "number",
+    describe: "Maximum number of tokens allowed in the response",
+    default: env.get("MAX_TOKENS").default("50000").asIntPositive(),
   })
-  .option('optimize-response', {
-    type: 'boolean',
-    describe: 'Enable GraphQL-style response optimization to include only requested fields',
-    default: env.get('OPTIMIZE_RESPONSE').default('false').asBool(),
+  .option("optimize-response", {
+    type: "boolean",
+    describe: "Enable GraphQL-style response optimization to include only requested fields",
+    default: env.get("OPTIMIZE_RESPONSE").default("false").asBool(),
   })
-  .option('export-translations', {
-    type: 'boolean',
-    describe: 'Export translations and exit',
+  .option("prefix", {
+    type: "string",
+    describe: "Optional string prefix to prepend to all generated outputs",
+    default: env.get("PREFIX").default("").asString(),
+  })
+  .option("export-translations", {
+    type: "boolean",
+    describe: "Export translations and exit",
     default: false, 
   })
   .parseSync();
@@ -55,10 +60,10 @@ Start with the example above and customize freely.` : undefined,
 const transHelper = createTranslationHelper()
 
 const maxTokens = argv.maxTokens; 
-console.log(maxTokens)
-console.log(useFields)
+const prefix = argv.prefix
+
 // Register all tools
-registerTools(server, backlog, transHelper, { useFields: useFields, maxTokens });
+registerTools(server, backlog, transHelper, { useFields: useFields, maxTokens, prefix });
 
 if (argv.exportTranslations) {
   const data = transHelper.dump();
