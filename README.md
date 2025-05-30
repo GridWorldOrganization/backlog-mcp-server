@@ -110,8 +110,6 @@ The following toolsets are available (enabled by default when `"all"` is used):
 | `git`           | Tools for managing Git repositories and pull requests                                |
 | `notifications` | Tools for managing user notifications                                                |
 
-[利用可能なツール](#available-tools)
-
 ### Specifying Toolsets
 
 You can control toolset activation in the following ways:
