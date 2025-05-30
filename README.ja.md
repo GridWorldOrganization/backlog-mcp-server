@@ -1,111 +1,38 @@
-# Backlog MCP Server（日本語）
+# Backlog MCP Server（日本語版）
 
 ![MIT License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Build](https://github.com/nulab/backlog-mcp-server/actions/workflows/ci.yml/badge.svg)
 ![Last Commit](https://img.shields.io/github/last-commit/nulab/backlog-mcp-server.svg)
 
-Backlog API とやり取りするための Model Context Protocol（MCP）サーバーです。Claude Desktop や Cline、Cursor などのAIエージェントを通じて、Backlog 上でプロジェクトや課題、Wikiページなどを操作するためのツールを提供します。
+[🇬🇧 English README](./README.md)
+
+Backlog API とやり取りするための Model Context Protocol（MCP）サーバーです。このサーバーは、Claude Desktop / Cline / Cursor などのAIエージェントを通じて、Backlog 上でプロジェクト、課題、Wikiページなどを管理するためのツールを提供します。
 
 ## 主な機能
 
-- プロジェクト管理（作成、取得、更新、削除）
-- 課題管理（作成、更新、削除、一覧）
-- Wiki ページ管理
-- Git リポジトリ管理
-- プルリクエスト管理（作成、更新、一覧、コメント）
-- 通知管理
-- ウォッチリスト管理
-- GraphQLスタイルのフィールド選択による最適化されたレスポンス
-- 大きなレスポンスに対するトークン制限
-- 強化されたエラーハンドリング
-- その他多数の Backlog API 機能に対応
+- プロジェクトツール（作成、読み取り、更新、削除）
+- 課題とコメントの追跡（作成、更新、削除、一覧表示）
+- Wikiページサポート
+- Gitリポジトリとプルリクエストツール
+- 通知ツール
+- 最適化されたレスポンスのためのGraphQLスタイルのフィールド選択
+- 大規模なレスポンスに対するトークン制限
 
-## 必要条件
+## 利用開始
+
+### 必要条件
 
 - Docker
-- Backlog アカウント（API アクセス付き）
-- Backlog の API キー
+- APIアクセスが可能なBacklogアカウント
+- BacklogアカウントのAPIキー
 
-## インストール方法
+### オプション1: Docker経由でのインストール
 
-### オプション1: Docker によるインストール
+このMCPサーバーを使用する最も簡単な方法は、MCP設定を利用することです：
 
-Claude Desktop または Cline の MCP 設定から以下を行ってください：
-
-1. Claude Desktop または Cline の設定を開く  
-2. MCP 設定セクションに移動  
-3. 以下の設定を追加：
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e", "BACKLOG_DOMAIN",
-        "-e", "BACKLOG_API_KEY",
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
-      "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key"
-      }
-    }
-  }
-}
-```
-
-`your-domain.backlog.com` と `your-api-key` を実際の値に置き換えてください。
-
-#### 高度な設定オプション
-
-これは実験的なアプローチであり、コンテキストウィンドウのサイズを削減するための標準的な方法ではありません。
-AIエージェントでこのMCPの使用に問題がある場合は、以下の設定を調整してみてください。
-サーバーの動作をカスタマイズするための追加オプションを設定できます：
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e", "BACKLOG_DOMAIN",
-        "-e", "BACKLOG_API_KEY",
-        "-e", "MAX_TOKENS",
-        "-e", "OPTIMIZE_RESPONSE",
-        "-e", "PREFIX",
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
-      "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key",
-        "MAX_TOKENS": "10000",
-        "OPTIMIZE_RESPONSE": "true",
-        "PREFIX": "backlog_"
-      }
-    }
-  }
-}
-```
-
-- `MAX_TOKENS`: レスポンスで許可される最大トークン数（デフォルト: 50000）
-- `OPTIMIZE_RESPONSE`: レスポンスサイズを最適化するためのGraphQLスタイルのフィールド選択を有効にする（デフォルト: false）
-- `PREFIX`: 生成されるすべてのtoolの名前の先頭に付加されるオプションの文字列接頭辞（デフォルト: ""）
-
-### Dockerイメージを最新に保つ
-
-デフォルトでは、Dockerは既にプルされている場合、ローカルにキャッシュされたイメージを使用します。
-`ghcr.io/nulab/backlog-mcp-server`の最新バージョンを常に使用するには、以下のいずれかの方法を検討してください：
-
-#### オプション1: `--pull always`を使用する（推奨）
-
-Docker 20.10以降を使用している場合は、`args`配列に`--pull always`フラグを含めるように変更できます：
+1. MCP設定を開きます
+2. MCP設定セクションに移動します
+3. 次の設定を追加します：
 
 ```json
 {
@@ -130,136 +57,157 @@ Docker 20.10以降を使用している場合は、`args`配列に`--pull always
 }
 ```
 
-これにより、実行前に常にGitHub Container Registryから最新のイメージをプルすることが保証されます。
+`your-domain.backlog.com` を実際のBacklogドメインに、`your-api-key` を実際のBacklog APIキーに置き換えてください。
 
-#### オプション2: 手動で最新のイメージをプルする
-Dockerのバージョンが--pull alwaysをサポートしていない場合は、サーバーを実行する前に手動で最新のイメージをプルできます：
+✅ `--pull always` を使用できない場合は、次のコマンドで手動でイメージを更新できます：
 
 ```
 docker pull ghcr.io/nulab/backlog-mcp-server:latest
 ```
 
-### オプション2: 手動インストール
+### オプション2: 手動セットアップ (Node.js)
 
-1. リポジトリをクローン：
-```bash
-git clone https://github.com/nulab/backlog-mcp-server.git
-cd backlog-mcp-server
-```
+1. クローンしてインストール：
+   ```bash
+   git clone https://github.com/nulab/backlog-mcp-server.git
+   cd backlog-mcp-server
+   npm install
+   npm run build
+   ```
 
-2. 依存パッケージをインストール：
-```bash
-npm install
-```
-
-3. ビルド：
-```bash
-npm run build
-```
-
-4. MCP用のJSON設定を作成：
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "node",
-      "args": [
-        "your-repository-location/build/index.js"
-      ],
-      "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key",
-        "MAX_TOKENS": "100000",
-        "OPTIMIZE_RESPONSE": "true"
+2. MCPとして使用するJSONを設定します：
+  ```json
+  {
+    "mcpServers": {
+      "backlog": {
+        "command": "node",
+        "args": [
+          "your-repository-location/build/index.js"
+        ],
+        "env": {
+          "BACKLOG_DOMAIN": "your-domain.backlog.com",
+          "BACKLOG_API_KEY": "your-api-key"
+        }
       }
     }
   }
-}
+  ```
+
+## ツール設定
+
+`--enable-toolsets` コマンドラインフラグまたは `ENABLE_TOOLSETS` 環境変数を使用して、特定の **ツールセット** を選択的に有効または無効にすることができます。これにより、AIエージェントが利用できるツールをより細かく制御し、コンテキストサイズを削減するのに役立ちます。
+
+### 利用可能なツールセット
+
+次のツールセットが利用可能です（`"all"` が使用されるとデフォルトで有効になります）：
+
+| ツールセット    | 説明                                                                 |
+|-----------------|--------------------------------------------------------------------------------------|
+| `space`         | Backlogスペース設定と一般情報を管理するためのツール                                  |
+| `project`       | プロジェクト、カテゴリ、カスタムフィールド、課題タイプを管理するためのツール             |
+| `issue`         | 課題とそのコメントを管理するためのツール                                             |
+| `wiki`          | Wikiページを管理するためのツール                                                     |
+| `git`           | Gitリポジトリとプルリクエストを管理するためのツール                                    |
+| `notifications` | ユーザー通知を管理するためのツール                                                   |
+
+### ツールセットの指定
+
+次の方法でツールセットのアクティベーションを制御できます：
+
+CLI経由での使用：
+
+```bash
+--enable-toolsets space,project,issue
 ```
 
-## 使用可能なツール
+または環境変数経由：
+
+```
+ENABLE_TOOLSETS="space,project,issue"
+```
+
+`all` が指定された場合、利用可能なすべてのツールセットが有効になります。これはデフォルトの動作でもあります。
+
+ツールセットリストがAIエージェントにとって大きすぎる場合や、特定のツールがパフォーマンスの問題を引き起こしている場合に、選択的なツールセットの使用が役立つことがあります。そのような場合、未使用のツールセットを無効にすると安定性が向上する可能性があります。
+
+> 🧩 ヒント: `project` ツールセットは、他の多くのツールがエントリポイントとしてプロジェクトデータに依存しているため、強く推奨されます。
+
+### 動的なツールセット検出（実験的）
+
+MCPサーバーをAIエージェントと共に使用している場合、実行時にツールセットの動的な検出を有効にすることができます：
+
+CLI経由での有効化：
+
+```
+--dynamic-toolsets
+```
+
+または環境変数経由：
+
+```
+-e DYNAMIC_TOOLSETS=1 \
+```
+
+動的ツールセットを有効にすると、LLMはツールインターフェースを介してオンデマンドでツールセットを一覧表示およびアクティブ化できるようになります。
+
+## 利用可能なツール
 
 以下のような Backlog 機能に対応するツールを提供しています：
-
 [Available Tools セクションへ](https://github.com/nulab/backlog-mcp-server?tab=readme-ov-file#available-tools)
 
 ## 使用例
 
-MCP サーバーを Claude や Cline などの AI エージェントに設定すれば、以下のようなプロンプトで利用できます：
+MCPサーバーがAIエージェントで設定されると、会話で直接ツールを使用できます。以下にいくつかの例を示します：
 
-- `Backlog 上のすべてのプロジェクトを一覧表示して`
-- `PROJECT-KEY に「ログインページのバグ修正」という高優先度の課題を作成して`
-- `PROJECT-KEY に含まれる Git リポジトリをリストアップして`
-- `repo-name のオープン中のプルリクエストを一覧表示して`
-- `feature/new-feature ブランチから main ブランチへのプルリクを作成して`
-
-### フィールド選択の使用
-
-`OPTIMIZE_RESPONSE` オプションが有効になっている場合、GraphQLスタイルの構文を使用して取得したいフィールドを指定できます：
-
+- プロジェクトの一覧表示
 ```
-PROJECT-KEYプロジェクトの詳細を表示して、ただし名前、キー、説明フィールドのみを含めて
+私のBacklogプロジェクトをすべてリストアップしてください。
 ```
-
-AIはレスポンスを最適化するためにフィールド選択を使用します：
-
+- 新しい課題の作成
 ```
-get_project(projectIdOrKey: "PROJECT-KEY", fields: "{ name key description }")
+PROJECT-KEYプロジェクトに「ログインページのエラーを修正」というタイトルの高優先度のバグ課題を作成してください。
 ```
-
-これにより、特に大きなオブジェクトの場合、レスポンスサイズと処理時間が削減されます。
-
-## 高度な機能
-
-### レスポンスの最適化
-
-#### フィールド選択
-
-`OPTIMIZE_RESPONSE=true` で有効にすると、GraphQLスタイルの構文を使用して特定のフィールドを選択できます：
-
+- プロジェクト詳細の取得
 ```
-{
-  id
-  name
-  description
-  users {
-    id
-    name
-  }
-}
+PROJECT-KEYプロジェクトの詳細を表示してください。
+```
+- Gitリポジトリの操作
+```
+PROJECT-KEYプロジェクト内のすべてのGitリポジトリをリストアップしてください。
+```
+- プルリクエストの管理
+```
+PROJECT-KEYプロジェクトの「repo-name」リポジトリ内のすべてのオープンなプルリクエストを表示してください。
+```
+```
+PROJECT-KEYプロジェクトの「repo-name」リポジトリで、ブランチ「feature/new-feature」から「main」への新しいプルリクエストを作成してください。
+```
+- ウォッチアイテム
+```
+私がウォッチしているすべてのアイテムを表示してください。
 ```
 
-これにより以下が可能になります：
-- 必要なフィールドのみをリクエストしてレスポンスサイズを削減
-- 特定のデータポイントに焦点を当てる
-- 大きなレスポンスのパフォーマンスを向上
+### i18n / 説明のオーバーライド
 
-#### トークン制限
+**ホームディレクトリ** に `.backlog-mcp-serverrc.json` ファイルを作成することで、ツールの説明をオーバーライドできます。
 
-大きなレスポンスは、トークン制限を超えないように自動的に制限されます：
-- デフォルト制限：50,000トークン
-- `MAX_TOKENS`環境変数で設定可能
-- 制限を超えるレスポンスはメッセージとともに切り捨てられます
-
-### i18n / 説明文の上書き
-
-ツールの説明文は、ホームディレクトリに `.backlog-mcp-serverrc.json` を作成することで上書きできます。
+ファイルには、ツール名をキーとし、新しい説明を値とするJSONオブジェクトを含める必要があります。
+例：
 
 ```json
 {
-  "TOOL_ADD_ISSUE_COMMENT_DESCRIPTION": "カスタムの説明文",
-  "TOOL_CREATE_PROJECT_DESCRIPTION": "新しいプロジェクトを Backlog に作成します"
+  "TOOL_ADD_ISSUE_COMMENT_DESCRIPTION": "代替の説明文",
+  "TOOL_CREATE_PROJECT_DESCRIPTION": "Backlogに新しいプロジェクトを作成します"
 }
 ```
 
-優先順位：
+サーバー起動時、各ツールの最終的な説明は次の優先順位に基づいて決定されます：
 
 1. 環境変数（例：`BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION`）
-2. `.backlog-mcp-serverrc.json` に記載された値（.json / .yaml / .yml 対応）
-3. 内部のデフォルト（英語）
+2. `.backlog-mcp-serverrc.json` 内のエントリ - サポートされる設定ファイル形式：.json、.yaml、.yml
+3. 組み込みのフォールバック値（英語）
 
-サンプル構成：
+サンプル設定：
 
 ```json
 {
@@ -284,49 +232,174 @@ get_project(projectIdOrKey: "PROJECT-KEY", fields: "{ name key description }")
 }
 ```
 
-## 翻訳のエクスポート
+### 現在の翻訳のエクスポート
 
-以下コマンドで現在の翻訳設定を出力できます：
+`--export-translations` フラグを指定してバイナリを実行することで、現在のデフォルト翻訳（オーバーライドを含む）をエクスポートできます。
+
+これにより、行ったカスタマイズを含むすべてのツール説明が標準出力に出力されます。
+
+例：
 
 ```bash
 docker run -i --rm ghcr.io/nulab/backlog-mcp-server node build/index.js --export-translations
 ```
 
-または：
+または
 
 ```bash
 npx github:nulab/backlog-mcp-server --export-translations
 ```
 
-## 日本語テンプレートの使用
-
-以下にテンプレートがあります：
+### 日本語翻訳テンプレートの使用
+サンプルの日本語設定ファイルは次の場所に提供されています：
 
 ```bash
 translationConfig/.backlog-mcp-serverrc.json.example
 ```
 
-ホームディレクトリにコピーして編集してください。
+これを使用するには、ホームディレクトリに `.backlog-mcp-serverrc.json` としてコピーします：
 
-## 環境変数による上書き
+その後、必要に応じてファイルを編集して説明をカスタマイズできます。
 
-環境変数は `BACKLOG_MCP_` を接頭辞にして使用します。
+### 環境変数の使用
+または、環境変数を介してツールの説明をオーバーライドすることもできます。
+
+環境変数名は、ツールキーに基づいており、`BACKLOG_MCP_` がプレフィックスとして付き、大文字で記述されます。
 
 例：
+`TOOL_ADD_ISSUE_COMMENT_DESCRIPTION` をオーバーライドするには：
 
 ```json
 {
-  "env": {
-    "BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION": "カスタムの説明文"
+  "mcpServers": {
+    "backlog": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e", "BACKLOG_DOMAIN",
+        "-e", "BACKLOG_API_KEY",
+        "-e", "BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION",
+        "ghcr.io/nulab/backlog-mcp-server"
+      ],
+      "env": {
+        "BACKLOG_DOMAIN": "your-domain.backlog.com",
+        "BACKLOG_API_KEY": "your-api-key",
+        "BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION": "代替の説明文"
+      }
+    }
   }
 }
 ```
 
-環境変数が設定されている場合は、ファイルよりも優先されます。
+サーバーは起動時に設定ファイルを同期的に読み込みます。
+
+環境変数は常に設定ファイルよりも優先されます。
+
+## 高度な機能
+
+### ツール名のプレフィックス
+
+次の方法でツール名にプレフィックスを追加します：
+
+```
+--prefix backlog_
+```
+
+または環境変数経由：
+
+```
+PREFIX="backlog_"
+```
+
+これは、同じ環境で複数のMCPサーバーまたはツールを使用していて、名前の衝突を避けたい場合に特に便利です。たとえば、`get_project` は `backlog_get_project` になり、他のサービスによって提供される同様の名前のツールと区別できます。
+
+### レスポンスの最適化とトークン制限
+
+#### フィールド選択（GraphQLスタイル）
+
+```
+--optimize-response
+```
+
+または環境変数：
+
+```
+OPTIMIZE_RESPONSE=1
+```
+
+次に、特定のフィールドのみを要求します：
+
+```
+get_project(projectIdOrKey: "PROJECT-KEY", fields: "{ name key description }")
+```
+
+AIはフィールド選択を使用してレスポンスを最適化します：
+
+```
+get_project(projectIdOrKey: "PROJECT-KEY", fields: "{ name key description }")
+```
+
+利点：
+- 必要なフィールドのみを要求することでレスポンスサイズを削減
+- 特定のデータポイントに焦点を当てる
+- 大規模なレスポンスのパフォーマンスを向上
+
+#### トークン制限
+
+大規模なレスポンスは、トークン制限を超えないように自動的に制限されます：
+- デフォルト制限：50,000トークン
+- `MAX_TOKENS` 環境変数で設定可能
+- 制限を超えるレスポンスはメッセージと共に切り捨てられます
+
+これを変更するには、次を使用します：
+
+```
+MAX_TOKENS=10000
+```
+
+レスポンスが制限を超えた場合、警告と共に切り捨てられます。
+> 注：これはベストエフォートの緩和策であり、保証された強制ではありません。
+
+### 完全なカスタム設定例
+
+このセクションでは、複数の環境変数を使用した高度な設定を示します。これらは実験的な機能であり、すべてのMCPクライアントでサポートされているとは限りません。これはMCP標準仕様の一部ではなく、注意して使用する必要があります。
+
+```json
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e", "BACKLOG_DOMAIN",
+        "-e", "BACKLOG_API_KEY",
+        "-e", "MAX_TOKENS",
+        "-e", "OPTIMIZE_RESPONSE",
+        "-e", "PREFIX",
+        "-e", "ENABLE_TOOLSETS",
+        "ghcr.io/nulab/backlog-mcp-server"
+      ],
+      "env": {
+        "BACKLOG_DOMAIN": "your-domain.backlog.com",
+        "BACKLOG_API_KEY": "your-api-key",
+        "MAX_TOKENS": "10000",
+        "OPTIMIZE_RESPONSE": "1",
+        "PREFIX": "backlog_",
+        "ENABLE_TOOLSETS": "space,project,issue",
+        "ENABLE_DYNAMIC_TOOLSETS": "1"
+      }
+    }
+  }
+}
+```
 
 ## 開発
 
-### テスト実行
+### テストの実行
 
 ```bash
 npm test
@@ -334,10 +407,10 @@ npm test
 
 ### 新しいツールの追加
 
-1. `src/tools/` に新しいファイルを追加  
-2. 対応するテストを作成  
-3. `src/tools/tools.ts` に追加  
-4. ビルドとテストを実行  
+1. 既存のツールのパターンに従って `src/tools/` に新しいファイルを作成します
+2. 対応するテストファイルを作成します
+3. 新しいツールを `src/tools/tools.ts` に追加します
+4. 変更をビルドしてテストします
 
 ### コマンドラインオプション
 
@@ -346,17 +419,20 @@ npm test
 - `--export-translations`: すべての翻訳キーと値をエクスポート
 - `--optimize-response`: GraphQLスタイルのフィールド選択を有効にする
 - `--max-tokens=NUMBER`: レスポンスの最大トークン制限を設定
-- `--prefix=STRING`: 生成されるすべての出力の先頭に付加されるオプションの文字列接頭辞
+- `--prefix=STRING`: すべてのツール名に付加するオプションの文字列プレフィックス（デフォルト：""）
+- `--enable-toolsets <toolsets...>`: 有効にするツールセットを指定します（カンマ区切りまたは複数の引数）。デフォルトは "all" です。
+  例：`--enable-toolsets space,project` または `--enable-toolsets issue --enable-toolsets git`
+  利用可能なツールセット：`space`、`project`、`issue`、`wiki`、`git`、`notifications`。
 
 例：
 ```bash
-node build/index.js --optimize-response --max-tokens=100000 --prefix="[BOT] "
+node build/index.js --optimize-response --max-tokens=100000 --prefix="backlog_" --enable-toolsets space,issue
 ```
 
 ## ライセンス
 
-このプロジェクトは [MITライセンス](./LICENSE) のもとで公開されています。
+このプロジェクトは [MITライセンス](./LICENSE) のもとでライセンスされています。
 
-> 本ツールは MIT ライセンスのもとで提供されており、**動作保証や公式サポートは行っておりません**。  
-> ご利用にあたっては内容をご確認のうえ、自己責任でご判断ください。  
-> 問題がある場合は [GitHub Issues](../../issues) にてご報告をお願いいたします。
+注意：このツールはMITライセンスのもとで提供されており、**いかなる保証も公式サポートもありません**。
+内容を確認し、ニーズへの適合性を判断した上で、自己責任で使用してください。
+問題が発生した場合は、[GitHub Issues](../../issues) を通じて報告してください。

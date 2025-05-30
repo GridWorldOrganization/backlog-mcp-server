@@ -10,104 +10,29 @@ A Model Context Protocol (MCP) server for interacting with the Backlog API. This
 
 ## Features
 
-- Project management (create, read, update, delete)
-- Issue tracking (create, update, delete, list)
-- Wiki page management
-- Git repository management
-- Pull request management (create, update, list, comment)
-- Notification management
-- Watching list management
+- Project tools (create, read, update, delete)
+- Issue tracking and comments (create, update, delete, list)
+- Wiki page support
+- Git repository and pull request tools
+- Notification tools
 - GraphQL-style field selection for optimized responses
 - Token limiting for large responses
-- Enhanced error handling
-- And more Backlog API integrations
 
-## Requirements
+## Getting Started
+
+### Requirements
 
 - Docker
 - A Backlog account with API access
 - API key from your Backlog account
 
-## Installation
-
 ### Option 1: Install via Docker
 
-The easiest way to use this MCP server is through MCP configuration for Claude Desktop or Cline:
+The easiest way to use this MCP server is through MCP configurations:
 
-1. Open Claude Desktop or Cline settings
+1. Open MCP settings
 2. Navigate to the MCP configuration section
 3. Add the following configuration:
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e", "BACKLOG_DOMAIN",
-        "-e", "BACKLOG_API_KEY",
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
-      "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key"
-      }
-    }
-  }
-}
-```
-
-Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` with your Backlog API key.
-
-#### Advanced Configuration Options
-
-This is an experimental approach, and not the standard way to reduce the size of the context window.
-If you're having trouble using this MCP with any AI agents, please try adjusting the following settings.
-You can add additional options to customize the server behavior:
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e", "BACKLOG_DOMAIN",
-        "-e", "BACKLOG_API_KEY",
-        "-e", "MAX_TOKENS",
-        "-e", "OPTIMIZE_RESPONSE",
-        "-e", "PREFIX",
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
-      "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key",
-        "MAX_TOKENS": "10000",
-        "OPTIMIZE_RESPONSE": "true",
-        "PREFIX": "backlog_"
-      }
-    }
-  }
-}
-```
-
-- `MAX_TOKENS`: Maximum number of tokens allowed in responses (default: 50000)
-- `OPTIMIZE_RESPONSE`: Enable GraphQL-style field selection to optimize response size (default: false)
-- `PREFIX`: Optional string prefix to prepend to all tool names (default: "")
-
-### Keeping the Docker Image Up-to-Date
-
-By default, Docker will use a locally cached image if it has already been pulled before.
-To ensure you're always using the latest version of `ghcr.io/nulab/backlog-mcp-server`, consider one of the following methods:
-
-#### Option 1: Use `--pull always` (recommended)
-
-If you are using Docker 20.10 or later, you can modify the `args` array to include the `--pull always` flag:
 
 ```json
 {
@@ -132,33 +57,25 @@ If you are using Docker 20.10 or later, you can modify the `args` array to inclu
 }
 ```
 
-This ensures that Docker always pulls the latest image from GitHub Container Registry before running.
+Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` with your Backlog API key.
 
-#### Option 2: Manually pull the latest image
-If your Docker version does not support --pull always, you can manually pull the latest image before running the server:
+✅ If you cannot use --pull always, you can manually update the image using:
 
 ```
 docker pull ghcr.io/nulab/backlog-mcp-server:latest
 ```
 
-### Option 2: Manual Installation
+### Option 2: Manual Setup (Node.js)
 
-1. Clone the repository:
+1. Clone and install:
    ```bash
    git clone https://github.com/nulab/backlog-mcp-server.git
    cd backlog-mcp-server
-   ```
-
-2. Install dependencies:
-   ```bash
    npm install
-   ```
-
-3. Build the project:
-   ```bash
    npm run build
    ```
-4. Set your json to use as MCP
+
+2. Set your json to use as MCP
   ```json
   {
     "mcpServers": {
@@ -176,192 +93,157 @@ docker pull ghcr.io/nulab/backlog-mcp-server:latest
   }
   ```
 
+## Tool Configuration
+
+You can selectively enable or disable specific **toolsets** using the `--enable-toolsets` command-line flag or the `ENABLE_TOOLSETS` environment variable. This allows better control over which tools are available to the AI agent and helps reduce context size.
+
+### Available Toolsets
+
+The following toolsets are available (enabled by default when `"all"` is used):
+
+| Toolset         | Description                                                                          |
+|-----------------|--------------------------------------------------------------------------------------|
+| `space`         | Tools for managing Backlog space settings and general information                   |
+| `project`       | Tools for managing projects, categories, custom fields, and issue types              |
+| `issue`         | Tools for managing issues and their comments                                         |
+| `wiki`          | Tools for managing wiki pages                                                        |
+| `git`           | Tools for managing Git repositories and pull requests                                |
+| `notifications` | Tools for managing user notifications                                                |
+
+[利用可能なツール](#available-tools)
+
+### Specifying Toolsets
+
+You can control toolset activation in the following ways:
+
+Using via CLI:
+
+```bash
+--enable-toolsets space,project,issue
+```
+
+Or via environment variable:
+
+```
+ENABLE_TOOLSETS="space,project,issue"
+```
+
+If all is specified, all available toolsets will be enabled. This is also the default behavior.
+
+Using selective toolsets can be helpful if the toolset list is too large for your AI agent or if certain tools are causing performance issues. In such cases, disabling unused toolsets may improve stability.
+
+> 🧩 Tip: `project` toolset is highly recommended, as many other tools rely on project data as an entry point.
+
+### Dynamic Toolset Discovery (Experimental)
+
+If you're using the MCP server with AI agents, you can enable dynamic discovery of toolsets at runtime:
+
+Enabling via CLI:
+
+```
+--dynamic-toolsets
+```
+
+Or via environment variable::
+
+```
+-e DYNAMIC_TOOLSETS=1 \
+```
+
+With dynamic toolsets enabled, the LLM will be able to list and activate toolsets on demand via tool interface.
+
 ## Available Tools
 
-The server provides the following tools for interacting with Backlog:
+### Toolset: `space`
+Tools for managing Backlog space settings and general information.
+- `get_space`: Returns information about the Backlog space.
+- `get_users`: Returns list of users in the Backlog space.
+- `get_myself`: Returns information about the authenticated user.
 
-### Space Tools
+### Toolset: `project`
+Tools for managing projects, categories, custom fields, and issue types.
+- `get_project_list`: Returns list of projects.
+- `add_project`: Creates a new project.
+- `get_project`: Returns information about a specific project.
+- `update_project`: Updates an existing project.
+- `delete_project`: Deletes a project.
 
-| Tool Name | Description |
-|-----------|-------------|
-| `get_space` | Returns information about the Backlog space |
-| `get_users` | Returns list of users in the Backlog space |
-| `get_myself` | Returns information about the authenticated user |
-| `get_priorities` | Returns list of priorities |
-| `get_resolutions` | Returns list of issue resolutions |
-| `get_issue_types` | Returns list of issue types for a project |
+### Toolset: `issue`
+Tools for managing issues, their comments, and related items like priorities, categories, custom fields, issue types, resolutions, and watching lists.
+- `get_issue`: Returns information about a specific issue.
+- `get_issues`: Returns list of issues.
+- `count_issues`: Returns count of issues.
+- `add_issue`: Creates a new issue in the specified project.
+- `update_issue`: Updates an existing issue.
+- `delete_issue`: Deletes an issue.
+- `get_issue_comments`: Returns list of comments for an issue.
+- `add_issue_comment`: Adds a comment to an issue.
+- `get_priorities`: Returns list of priorities.
+- `get_categories`: Returns list of categories for a project.
+- `get_custom_fields`: Returns list of custom fields for a project.
+- `get_issue_types`: Returns list of issue types for a project.
+- `get_resolutions`: Returns list of issue resolutions.
+- `get_watching_list_items`: Returns list of watching items for a user.
+- `get_watching_list_count`: Returns count of watching items for a user.
 
-### Project Tools
+### Toolset: `wiki`
+Tools for managing wiki pages.
+- `get_wiki_pages`: Returns list of Wiki pages.
+- `get_wikis_count`: Returns count of wiki pages in a project.
+- `get_wiki`: Returns information about a specific wiki page.
+- `add_wiki`: Creates a new wiki page.
 
-| Tool Name | Description |
-|-----------|-------------|
-| `get_project_list` | Returns list of projects |
-| `add_project` | Creates a new project |
-| `get_project` | Returns information about a specific project |
-| `update_project` | Updates an existing project |
-| `delete_project` | Deletes a project |
-| `get_custom_fields` | Returns list of custom fields for a project |
+### Toolset: `git`
+Tools for managing Git repositories and pull requests.
+- `get_git_repositories`: Returns list of Git repositories for a project.
+- `get_git_repository`: Returns information about a specific Git repository.
+- `get_pull_requests`: Returns list of pull requests for a repository.
+- `get_pull_requests_count`: Returns count of pull requests for a repository.
+- `get_pull_request`: Returns information about a specific pull request.
+- `add_pull_request`: Creates a new pull request.
+- `update_pull_request`: Updates an existing pull request.
+- `get_pull_request_comments`: Returns list of comments for a pull request.
+- `add_pull_request_comment`: Adds a comment to a pull request.
+- `update_pull_request_comment`: Updates a comment on a pull request.
 
-### Issue Tools
-
-| Tool Name | Description |
-|-----------|-------------|
-| `get_issue` | Returns information about a specific issue |
-| `get_issues` | Returns list of issues |
-| `count_issues` | Returns count of issues |
-| `add_issue` | Creates a new issue in the specified project |
-| `update_issue` | Updates an existing issue |
-| `delete_issue` | Deletes an issue |
-
-### Comment Tools
-
-| Tool Name | Description |
-|-----------|-------------|
-| `get_issue_comments` | Returns list of comments for an issue |
-| `add_issue_comment` | Adds a comment to an issue |
-
-### Wiki Tools
-
-| Tool Name | Description |
-|-----------|-------------|
-| `get_wiki_pages` | Returns list of Wiki pages |
-| `get_wikis_count` | Returns count of wiki pages in a project |
-| `get_wiki` | Returns information about a specific wiki page |
-| `add_wiki` | Creates a new wiki page |
-
-### Category Tools
-
-| Tool Name | Description |
-|-----------|-------------|
-| `get_categories` | Returns list of categories for a project |
-
-### Notification Tools
-
-| Tool Name | Description |
-|-----------|-------------|
-| `get_notifications` | Returns list of notifications |
-| `count_notifications` | Returns count of notifications |
-| `reset_unread_notification_count` | Reset unread notification count |
-| `mark_notification_as_read` | Mark a notification as read |
-
-### Git Repository Tools
-
-| Tool Name | Description |
-|-----------|-------------|
-| `get_git_repositories` | Returns list of Git repositories for a project |
-| `get_git_repository` | Returns information about a specific Git repository |
-
-### Pull Request Tools
-
-| Tool Name | Description |
-|-----------|-------------|
-| `get_pull_requests` | Returns list of pull requests for a repository |
-| `get_pull_requests_count` | Returns count of pull requests for a repository |
-| `get_pull_request` | Returns information about a specific pull request |
-| `add_pull_request` | Creates a new pull request |
-| `update_pull_request` | Updates an existing pull request |
-| `get_pull_request_comments` | Returns list of comments for a pull request |
-| `add_pull_request_comment` | Adds a comment to a pull request |
-| `update_pull_request_comment` | Updates a comment on a pull request |
-
-### Watching Tools
-
-| Tool Name | Description |
-|-----------|-------------|
-| `get_watching_list_items` | Returns list of watching items for a user |
-| `get_watching_list_count` | Returns count of watching items for a user |
+### Toolset: `notifications`
+Tools for managing user notifications.
+- `get_notifications`: Returns list of notifications.
+- `get_notifications_count`: Returns count of notifications.
+- `reset_unread_notification_count`: Resets unread notification count.
+- `mark_notification_as_read`: Marks a notification as read.
 
 ## Usage Examples
 
 Once the MCP server is configured in AI agents, you can use the tools directly in your conversations. Here are some examples:
 
-### Listing Projects
-
+- Listing Projects
 ```
 Could you list all my Backlog projects?
 ```
-
-### Creating a New Issue
-
+- Creating a New Issue
 ```
 Create a new bug issue in the PROJECT-KEY project with high priority titled "Fix login page error"
 ```
-
-### Getting Project Details
-
+- Getting Project Details
 ```
 Show me the details of the PROJECT-KEY project
 ```
-
-### Working with Git Repositories
-
+- Working with Git Repositories
 ```
 List all Git repositories in the PROJECT-KEY project
 ```
-
-### Managing Pull Requests
-
+- Managing Pull Requests
 ```
 Show me all open pull requests in the repository "repo-name" of PROJECT-KEY project
 ```
-
 ```
 Create a new pull request from branch "feature/new-feature" to "main" in the repository "repo-name" of PROJECT-KEY project
 ```
-
-### Watching Items
-
+- Watching Items
 ```
 Show me all items I'm watching 
 ```
-
-### Using Field Selection
-
-When the `OPTIMIZE_RESPONSE` option is enabled, you can specify which fields you want to retrieve using GraphQL-style syntax:
-
-```
-Show me the details of the PROJECT-KEY project, but only include the name, key, and description fields
-```
-
-The AI will use field selection to optimize the response:
-
-```
-get_project(projectIdOrKey: "PROJECT-KEY", fields: "{ name key description }")
-```
-
-This reduces response size and processing time, especially for large objects.
-
-## Advanced Features
-
-### Response Optimization
-
-#### Field Selection
-
-When enabled with `OPTIMIZE_RESPONSE=true`, you can use GraphQL-style syntax to select specific fields:
-
-```
-{
-  id
-  name
-  description
-  users {
-    id
-    name
-  }
-}
-```
-
-This allows you to:
-- Reduce response size by requesting only needed fields
-- Focus on specific data points
-- Improve performance for large responses
-
-#### Token Limiting
-
-Large responses are automatically limited to prevent exceeding token limits:
-- Default limit: 50,000 tokens
-- Configurable via `MAX_TOKENS` environment variable
-- Responses exceeding the limit are truncated with a message
 
 ### i18n / Overriding Descriptions
 
@@ -473,6 +355,106 @@ The server loads the config file synchronously at startup.
 
 Environment variables always take precedence over the config file.
 
+## Advanced Features
+
+### Tool Name Prefixing
+
+Add prefix to tool names with:
+
+```
+--prefix backlog_
+```
+
+or via environment variable:
+
+```
+PREFIX="backlog_"
+```
+
+This is especially useful if you're using multiple MCP servers or tools in the same environment and want to avoid name collisions. For example, get_project can become backlog_get_project to distinguish it from similarly named tools provided by other services.
+
+### Response Optimization & Token Limits
+
+#### Field Selection (GraphQL-style)
+
+```
+--optimize-response
+```
+
+Or environment variable:
+
+```
+OPTIMIZE_RESPONSE=1
+```
+
+Then, request only specific fields:
+
+```
+get_project(projectIdOrKey: "PROJECT-KEY", fields: "{ name key description }")
+```
+
+The AI will use field selection to optimize the response:
+
+```
+get_project(projectIdOrKey: "PROJECT-KEY", fields: "{ name key description }")
+```
+
+Benefits:
+- Reduce response size by requesting only needed fields
+- Focus on specific data points
+- Improve performance for large responses
+
+#### Token Limiting
+
+Large responses are automatically limited to prevent exceeding token limits:
+- Default limit: 50,000 tokens
+- Configurable via `MAX_TOKENS` environment variable
+- Responses exceeding the limit are truncated with a message
+
+You can change this using:
+
+```
+MAX_TOKENS=10000
+```
+
+If a response exceeds the limit, it will be truncated with a warning.
+> Note: This is a best-effort mitigation, not a guaranteed enforcement.
+
+### Full Custom Configuration Example
+
+This section demonstrates advanced configuration using multiple environment variables. These are experimental features and may not be supported across all MCP clients. This is not part of the MCP standard specification and should be used with caution.
+
+```json
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e", "BACKLOG_DOMAIN",
+        "-e", "BACKLOG_API_KEY",
+        "-e", "MAX_TOKENS",
+        "-e", "OPTIMIZE_RESPONSE",
+        "-e", "PREFIX",
+        "-e", "ENABLE_TOOLSETS",
+        "ghcr.io/nulab/backlog-mcp-server"
+      ],
+      "env": {
+        "BACKLOG_DOMAIN": "your-domain.backlog.com",
+        "BACKLOG_API_KEY": "your-api-key",
+        "MAX_TOKENS": "10000",
+        "OPTIMIZE_RESPONSE": "1",
+        "PREFIX": "backlog_",
+        "ENABLE_TOOLSETS": "space,project,issue",
+        "ENABLE_DYNAMIC_TOOLSETS": "1"
+      }
+    }
+  }
+}
+```
+
 ## Development
 
 ### Running Tests
@@ -495,11 +477,14 @@ The server supports several command line options:
 - `--export-translations`: Export all translation keys and values
 - `--optimize-response`: Enable GraphQL-style field selection
 - `--max-tokens=NUMBER`: Set maximum token limit for responses
-- `--prefix=STRING`: Optional string prefix to prepend to all generated outputs
+- `--prefix=STRING`: Optional string prefix to prepend to all tool names (default: "")
+- `--enable-toolsets <toolsets...>`: Specify which toolsets to enable (comma-separated or multiple arguments). Defaults to "all".
+  Example: `--enable-toolsets space,project` or `--enable-toolsets issue --enable-toolsets git`
+  Available toolsets: `space`, `project`, `issue`, `wiki`, `git`, `notifications`.
 
 Example:
 ```bash
-node build/index.js --optimize-response --max-tokens=100000 --prefix="[BOT] "
+node build/index.js --optimize-response --max-tokens=100000 --prefix="backlog_" --enable-toolsets space,issue
 ```
 
 ## License
