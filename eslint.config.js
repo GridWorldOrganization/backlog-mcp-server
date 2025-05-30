@@ -33,7 +33,7 @@ export default [
   {
     files: ['**/*.test.ts'],
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off', // テストでは許可
+      '@typescript-eslint/no-explicit-any': 'off', // Allow on unit tests
     },
   },
   {

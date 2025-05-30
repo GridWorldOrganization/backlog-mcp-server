@@ -15,7 +15,7 @@ export function wrapWithTokenLimit<I, O>(
     const tokenCount = countTokens(fullText);
 
     if (tokenCount > maxTokens) {
-      const roughCut = fullText.slice(0, Math.floor(maxTokens * 4)); // UTF-8想定で少し余裕持って切る
+      const roughCut = fullText.slice(0, Math.floor(maxTokens * 4)); 
       return {
         kind: "ok",
         data: `${roughCut}\n...(output truncated due to token limit)`
