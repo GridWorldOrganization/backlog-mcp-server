@@ -594,3 +594,12 @@ This project is licensed under the [MIT License](./LICENSE).
 Please note: This tool is provided under the MIT License **without any warranty or official support**.  
 Use it at your own risk after reviewing the contents and determining its suitability for your needs.  
 If you encounter any issues, please report them via [GitHub Issues](../../issues).
+
+---
+
+## About this fork
+
+This fork is maintained by:
+
+- [GridWorld合同会社 (GridWorld LLC)](https://gridworld.co)
+- [GridJapan株式会社 (GridJapan Inc.)](https://gridjapan.com)
