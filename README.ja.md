@@ -514,3 +514,12 @@ node build/index.js --optimize-response --max-tokens=100000 --prefix="backlog_" 
 注意：このツールはMITライセンスのもとで提供されており、**いかなる保証も公式サポートもありません**。
 内容を確認し、ニーズへの適合性を判断した上で、自己責任で使用してください。
 問題が発生した場合は、[GitHub Issues](../../issues) を通じて報告してください。
+
+---
+
+## このフォークについて
+
+このフォークは以下の組織によってメンテナンスされています：
+
+- [GridWorld合同会社 (GridWorld LLC)](https://gridworld.co)
+- [GridJapan株式会社 (GridJapan Inc.)](https://gridjapan.com)
