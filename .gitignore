@@ -51,4 +51,4 @@ coverage/
 tmp/
 temp/
 
-src/version.ts
+src/version.ts.npmrc

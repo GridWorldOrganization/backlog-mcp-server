@@ -1,5 +1,5 @@
 {
-  "name": "backlog-mcp-server",
+  "name": "@gridworld-jp/backlog-mcp-server",
   "version": "0.9.1",
   "type": "module",
   "bin": {
