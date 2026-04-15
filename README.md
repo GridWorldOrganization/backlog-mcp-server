@@ -4,36 +4,43 @@
 ![Build](https://github.com/nulab/backlog-mcp-server/actions/workflows/ci.yml/badge.svg)
 ![Last Commit](https://img.shields.io/github/last-commit/nulab/backlog-mcp-server.svg)
 
-[📘 日本語でのご利用ガイド](./README.ja.md)
+Backlog API と対話するための Model Context Protocol (MCP) サーバーです。Claude Desktop / Cline / Cursor などの AI エージェントから、プロジェクト・課題・Wiki ページなどを操作できます。
 
-A Model Context Protocol (MCP) server for interacting with the Backlog API. This server provides tools for managing projects, issues, wiki pages, and more in Backlog through AI agents like Claude Desktop / Cline / Cursor etc.
+*A Model Context Protocol (MCP) server for interacting with the Backlog API. Provides tools for managing projects, issues, wiki pages, and more through AI agents like Claude Desktop / Cline / Cursor.*
 
-## Features
+> 📘 このドキュメントは日本語を主、英語を副として併記しています。
+> *This document is written with Japanese as the primary language and English as a secondary annotation per section.*
 
-- Project tools (create, read, update, delete)
-- Issue tracking and comments (create, update, delete, list)
-- Version/Milestone management (create, read, update, delete)
-- Wiki page support
-- Git repository and pull request tools
-- Notification tools
-- GraphQL-style field selection for optimized responses
-- Token limiting for large responses
+## 機能 / Features
 
-## Getting Started
+- プロジェクト管理ツール（作成・取得・更新・削除）
+- 課題トラッキングとコメント（作成・更新・削除・一覧）
+- バージョン／マイルストーン管理
+- Wiki ページ操作
+- Git リポジトリとプルリクエストツール
+- 通知ツール
+- GraphQL 風フィールド選択によるレスポンス最適化
+- 大きなレスポンスに対するトークン制限
 
-### Requirements
+*Projects, issues & comments, version/milestones, wiki pages, Git repositories & pull requests, notifications, GraphQL-style field selection, and token limiting for large responses.*
+
+## はじめに / Getting Started
+
+### 必要環境 / Requirements
 
 - Docker
-- A Backlog account with API access
-- API key from your Backlog account
+- API アクセス可能な Backlog アカウント / A Backlog account with API access
+- Backlog アカウントの API キー / API key from your Backlog account
 
-### Option 1: Install via Docker
+### Option 1: Docker でインストール / Install via Docker
 
-The easiest way to use this MCP server is through MCP configurations:
+もっとも簡単な方法は MCP 設定経由で Docker イメージを使うことです。
 
-1. Open MCP settings
-2. Navigate to the MCP configuration section
-3. Add the following configuration:
+*The easiest way to use this MCP server is through MCP configurations.*
+
+1. MCP 設定を開きます / Open MCP settings
+2. MCP 設定セクションへ移動します / Navigate to the MCP configuration section
+3. 以下の設定を追加します / Add the following configuration:
 
 ```json
 {
@@ -61,21 +68,22 @@ The easiest way to use this MCP server is through MCP configurations:
 }
 ```
 
-Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` with your Backlog API key.
+`your-domain.backlog.com` と `your-api-key` は実際の値に置き換えてください。
 
-✅ If you cannot use --pull always, you can manually update the image using:
+*Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` with your Backlog API key.*
+
+✅ `--pull always` が使えない環境では、手動でイメージを更新できます。
+*If you cannot use `--pull always`, you can manually update the image:*
 
 ```
 docker pull ghcr.io/nulab/backlog-mcp-server:latest
 ```
 
-### Option 2: Install via npx
+### Option 2: npx でインストール / Install via npx
 
-You can also run the server directly using `npx` without cloning the repository. This is a convenient way to run the server without a full installation.
+リポジトリをクローンせず、`npx` で直接サーバーを起動する方法です。手軽にセットアップできます。
 
-1. Open MCP settings
-2. Navigate to the MCP configuration section
-3. Add the following configuration:
+*You can also run the server directly using `npx` without cloning the repository — a convenient way to run the server without a full installation.*
 
 ```json
 {
@@ -92,11 +100,9 @@ You can also run the server directly using `npx` without cloning the repository.
 }
 ```
 
-Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` with your Backlog API key.
+### Option 3: 手動セットアップ (Node.js) / Manual Setup (Node.js)
 
-### Option 3: Manual Setup (Node.js)
-
-1. Clone and install:
+1. クローンしてインストール / Clone and install:
 
    ```bash
    git clone https://github.com/nulab/backlog-mcp-server.git
@@ -105,251 +111,271 @@ Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` wi
    npm run build
    ```
 
-2. Create `.env` from template and set required variables:
+2. テンプレートから `.env` を作成して必要な変数を設定します。
+   *Create `.env` from template and set required variables:*
 
-```bash
-cp .env.example .env
-```
+   ```bash
+   cp .env.example .env
+   ```
 
-Set the following values in `.env`:
+   `.env` に以下の値を設定します / Set the following in `.env`:
 
-- `BACKLOG_DOMAIN=your-domain.backlog.com`
-- `BACKLOG_API_KEY=your-api-key`
+   - `BACKLOG_DOMAIN=your-domain.backlog.com`
+   - `BACKLOG_API_KEY=your-api-key`
 
-3. Run locally:
+3. ローカル起動 / Run locally:
 
-```bash
-npm run dev
-```
+   ```bash
+   npm run dev
+   ```
 
-4. Set your json to use as MCP
+4. MCP 設定として JSON を指定します。
+   *Set your JSON to use as MCP:*
 
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "node",
-      "args": ["your-repository-location/build/index.js"],
-      "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key"
-      }
-    }
-  }
-}
-```
+   ```json
+   {
+     "mcpServers": {
+       "backlog": {
+         "command": "node",
+         "args": ["your-repository-location/build/index.js"],
+         "env": {
+           "BACKLOG_DOMAIN": "your-domain.backlog.com",
+           "BACKLOG_API_KEY": "your-api-key"
+         }
+       }
+     }
+   }
+   ```
 
-## Tool Configuration
+## ツール設定 / Tool Configuration
 
-You can selectively enable or disable specific **toolsets** using the `--enable-toolsets` command-line flag or the `ENABLE_TOOLSETS` environment variable. This allows better control over which tools are available to the AI agent and helps reduce context size.
+`--enable-toolsets` フラグまたは `ENABLE_TOOLSETS` 環境変数で、個別の **ツールセット** を有効・無効にできます。AI エージェントに公開するツールを絞り込むことで、コンテキストサイズの削減にもつながります。
 
-### Available Toolsets
+*You can selectively enable or disable specific **toolsets** using the `--enable-toolsets` flag or the `ENABLE_TOOLSETS` environment variable. This gives better control over which tools are exposed to the AI agent and helps reduce context size.*
 
-The following toolsets are available (enabled by default when `"all"` is used):
+### 利用可能なツールセット / Available Toolsets
 
-| Toolset         | Description                                                             |
+`"all"` 指定時はすべてのツールセットが有効になります（デフォルト）。
+
+*All toolsets are enabled when `"all"` is specified (default).*
+
+| Toolset         | 説明 / Description                                                      |
 | --------------- | ----------------------------------------------------------------------- |
-| `space`         | Tools for managing Backlog space settings and general information       |
-| `project`       | Tools for managing projects, categories, custom fields, and issue types |
-| `issue`         | Tools for managing issues and their comments, version milestones        |
-| `wiki`          | Tools for managing wiki pages                                           |
-| `git`           | Tools for managing Git repositories and pull requests                   |
-| `notifications` | Tools for managing user notifications                                   |
-| `document`      | Tools for viewing documents and document trees                          |
+| `space`         | Backlog スペース全般の情報管理 / Space settings and general information |
+| `project`       | プロジェクト・カテゴリ・カスタムフィールド・課題タイプ管理 / Projects, categories, custom fields, issue types |
+| `issue`         | 課題・コメント・バージョンマイルストーン管理 / Issues, comments, version milestones |
+| `wiki`          | Wiki ページ管理 / Wiki pages                                            |
+| `git`           | Git リポジトリとプルリクエスト管理 / Git repositories and pull requests |
+| `notifications` | 通知管理 / User notifications                                           |
+| `document`      | ドキュメント閲覧 / Documents and document trees                         |
 
-### Specifying Toolsets
+### ツールセットの指定 / Specifying Toolsets
 
-You can control toolset activation in the following ways:
-
-Using via CLI:
+CLI から指定する場合 / Using via CLI:
 
 ```bash
 --enable-toolsets space,project,issue
 ```
 
-Or via environment variable:
+環境変数で指定する場合 / Or via environment variable:
 
 ```
 ENABLE_TOOLSETS="space,project,issue"
 ```
 
-If all is specified, all available toolsets will be enabled. This is also the default behavior.
+`all` を指定するとすべて有効化されます（デフォルト挙動と同じ）。エージェントに渡るツール数が多すぎて不安定なときは、使わないツールセットを無効化すると安定することがあります。
 
-Using selective toolsets can be helpful if the toolset list is too large for your AI agent or if certain tools are causing performance issues. In such cases, disabling unused toolsets may improve stability.
+*If `all` is specified, all toolsets will be enabled — this is also the default. Disabling unused toolsets can improve stability when the tool list is too large.*
 
-> 🧩 Tip: `project` toolset is highly recommended, as many other tools rely on project data as an entry point.
+> 🧩 ヒント: 多くのツールはプロジェクト情報を起点にするため、`project` ツールセットは有効のままにすることを強く推奨します。
+> *Tip: The `project` toolset is highly recommended, as many other tools rely on project data as an entry point.*
 
-### Dynamic Toolset Discovery (Experimental)
+### 動的ツールセット検出 (実験的) / Dynamic Toolset Discovery (Experimental)
 
-If you're using the MCP server with AI agents, you can enable dynamic discovery of toolsets at runtime:
+AI エージェントと組み合わせる場合、実行時にツールセットを動的に検出・有効化できます。
 
-Enabling via CLI:
+*When used with AI agents, you can enable runtime discovery of toolsets.*
+
+CLI での有効化 / Enabling via CLI:
 
 ```
 --dynamic-toolsets
 ```
 
-Or via environment variable::
+環境変数での有効化 / Or via environment variable:
 
 ```
 -e DYNAMIC_TOOLSETS=1 \
 ```
 
-With dynamic toolsets enabled, the LLM will be able to list and activate toolsets on demand via tool interface.
+この設定を有効化すると、LLM がツールインターフェース経由でツールセットを一覧・有効化できるようになります。
 
-## Available Tools
+*With dynamic toolsets enabled, the LLM can list and activate toolsets on demand via the tool interface.*
+
+## 利用可能なツール / Available Tools
 
 ### Toolset: `space`
 
-Tools for managing Backlog space settings and general information.
+Backlog スペース設定と全般情報のためのツール。
+*Tools for managing Backlog space settings and general information.*
 
-- `get_space`: Returns information about the Backlog space.
-- `get_users`: Returns list of users in the Backlog space.
-- `get_myself`: Returns information about the authenticated user.
+- `get_space`: スペース情報を返します / Returns information about the Backlog space.
+- `get_users`: スペース内のユーザー一覧を返します / Returns list of users in the space.
+- `get_myself`: 認証済みユーザーの情報を返します / Returns info about the authenticated user.
 
 ### Toolset: `project`
 
-Tools for managing projects, categories, custom fields, and issue types.
+プロジェクト・カテゴリ・カスタムフィールド・課題タイプを管理するツール。
+*Tools for managing projects, categories, custom fields, and issue types.*
 
-- `get_project_list`: Returns list of projects.
-- `add_project`: Creates a new project.
-- `get_project`: Returns information about a specific project.
-- `update_project`: Updates an existing project.
-- `delete_project`: Deletes a project.
+- `get_project_list`: プロジェクト一覧 / Returns list of projects.
+- `add_project`: プロジェクト作成 / Creates a new project.
+- `get_project`: プロジェクト詳細 / Returns information about a specific project.
+- `update_project`: プロジェクト更新 / Updates an existing project.
+- `delete_project`: プロジェクト削除 / Deletes a project.
 
 ### Toolset: `issue`
 
-Tools for managing issues, their comments, and related items like priorities, categories, custom fields, issue types, resolutions, and watching lists.
+課題・コメント・優先度・カテゴリ・カスタムフィールド・課題タイプ・完了理由・ウォッチリスト管理ツール。
+*Tools for managing issues, comments, priorities, categories, custom fields, issue types, resolutions, and watching lists.*
 
-- `get_issue`: Returns information about a specific issue.
-- `get_issues`: Returns list of issues.
-- `count_issues`: Returns count of issues.
-- `add_issue`: Creates a new issue in the specified project.
-- `update_issue`: Updates an existing issue.
-- `delete_issue`: Deletes an issue.
-- `get_issue_comments`: Returns list of comments for an issue.
-- `add_issue_comment`: Adds a comment to an issue.
-- `update_issue_comment`: Updates an existing comment on an issue. Only the comment author can update it.
-- `get_priorities`: Returns list of priorities.
-- `get_categories`: Returns list of categories for a project.
-- `get_custom_fields`: Returns list of custom fields for a project.
-- `get_issue_types`: Returns list of issue types for a project.
-- `get_resolutions`: Returns list of issue resolutions.
-- `get_watching_list_items`: Returns list of watching items for a user.
-- `get_watching_list_count`: Returns count of watching items for a user.
-- `add_watching`: Adds a new watch to an issue.
-- `update_watching`: Updates an existing watch note.
-- `delete_watching`: Deletes a watch from an issue.
-- `mark_watching_as_read`: Marks a watch as read.
-- `get_version_milestone_list`: Returns list of version milestones for a project.
-- `add_version_milestone`: Creates a new version milestone for a project.
-- `update_version_milestone`: Updates an existing version milestone.
-- `delete_version_milestone`: Deletes a version milestone.
+- `get_issue`: 課題詳細 / Returns information about a specific issue.
+- `get_issues`: 課題一覧 / Returns list of issues.
+- `count_issues`: 課題件数 / Returns count of issues.
+- `add_issue`: 課題作成 / Creates a new issue in the specified project.
+- `update_issue`: 課題更新 / Updates an existing issue.
+- `delete_issue`: 課題削除 / Deletes an issue.
+- `get_issue_comments`: コメント一覧 / Returns list of comments for an issue.
+- `add_issue_comment`: コメント追加 / Adds a comment to an issue.
+- `update_issue_comment`: コメント更新（投稿者のみ）/ Updates a comment (author only).
+- `get_priorities`: 優先度一覧 / Returns list of priorities.
+- `get_categories`: カテゴリ一覧 / Returns list of categories for a project.
+- `get_custom_fields`: カスタムフィールド一覧 / Returns list of custom fields for a project.
+- `get_issue_types`: 課題タイプ一覧 / Returns list of issue types for a project.
+- `get_resolutions`: 完了理由一覧 / Returns list of issue resolutions.
+- `get_watching_list_items`: ウォッチ一覧 / Returns watching items for a user.
+- `get_watching_list_count`: ウォッチ件数 / Returns count of watching items.
+- `add_watching`: ウォッチ追加 / Adds a new watch to an issue.
+- `update_watching`: ウォッチ更新 / Updates an existing watch note.
+- `delete_watching`: ウォッチ削除 / Deletes a watch from an issue.
+- `mark_watching_as_read`: ウォッチ既読化 / Marks a watch as read.
+- `get_version_milestone_list`: マイルストーン一覧 / Returns version milestones for a project.
+- `add_version_milestone`: マイルストーン作成 / Creates a new version milestone.
+- `update_version_milestone`: マイルストーン更新 / Updates a version milestone.
+- `delete_version_milestone`: マイルストーン削除 / Deletes a version milestone.
 
 ### Toolset: `wiki`
 
-Tools for managing wiki pages.
+Wiki ページ管理ツール。
+*Tools for managing wiki pages.*
 
-- `get_wiki_pages`: Returns list of Wiki pages.
-- `get_wikis_count`: Returns count of wiki pages in a project.
-- `get_wiki`: Returns information about a specific wiki page.
-- `add_wiki`: Creates a new wiki page. Auto-recovers over-escaped `\n` sequences in `content`.
-- `update_wiki`: Updates an existing wiki page. Same `\n` auto-recovery as `add_wiki`.
-- `delete_wiki`: Deletes a wiki page.
-- `get_wiki_history`: Returns the edit history of a wiki page.
-- `get_wiki_stars`: Returns the list of stars on a wiki page.
-- `get_wiki_tags`: Returns the list of tags used by wiki pages in a project.
-- `get_wiki_attachments`: Returns the list of attachments on a wiki page.
-- `add_wiki_attachments`: Links uploaded attachments (see `upload_attachment`) to a wiki page.
-- `delete_wiki_attachment`: Removes an attachment from a wiki page.
+- `get_wiki_pages`: Wiki 一覧 / Returns list of Wiki pages.
+- `get_wikis_count`: Wiki 件数 / Returns count of wiki pages in a project.
+- `get_wiki`: Wiki 詳細 / Returns information about a specific wiki page.
+- `add_wiki`: Wiki 作成。`content` に含まれる過剰エスケープされた `\n` を自動復元します。/ Creates a wiki page; auto-recovers over-escaped `\n` sequences in `content`.
+- `update_wiki`: Wiki 更新。`add_wiki` と同じ `\n` 自動復元。/ Updates a wiki page; same `\n` auto-recovery.
+- `delete_wiki`: Wiki 削除 / Deletes a wiki page.
+- `get_wiki_history`: 編集履歴 / Returns the edit history of a wiki page.
+- `get_wiki_stars`: スター一覧 / Returns the list of stars on a wiki page.
+- `get_wiki_tags`: タグ一覧 / Returns tags used by wiki pages in a project.
+- `get_wiki_attachments`: 添付一覧 / Returns attachments on a wiki page.
+- `add_wiki_attachments`: アップロード済み添付を Wiki に紐付け（`upload_attachment` 参照）/ Links uploaded attachments to a wiki page.
+- `delete_wiki_attachment`: 添付削除 / Removes an attachment from a wiki page.
 
-### Toolset: `shared` (cross-resource utilities)
+### Toolset: `shared` (横断ユーティリティ / cross-resource utilities)
 
-- `upload_attachment`: Uploads a local file to Backlog space and returns an attachment ID. Use the returned id with `add_wiki_attachments`, issue creation, comments, etc.
-- `add_star`: Adds a star to an issue, comment, wiki, pull request, or pull request comment. Exactly one target ID must be provided.
+- `upload_attachment`: ローカルファイルを Backlog スペースへアップロードし、添付 ID を返します。戻り値を `add_wiki_attachments` や課題作成・コメント等で利用します。/ Uploads a local file to Backlog and returns an attachment ID; use the returned id with `add_wiki_attachments`, issue creation, comments, etc.
+- `add_star`: 課題・コメント・Wiki・プルリクエスト・PR コメントにスターを付けます。対象 ID はいずれか1つだけ指定します。/ Adds a star to an issue, comment, wiki, pull request, or PR comment. Exactly one target ID must be provided.
 
 ### Toolset: `git`
 
-Tools for managing Git repositories and pull requests.
+Git リポジトリとプルリクエスト管理ツール。
+*Tools for managing Git repositories and pull requests.*
 
-- `get_git_repositories`: Returns list of Git repositories for a project.
-- `get_git_repository`: Returns information about a specific Git repository.
-- `get_pull_requests`: Returns list of pull requests for a repository.
-- `get_pull_requests_count`: Returns count of pull requests for a repository.
-- `get_pull_request`: Returns information about a specific pull request.
-- `add_pull_request`: Creates a new pull request.
-- `update_pull_request`: Updates an existing pull request.
-- `get_pull_request_comments`: Returns list of comments for a pull request.
-- `add_pull_request_comment`: Adds a comment to a pull request.
-- `update_pull_request_comment`: Updates a comment on a pull request.
+- `get_git_repositories`: リポジトリ一覧 / Returns list of Git repositories.
+- `get_git_repository`: リポジトリ詳細 / Returns a specific Git repository.
+- `get_pull_requests`: PR 一覧 / Returns list of pull requests.
+- `get_pull_requests_count`: PR 件数 / Returns count of pull requests.
+- `get_pull_request`: PR 詳細 / Returns a specific pull request.
+- `add_pull_request`: PR 作成 / Creates a new pull request.
+- `update_pull_request`: PR 更新 / Updates an existing pull request.
+- `get_pull_request_comments`: PR コメント一覧 / Returns PR comments.
+- `add_pull_request_comment`: PR コメント追加 / Adds a comment to a PR.
+- `update_pull_request_comment`: PR コメント更新 / Updates a PR comment.
 
 ### Toolset: `notifications`
 
-Tools for managing user notifications.
+ユーザー通知管理ツール。
+*Tools for managing user notifications.*
 
-- `get_notifications`: Returns list of notifications.
-- `get_notifications_count`: Returns count of notifications.
-- `reset_unread_notification_count`: Resets unread notification count.
-- `mark_notification_as_read`: Marks a notification as read.
+- `get_notifications`: 通知一覧 / Returns list of notifications.
+- `get_notifications_count`: 通知件数 / Returns count of notifications.
+- `reset_unread_notification_count`: 未読件数リセット / Resets unread notification count.
+- `mark_notification_as_read`: 通知既読化 / Marks a notification as read.
 
 ### Toolset: `document`
 
-Tools for managing documents and document trees in Backlog projects.
+ドキュメントとドキュメントツリーの管理ツール。
+*Tools for managing documents and document trees.*
 
-- `get_document_tree`: Returns the hierarchical tree of documents for a project, including folders and ne
-- `get_documents`: Returns a flat list of documents in a project or folder.
-- `get_document`: Returns detailed information about a specific document, including metadata, content, an
+- `get_document_tree`: プロジェクトのドキュメント階層ツリー / Returns the hierarchical tree of documents for a project.
+- `get_documents`: ドキュメントのフラット一覧 / Returns a flat list of documents in a project or folder.
+- `get_document`: ドキュメント詳細（メタデータ・本文・添付）/ Returns detailed information about a specific document.
 
-## Usage Examples
+## 使用例 / Usage Examples
 
-Once the MCP server is configured in AI agents, you can use the tools directly in your conversations. Here are some examples:
+AI エージェントに MCP サーバーを登録したら、会話の中で直接ツールを利用できます。
 
-- Listing Projects
+*Once the MCP server is configured in AI agents, you can use the tools directly in your conversations.*
 
-```
-Could you list all my Backlog projects?
-```
+- プロジェクト一覧 / Listing Projects
 
-- Creating a New Issue
+  ```
+  Could you list all my Backlog projects?
+  ```
 
-```
-Create a new bug issue in the PROJECT-KEY project with high priority titled "Fix login page error"
-```
+- 課題作成 / Creating a New Issue
 
-- Getting Project Details
+  ```
+  Create a new bug issue in the PROJECT-KEY project with high priority titled "Fix login page error"
+  ```
 
-```
-Show me the details of the PROJECT-KEY project
-```
+- プロジェクト詳細 / Getting Project Details
 
-- Working with Git Repositories
+  ```
+  Show me the details of the PROJECT-KEY project
+  ```
 
-```
-List all Git repositories in the PROJECT-KEY project
-```
+- Git リポジトリ / Working with Git Repositories
 
-- Managing Pull Requests
+  ```
+  List all Git repositories in the PROJECT-KEY project
+  ```
 
-```
-Show me all open pull requests in the repository "repo-name" of PROJECT-KEY project
-```
+- プルリクエスト / Managing Pull Requests
 
-```
-Create a new pull request from branch "feature/new-feature" to "main" in the repository "repo-name" of PROJECT-KEY project
-```
+  ```
+  Show me all open pull requests in the repository "repo-name" of PROJECT-KEY project
+  ```
 
-- Watching Items
+  ```
+  Create a new pull request from branch "feature/new-feature" to "main" in the repository "repo-name" of PROJECT-KEY project
+  ```
 
-```
-Show me all items I'm watching
-```
+- ウォッチ中アイテム / Watching Items
 
-### i18n / Overriding Descriptions
+  ```
+  Show me all items I'm watching
+  ```
 
-You can override the descriptions of tools by creating a `.backlog-mcp-serverrc.json` file in your **home directory**.
+### 国際化 / 説明の上書き / i18n / Overriding Descriptions
 
-The file should contain a JSON object with the tool names as keys and the new descriptions as values.  
-For example:
+ホームディレクトリに `.backlog-mcp-serverrc.json` を置くことで、ツールの説明（description）を上書きできます。
+
+*You can override tool descriptions by creating a `.backlog-mcp-serverrc.json` in your **home directory**.*
+
+キーにツール名、値に新しい説明を記述します。
+*The file is a JSON object with tool names as keys and new descriptions as values.*
 
 ```json
 {
@@ -358,13 +384,14 @@ For example:
 }
 ```
 
-When the server starts, it determines the final description for each tool based on the following priority:
+サーバー起動時には以下の優先順位で説明が決定されます。
+*When the server starts, descriptions are resolved in this priority order:*
 
-1. Environment variables (e.g., `BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION`)
-2. Entries in `.backlog-mcp-serverrc.json` - Supported configuration file formats: .json, .yaml, .yml
-3. Built-in fallback values (English)
+1. 環境変数 / Environment variables (e.g., `BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION`)
+2. `.backlog-mcp-serverrc.json` のエントリ（`.json`, `.yaml`, `.yml` 対応）/ Entries in the config file (`.json`, `.yaml`, `.yml` supported)
+3. 組み込みの英語フォールバック値 / Built-in fallback values (English)
 
-Sample config:
+設定例 / Sample config:
 
 ```json
 {
@@ -392,44 +419,44 @@ Sample config:
 }
 ```
 
-### Exporting Current Translations
+### 現在の翻訳をエクスポート / Exporting Current Translations
 
-You can export the current default translations (including any overrides) by running the binary with the --export-translations flag.
+`--export-translations` フラグを付けて起動すると、現在のデフォルト翻訳（上書き分を含む）を標準出力へ書き出せます。
 
-This will print all tool descriptions to stdout, including any customizations you have made.
+*Running the binary with `--export-translations` prints all tool descriptions to stdout, including any customizations.*
 
-Example:
+例 / Example:
 
 ```bash
 docker run -i --rm ghcr.io/nulab/backlog-mcp-server node build/index.js --export-translations
 ```
 
-or
+または / or:
 
 ```bash
 npx github:nulab/backlog-mcp-server --export-translations
 ```
 
-### Using a Japanese Translation Template
+### 日本語テンプレートの利用 / Using a Japanese Translation Template
 
-A sample Japanese configuration file is provided at:
+日本語設定のサンプルは以下のパスに同梱されています。
+*A sample Japanese configuration file is provided at:*
 
 ```bash
 translationConfig/.backlog-mcp-serverrc.json.example
 ```
 
-To use it, copy it to your home directory as .backlog-mcp-serverrc.json:
+ホームディレクトリへコピーして `.backlog-mcp-serverrc.json` として使用し、内容を必要に応じて編集してください。
 
-You can then edit the file to customize the descriptions as needed.
+*Copy it to your home directory as `.backlog-mcp-serverrc.json` and edit as needed.*
 
-### Using Environment Variables
+### 環境変数による上書き / Using Environment Variables
 
-Alternatively, you can override tool descriptions via environment variables.
+ツールごとの説明は環境変数でも上書きできます。変数名はツールキーを大文字化し、`BACKLOG_MCP_` を前置します。
 
-The environment variable names are based on the tool keys, prefixed with BACKLOG*MCP* and written in uppercase.
+*You can also override descriptions via environment variables. Names are based on tool keys, prefixed with `BACKLOG_MCP_` in uppercase.*
 
-Example:
-To override the TOOL_ADD_ISSUE_COMMENT_DESCRIPTION:
+例: `TOOL_ADD_ISSUE_COMMENT_DESCRIPTION` を上書きする場合 / Example — to override `TOOL_ADD_ISSUE_COMMENT_DESCRIPTION`:
 
 ```json
 {
@@ -455,81 +482,83 @@ To override the TOOL_ADD_ISSUE_COMMENT_DESCRIPTION:
 }
 ```
 
-The server loads the config file synchronously at startup.
+設定ファイルは起動時に同期的にロードされます。環境変数は常に設定ファイルより優先されます。
 
-Environment variables always take precedence over the config file.
+*The config file is loaded synchronously at startup. Environment variables always take precedence over the config file.*
 
-## Advanced Features
+## 高度な機能 / Advanced Features
 
-### Tool Name Prefixing
+### ツール名のプレフィックス / Tool Name Prefixing
 
-Add prefix to tool names with:
+ツール名に任意のプレフィックスを付けられます。
+*You can add a prefix to tool names:*
 
 ```
 --prefix backlog_
 ```
 
-or via environment variable:
+環境変数の場合 / Or via environment variable:
 
 ```
 PREFIX="backlog_"
 ```
 
-This is especially useful if you're using multiple MCP servers or tools in the same environment and want to avoid name collisions. For example, get_project can become backlog_get_project to distinguish it from similarly named tools provided by other services.
+同一環境で複数の MCP サーバー／ツールを使う際、名前衝突を避けるのに便利です。例えば `get_project` を `backlog_get_project` にして他サービスと区別できます。
 
-### Response Optimization & Token Limits
+*Useful when multiple MCP servers or tools live in the same environment — e.g., `get_project` becomes `backlog_get_project` to avoid collisions.*
 
-#### Field Selection (GraphQL-style)
+### レスポンス最適化とトークン制限 / Response Optimization & Token Limits
+
+#### フィールド選択 (GraphQL 風) / Field Selection (GraphQL-style)
 
 ```
 --optimize-response
 ```
 
-Or environment variable:
+環境変数の場合 / Or environment variable:
 
 ```
 OPTIMIZE_RESPONSE=1
 ```
 
-Then, request only specific fields:
+必要なフィールドだけをリクエストできます / Then request only specific fields:
 
 ```
 get_project(projectIdOrKey: "PROJECT-KEY", fields: "{ name key description }")
 ```
 
-The AI will use field selection to optimize the response:
+AI はフィールド選択を使ってレスポンスを最適化します。
+*The AI will use field selection to optimize the response.*
 
-```
-get_project(projectIdOrKey: "PROJECT-KEY", fields: "{ name key description }")
-```
+利点 / Benefits:
 
-Benefits:
+- 不要フィールドを除外してレスポンスサイズを削減 / Reduce response size by requesting only needed fields
+- 必要なデータ点へフォーカス / Focus on specific data points
+- 大きなレスポンスでの性能改善 / Improve performance for large responses
 
-- Reduce response size by requesting only needed fields
-- Focus on specific data points
-- Improve performance for large responses
+#### トークン制限 / Token Limiting
 
-#### Token Limiting
+トークン上限を超えないよう、大きなレスポンスは自動的に切り詰められます。
+*Large responses are automatically limited to prevent exceeding token limits.*
 
-Large responses are automatically limited to prevent exceeding token limits:
+- デフォルト上限: 50,000 トークン / Default limit: 50,000 tokens
+- `MAX_TOKENS` 環境変数で変更可能 / Configurable via `MAX_TOKENS`
+- 上限を超えると、警告メッセージと共に切り詰められます / Exceeding the limit truncates the response with a message
 
-- Default limit: 50,000 tokens
-- Configurable via `MAX_TOKENS` environment variable
-- Responses exceeding the limit are truncated with a message
-
-You can change this using:
+変更方法 / Change it via:
 
 ```
 MAX_TOKENS=10000
 ```
 
-If a response exceeds the limit, it will be truncated with a warning.
+> 注意: ベストエフォートによる緩和策であり、厳密な強制ではありません。
+> *Note: This is a best-effort mitigation, not a guaranteed enforcement.*
 
-> Note: This is a best-effort mitigation, not a guaranteed enforcement.
+### 完全なカスタム設定例 / Full Custom Configuration Example
 
-### Full Custom Configuration Example
+このセクションは複数の環境変数を組み合わせた高度な設定例です。実験的機能を含み、すべての MCP クライアントで動作するとは限りません。MCP 標準仕様の一部ではないため、利用は自己責任でお願いします。
 
-This section demonstrates advanced configuration using multiple environment variables. These are experimental features and may not be supported across all MCP clients. This is not part of the MCP standard specification and should be used with caution.
+*This section demonstrates advanced configuration using multiple environment variables. These are experimental and may not be supported across all MCP clients — not part of the MCP standard spec; use with caution.*
 
 ```json
 {
@@ -568,52 +597,55 @@ This section demonstrates advanced configuration using multiple environment vari
 }
 ```
 
-## Development
+## 開発 / Development
 
-### Running Tests
+### テスト実行 / Running Tests
 
 ```bash
 npm test
 ```
 
-### Adding New Tools
+### 新しいツールの追加 / Adding New Tools
 
-1. Create a new file in `src/tools/` following the pattern of existing tools
-2. Create a corresponding test file
-3. Add the new tool to `src/tools/tools.ts`
-4. Build and test your changes
+1. 既存ツールのパターンに従い、`src/tools/` 配下に新規ファイルを作成 / Create a new file in `src/tools/` following existing patterns
+2. 対応するテストファイルを作成 / Create a corresponding test file
+3. `src/tools/tools.ts` に追加 / Register in `src/tools/tools.ts`
+4. ビルドして動作確認 / Build and test your changes
 
-### Command Line Options
+### コマンドラインオプション / Command Line Options
 
-The server supports several command line options:
+サーバーは次のオプションをサポートします。
+*The server supports these command line options:*
 
-- `--export-translations`: Export all translation keys and values
-- `--optimize-response`: Enable GraphQL-style field selection
-- `--max-tokens=NUMBER`: Set maximum token limit for responses
-- `--prefix=STRING`: Optional string prefix to prepend to all tool names (default: "")
-- `--enable-toolsets <toolsets...>`: Specify which toolsets to enable (comma-separated or multiple arguments). Defaults to "all".
-  Example: `--enable-toolsets space,project` or `--enable-toolsets issue --enable-toolsets git`
-  Available toolsets: `space`, `project`, `issue`, `wiki`, `git`, `notifications`.
+- `--export-translations`: 翻訳キーと値をエクスポート / Export all translation keys and values
+- `--optimize-response`: GraphQL 風フィールド選択を有効化 / Enable GraphQL-style field selection
+- `--max-tokens=NUMBER`: レスポンスのトークン上限 / Set maximum token limit
+- `--prefix=STRING`: ツール名に付与する任意プレフィックス（デフォルトは空）/ Optional prefix for tool names (default: "")
+- `--enable-toolsets <toolsets...>`: 有効化するツールセット（カンマ区切り or 複数指定）。デフォルトは `"all"`。/ Specify which toolsets to enable (comma-separated or multiple). Defaults to `"all"`.
+  例 / Example: `--enable-toolsets space,project` または / or `--enable-toolsets issue --enable-toolsets git`
+  利用可能 / Available: `space`, `project`, `issue`, `wiki`, `git`, `notifications`.
 
-Example:
+例 / Example:
 
 ```bash
 node build/index.js --optimize-response --max-tokens=100000 --prefix="backlog_" --enable-toolsets space,issue
 ```
 
-## License
+## ライセンス / License
 
-This project is licensed under the [MIT License](./LICENSE).
+本プロジェクトは [MIT License](./LICENSE) の下で提供されています。
+*This project is licensed under the [MIT License](./LICENSE).*
 
-Please note: This tool is provided under the MIT License **without any warranty or official support**.  
-Use it at your own risk after reviewing the contents and determining its suitability for your needs.  
-If you encounter any issues, please report them via [GitHub Issues](../../issues).
+本ツールは MIT License に基づき、**無保証・公式サポートなし** で提供されます。内容を確認のうえ、自身のニーズに合うかを判断してから利用してください。不具合は [GitHub Issues](../../issues) へご報告ください。
+
+*Please note: this tool is provided under the MIT License **without any warranty or official support**. Use it at your own risk after reviewing the contents and determining its suitability for your needs. Report issues via [GitHub Issues](../../issues).*
 
 ---
 
-## About this fork
+## このフォークについて / About this fork
 
-This fork is maintained by:
+本フォークは以下のメンバーが保守しています。
+*This fork is maintained by:*
 
 - [GridWorld合同会社 (GridWorld LLC)](https://gridworld.co)
 - [GridJapan株式会社 (GridJapan Inc.)](https://gridjapan.com)
