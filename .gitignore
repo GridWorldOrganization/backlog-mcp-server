@@ -18,6 +18,9 @@ dist/
 .env.test.local
 .env.production.local
 
+# Local MCP config (contains API keys)
+.mcp.json
+
 # Editor directories and files
 .idea/
 .vscode/*

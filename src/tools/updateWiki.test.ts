@@ -34,6 +34,19 @@ describe('updateWikiTool', () => {
   const mockTranslationHelper = createTranslationHelper();
   const tool = updateWikiTool(mockBacklog as Backlog, mockTranslationHelper);
 
+  it('normalizes literal \\n in content before calling backlog.patchWiki', async () => {
+    await tool.handler({
+      wikiId: 1,
+      content: '# Title\\n\\n| a | b |\\n|---|---|',
+    });
+
+    expect(mockBacklog.patchWiki).toHaveBeenCalledWith(1, {
+      name: undefined,
+      content: '# Title\n\n| a | b |\n|---|---|',
+      mailNotify: undefined,
+    });
+  });
+
   it('returns updated wiki as formatted JSON text', async () => {
     const result = await tool.handler({
       wikiId: 1,

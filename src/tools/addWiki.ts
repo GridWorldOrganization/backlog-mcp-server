@@ -3,13 +3,19 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from '../createTranslationHelper.js';
 import { WikiSchema } from '../types/zod/backlogOutputDefinition.js';
+import { normalizeMarkdownContent } from '../utils/normalizeMarkdownContent.js';
 
 const addWikiSchema = buildToolSchema((t) => ({
   projectId: z.number().describe(t('TOOL_ADD_WIKI_PROJECT_ID', 'Project ID')),
   name: z.string().describe(t('TOOL_ADD_WIKI_NAME', 'Name of the wiki page')),
   content: z
     .string()
-    .describe(t('TOOL_ADD_WIKI_CONTENT', 'Content of the wiki page')),
+    .describe(
+      t(
+        'TOOL_ADD_WIKI_CONTENT',
+        'Content of the wiki page (Markdown). Use real LF newlines, not literal "\\n" sequences — Backlog renders bodies verbatim and over-escaped strings break tables and code blocks.'
+      )
+    ),
   mailNotify: z
     .boolean()
     .optional()
@@ -38,7 +44,7 @@ export const addWikiTool = (
       backlog.postWiki({
         projectId,
         name,
-        content,
+        content: normalizeMarkdownContent(content),
         mailNotify,
       }),
   };

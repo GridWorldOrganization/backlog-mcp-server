@@ -49,6 +49,22 @@ describe('addWikiTool', () => {
     expect(result.content).toContain('Welcome to the project');
   });
 
+  it('normalizes literal \\n in content before calling backlog.postWiki', async () => {
+    await tool.handler({
+      projectId: 100,
+      name: 'Broken Body',
+      content: '# Title\\n\\n| a | b |\\n|---|---|',
+      mailNotify: false,
+    });
+
+    expect(mockBacklog.postWiki).toHaveBeenCalledWith({
+      projectId: 100,
+      name: 'Broken Body',
+      content: '# Title\n\n| a | b |\n|---|---|',
+      mailNotify: false,
+    });
+  });
+
   it('calls backlog.postWiki with correct params', async () => {
     const params = {
       projectId: 100,

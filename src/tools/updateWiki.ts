@@ -3,6 +3,7 @@ import { Backlog } from 'backlog-js';
 import { buildToolSchema, ToolDefinition } from '../types/tool.js';
 import { TranslationHelper } from '../createTranslationHelper.js';
 import { WikiSchema } from '../types/zod/backlogOutputDefinition.js';
+import { normalizeMarkdownContent } from '../utils/normalizeMarkdownContent.js';
 
 const updateWikiSchema = buildToolSchema((t) => ({
   wikiId: z
@@ -15,7 +16,12 @@ const updateWikiSchema = buildToolSchema((t) => ({
   content: z
     .string()
     .optional()
-    .describe(t('TOOL_UPDATE_WIKI_CONTENT', 'Content of the wiki page')),
+    .describe(
+      t(
+        'TOOL_UPDATE_WIKI_CONTENT',
+        'Content of the wiki page (Markdown). Use real LF newlines, not literal "\\n" sequences — Backlog renders bodies verbatim and over-escaped strings break tables and code blocks.'
+      )
+    ),
   mailNotify: z
     .boolean()
     .optional()
@@ -49,7 +55,7 @@ export const updateWikiTool = (
 
       return backlog.patchWiki(wikiIdNumber, {
         name,
-        content,
+        content: normalizeMarkdownContent(content),
         mailNotify,
       });
     },
