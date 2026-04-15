@@ -2,7 +2,14 @@
 
 > Note: This fork (`@gridworld-jp/backlog-mcp-server`) reset its versioning to `0.1.0`. Entries below `0.9.1` belong to upstream `nulab/backlog-mcp-server` and are kept for reference.
 
-## [0.2.0] - 2026-04-15
+## [0.2.1] - 2026-04-15
+
+Re-released as 0.2.1 because the `v0.2.0` git tag was already used in earlier
+fork-bootstrap history. Same content as 0.2.0 below, plus a CI fix:
+
+* **ci:** allow Web globals (FormData/Blob/File/URL/fetch) in eslint config; prettier auto-format pass.
+
+## [0.2.0] - 2026-04-15 (unreleased — superseded by 0.2.1)
 
 ### Features
 
