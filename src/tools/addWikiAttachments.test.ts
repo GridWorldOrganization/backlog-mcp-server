@@ -14,4 +14,9 @@ describe('addWikiAttachmentsTool', () => {
     expect(Array.isArray(result)).toBe(true);
     expect(mockBacklog.postWikisAttachments).toHaveBeenCalledWith(42, [7, 8]);
   });
+
+  it('accepts string wikiId', async () => {
+    await tool.handler({ wikiId: '42', attachmentId: [7] });
+    expect(mockBacklog.postWikisAttachments).toHaveBeenLastCalledWith(42, [7]);
+  });
 });

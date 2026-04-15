@@ -14,4 +14,9 @@ describe('getWikiStarsTool', () => {
     expect(Array.isArray(result)).toBe(true);
     expect(mockBacklog.getWikisStars).toHaveBeenCalledWith(42);
   });
+
+  it('accepts string wikiId', async () => {
+    await tool.handler({ wikiId: '42' });
+    expect(mockBacklog.getWikisStars).toHaveBeenLastCalledWith(42);
+  });
 });

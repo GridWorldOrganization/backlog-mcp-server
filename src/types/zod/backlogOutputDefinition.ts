@@ -465,6 +465,12 @@ export const WikiCountSchema = z.object({
   count: z.number(),
 });
 
+export const FileInfoSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  size: z.number(),
+});
+
 export const WikiHistorySchema = z.object({
   pageId: z.number(),
   version: z.number(),

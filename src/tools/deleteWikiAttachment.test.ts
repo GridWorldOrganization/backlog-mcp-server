@@ -15,4 +15,9 @@ describe('deleteWikiAttachmentTool', () => {
     expect(result.id).toBe(7);
     expect(mockBacklog.deleteWikisAttachments).toHaveBeenCalledWith(42, 7);
   });
+
+  it('accepts string wikiId', async () => {
+    await tool.handler({ wikiId: '42', attachmentId: 7 });
+    expect(mockBacklog.deleteWikisAttachments).toHaveBeenLastCalledWith(42, 7);
+  });
 });

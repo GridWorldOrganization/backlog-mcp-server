@@ -67,6 +67,7 @@ import { updateVersionMilestoneTool } from './updateVersionMilestone.js';
 import { deleteVersionTool } from './deleteVersion.js';
 import { addDocumentTool } from './addDocument.js';
 import { addStarTool } from './addStar.js';
+import { uploadAttachmentTool } from './uploadAttachment.js';
 
 export const allTools = (
   backlog: Backlog,
@@ -85,6 +86,7 @@ export const allTools = (
           getUsersTool(backlog, helper),
           getUserStarsCountTool(backlog, helper),
           addStarTool(backlog, helper),
+          uploadAttachmentTool(backlog, helper),
           getMyselfTool(backlog, helper),
           getUserRecentUpdatesTool(backlog, helper),
         ],

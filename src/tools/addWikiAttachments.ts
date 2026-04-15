@@ -13,7 +13,7 @@ const addWikiAttachmentsSchema = buildToolSchema((t) => ({
     .describe(
       t(
         'TOOL_ADD_WIKI_ATTACHMENTS_ATTACHMENT_ID',
-        'Attachment IDs to link (obtained via /api/v2/space/attachment upload)'
+        'Attachment IDs to link (obtain by calling upload_attachment first)'
       )
     ),
 }));

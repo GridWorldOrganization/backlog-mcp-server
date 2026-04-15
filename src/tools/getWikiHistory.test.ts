@@ -21,4 +21,9 @@ describe('getWikiHistoryTool', () => {
     await tool.handler({ wikiId: 42, order: 'asc' });
     expect(mockBacklog.getWikisHistory).toHaveBeenLastCalledWith(42, { order: 'asc' });
   });
+
+  it('accepts string wikiId', async () => {
+    await tool.handler({ wikiId: '42' });
+    expect(mockBacklog.getWikisHistory).toHaveBeenLastCalledWith(42, {});
+  });
 });
