@@ -7,7 +7,10 @@ describe('getWikiStarsTool', () => {
   const mockBacklog: Partial<Backlog> = {
     getWikisStars: vi.fn<() => Promise<any>>().mockResolvedValue([{ id: 1 }]),
   };
-  const tool = getWikiStarsTool(mockBacklog as Backlog, createTranslationHelper());
+  const tool = getWikiStarsTool(
+    mockBacklog as Backlog,
+    createTranslationHelper()
+  );
 
   it('returns stars', async () => {
     const result = await tool.handler({ wikiId: 42 });

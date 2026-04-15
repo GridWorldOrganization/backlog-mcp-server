@@ -5,9 +5,14 @@ import { createTranslationHelper } from '../createTranslationHelper.js';
 
 describe('getWikiTagsTool', () => {
   const mockBacklog: Partial<Backlog> = {
-    getWikisTags: vi.fn<() => Promise<any>>().mockResolvedValue([{ id: 1, name: 'docs' }]),
+    getWikisTags: vi
+      .fn<() => Promise<any>>()
+      .mockResolvedValue([{ id: 1, name: 'docs' }]),
   };
-  const tool = getWikiTagsTool(mockBacklog as Backlog, createTranslationHelper());
+  const tool = getWikiTagsTool(
+    mockBacklog as Backlog,
+    createTranslationHelper()
+  );
 
   it('resolves projectId', async () => {
     const result = await tool.handler({ projectId: 100 });

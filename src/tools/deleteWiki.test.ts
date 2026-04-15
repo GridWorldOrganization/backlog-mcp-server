@@ -5,9 +5,14 @@ import { createTranslationHelper } from '../createTranslationHelper.js';
 
 describe('deleteWikiTool', () => {
   const mockBacklog: Partial<Backlog> = {
-    deleteWiki: vi.fn<() => Promise<any>>().mockResolvedValue({ id: 42, name: 'Old Page' }),
+    deleteWiki: vi
+      .fn<() => Promise<any>>()
+      .mockResolvedValue({ id: 42, name: 'Old Page' }),
   };
-  const tool = deleteWikiTool(mockBacklog as Backlog, createTranslationHelper());
+  const tool = deleteWikiTool(
+    mockBacklog as Backlog,
+    createTranslationHelper()
+  );
 
   it('deletes wiki and returns the deleted entity', async () => {
     const result = await tool.handler({ wikiId: 42 });

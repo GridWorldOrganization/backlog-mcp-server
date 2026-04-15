@@ -23,8 +23,8 @@ describe('addStarTool', () => {
   });
 
   it('throws when multiple targets are provided', async () => {
-    await expect(
-      tool.handler({ issueId: 1, wikiId: 2 })
-    ).rejects.toThrow(/Exactly one/);
+    await expect(tool.handler({ issueId: 1, wikiId: 2 })).rejects.toThrow(
+      /Exactly one/
+    );
   });
 });
