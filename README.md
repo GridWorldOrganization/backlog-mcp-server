@@ -253,7 +253,20 @@ Tools for managing wiki pages.
 - `get_wiki_pages`: Returns list of Wiki pages.
 - `get_wikis_count`: Returns count of wiki pages in a project.
 - `get_wiki`: Returns information about a specific wiki page.
-- `add_wiki`: Creates a new wiki page.
+- `add_wiki`: Creates a new wiki page. Auto-recovers over-escaped `\n` sequences in `content`.
+- `update_wiki`: Updates an existing wiki page. Same `\n` auto-recovery as `add_wiki`.
+- `delete_wiki`: Deletes a wiki page.
+- `get_wiki_history`: Returns the edit history of a wiki page.
+- `get_wiki_stars`: Returns the list of stars on a wiki page.
+- `get_wiki_tags`: Returns the list of tags used by wiki pages in a project.
+- `get_wiki_attachments`: Returns the list of attachments on a wiki page.
+- `add_wiki_attachments`: Links uploaded attachments (see `upload_attachment`) to a wiki page.
+- `delete_wiki_attachment`: Removes an attachment from a wiki page.
+
+### Toolset: `shared` (cross-resource utilities)
+
+- `upload_attachment`: Uploads a local file to Backlog space and returns an attachment ID. Use the returned id with `add_wiki_attachments`, issue creation, comments, etc.
+- `add_star`: Adds a star to an issue, comment, wiki, pull request, or pull request comment. Exactly one target ID must be provided.
 
 ### Toolset: `git`
 
