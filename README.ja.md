@@ -201,7 +201,9 @@ CLI経由での有効化：
 
 以下のような Backlog 機能に対応するツールを提供しています：
 
-[Available Tools セクションへ](https://github.com/nulab/backlog-mcp-server?tab=readme-ov-file#available-tools)
+[Available Tools セクションへ](./README.md#available-tools)
+
+このフォークでは、Wikiツールの完全カバー（履歴/スター/タグ/添付）、ファイルアップロード（`upload_attachment`）、`add_star`、Wiki本文の `\n` 過剰エスケープ自動修復を追加しています。詳細は英語版READMEを参照してください。
 
 ## 使用例
 

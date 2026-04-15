@@ -1,5 +1,24 @@
 # Changelog
 
+> Note: This fork (`@gridworld-jp/backlog-mcp-server`) reset its versioning to `0.1.0`. Entries below `0.9.1` belong to upstream `nulab/backlog-mcp-server` and are kept for reference.
+
+## [0.2.0] - 2026-04-15
+
+### Features
+
+* **wiki:** Add 7 Wiki MCP tools — `update_wiki`, `delete_wiki`, `get_wiki_history`, `get_wiki_stars`, `get_wiki_tags`, `get_wiki_attachments`, `add_wiki_attachments`, `delete_wiki_attachment` (full coverage of the public Wiki API).
+* **attachments:** Add `upload_attachment` for uploading local files to Backlog space; pair with `add_wiki_attachments` / issue tools to attach.
+* **stars:** Add `add_star` covering issue, comment, wiki, pull request, and PR comment targets.
+
+### Bug Fixes
+
+* **wiki:** `add_wiki` and `update_wiki` now auto-recover over-escaped `\n` sequences in `content`, so AI-pasted markdown no longer ships with literal backslash-n that breaks tables and code blocks.
+
+### For contributors
+
+* New `normalizeMarkdownContent` utility with unit tests; wired into both wiki write paths.
+* Hardened Wiki tool tests; added integration tests for normalization in `addWiki.test.ts` / `updateWiki.test.ts`.
+
 ## [0.9.1](https://github.com/nulab/backlog-mcp-server/compare/v0.9.0...v0.9.1) (2026-03-27)
 
 ### Bug Fixes

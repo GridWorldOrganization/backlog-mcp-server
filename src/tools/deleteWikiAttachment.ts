@@ -10,9 +10,7 @@ const deleteWikiAttachmentSchema = buildToolSchema((t) => ({
     .describe(t('TOOL_DELETE_WIKI_ATTACHMENT_WIKI_ID', 'Wiki ID')),
   attachmentId: z
     .number()
-    .describe(
-      t('TOOL_DELETE_WIKI_ATTACHMENT_ID', 'Attachment ID to remove')
-    ),
+    .describe(t('TOOL_DELETE_WIKI_ATTACHMENT_ID', 'Attachment ID to remove')),
 }));
 
 export const deleteWikiAttachmentTool = (
