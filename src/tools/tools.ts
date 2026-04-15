@@ -8,6 +8,13 @@ import { addPullRequestTool } from './addPullRequest.js';
 import { addPullRequestCommentTool } from './addPullRequestComment.js';
 import { addWikiTool } from './addWiki.js';
 import { updateWikiTool } from './updateWiki.js';
+import { deleteWikiTool } from './deleteWiki.js';
+import { getWikiHistoryTool } from './getWikiHistory.js';
+import { getWikiTagsTool } from './getWikiTags.js';
+import { getWikiStarsTool } from './getWikiStars.js';
+import { getWikiAttachmentsTool } from './getWikiAttachments.js';
+import { addWikiAttachmentsTool } from './addWikiAttachments.js';
+import { deleteWikiAttachmentTool } from './deleteWikiAttachment.js';
 import { countIssuesTool } from './countIssues.js';
 import { deleteIssueTool } from './deleteIssue.js';
 import { deleteProjectTool } from './deleteProject.js';
@@ -136,6 +143,13 @@ export const allTools = (
           getWikiTool(backlog, helper),
           addWikiTool(backlog, helper),
           updateWikiTool(backlog, helper),
+          deleteWikiTool(backlog, helper),
+          getWikiHistoryTool(backlog, helper),
+          getWikiTagsTool(backlog, helper),
+          getWikiStarsTool(backlog, helper),
+          getWikiAttachmentsTool(backlog, helper),
+          addWikiAttachmentsTool(backlog, helper),
+          deleteWikiAttachmentTool(backlog, helper),
         ],
       },
       {
