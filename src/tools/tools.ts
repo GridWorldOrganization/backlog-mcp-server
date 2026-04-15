@@ -59,6 +59,7 @@ import { addVersionMilestoneTool } from './addVersionMilestone.js';
 import { updateVersionMilestoneTool } from './updateVersionMilestone.js';
 import { deleteVersionTool } from './deleteVersion.js';
 import { addDocumentTool } from './addDocument.js';
+import { addStarTool } from './addStar.js';
 
 export const allTools = (
   backlog: Backlog,
@@ -76,6 +77,7 @@ export const allTools = (
           getSpaceActivitiesTool(backlog, helper),
           getUsersTool(backlog, helper),
           getUserStarsCountTool(backlog, helper),
+          addStarTool(backlog, helper),
           getMyselfTool(backlog, helper),
           getUserRecentUpdatesTool(backlog, helper),
         ],
