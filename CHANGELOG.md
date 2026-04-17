@@ -2,6 +2,30 @@
 
 > Note: This fork (`@gridworld-jp/backlog-mcp-server`) reset its versioning to `0.1.0`. Entries below `0.9.1` belong to upstream `nulab/backlog-mcp-server` and are kept for reference.
 
+## [0.10.0] - 2026-04-18
+
+> Version jumps from 0.2.1 directly to 0.10.0. The upstream `nulab/backlog-mcp-server`
+> tags (`v0.3.0` through `v0.9.1`) exist in this fork's git history and `0.9.1` / `0.9.2`
+> are also on npm. Bumping to `0.10.0` clears both the git tag space and the npm
+> registry conflict in one move.
+
+
+### Features
+
+* **issue comments:** Add `delete_issue_comment` tool that records every deletion to `.backlog/deletions.log.jsonl` (JSON Lines, per-cwd audit log) *before* calling the Backlog API. Each entry captures a snapshot of the comment (content, author, timestamps) so deletions are recoverable.
+* **issue comments:** Add `export_deleted_comments` tool that reads the audit log and posts the selected (or all unexported) entries as a single consolidated comment on a target issue, then flags the exported entries. Supports variable argument selection — omit `entryIds` for all-unexported, or pass an explicit list like `["A", "C", "D"]` to cherry-pick. Any unknown / already-exported / duplicated id in the list throws before posting.
+* **delete safety:** `delete_issue_comment` refuses system-generated change-log records (`content === null && changeLog.length > 0`). Backlog's DELETE endpoint returns 200 on these but does NOT actually remove them — refusing upfront keeps the audit log aligned with reality. See `docs/design/delete-issue-comment-status-change-behavior.md` for the three-case experimental model.
+
+### Internals
+
+* New `src/utils/deletionLogger.ts` — JSONL append-only writes, per-entry UUID, safe line-level parse (one malformed line no longer kills the reader), atomic rewrite via temp file + `rename` for the export-mark step.
+* `export_deleted_comments` surfaces a reconciliation error when post succeeds but mark-exported fails, naming the posted `commentId` + unresolved entry IDs so the user can fix the log manually instead of double-posting.
+* Blockquote-prefixes the deleted content in exported comments so `##` headings / `---` separators in source material don't collide with the wrapper's markdown structure.
+
+### Design docs
+
+* `docs/design/delete-issue-comment-status-change-behavior.md` — experimental verification of Backlog's DELETE endpoint across text comments, status-change comments, and PATCH-then-DELETE hybrids. Documents the unified model: `DELETE` nulls `content`; envelope is destroyed only when `changeLog` is empty.
+
 ## [0.2.1] - 2026-04-15
 
 Re-released as 0.2.1 because the `v0.2.0` git tag was already used in earlier

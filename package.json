@@ -1,6 +1,6 @@
 {
   "name": "@gridworld-jp/backlog-mcp-server",
-  "version": "0.2.1",
+  "version": "0.10.0",
   "type": "module",
   "bin": {
     "backlog-mcp-server": "./build/index.js"

@@ -55,6 +55,8 @@ import { markNotificationAsReadTool } from './markNotificationAsRead.js';
 import { resetUnreadNotificationCountTool } from './resetUnreadNotificationCount.js';
 import { updateIssueTool } from './updateIssue.js';
 import { updateIssueCommentTool } from './updateIssueComment.js';
+import { deleteIssueCommentTool } from './deleteIssueComment.js';
+import { exportDeletedCommentsTool } from './exportDeletedComments.js';
 import { updateProjectTool } from './updateProject.js';
 import { updatePullRequestTool } from './updatePullRequest.js';
 import { updatePullRequestCommentTool } from './updatePullRequestComment.js';
@@ -118,6 +120,8 @@ export const allTools = (
           getIssueCommentsTool(backlog, helper),
           addIssueCommentTool(backlog, helper),
           updateIssueCommentTool(backlog, helper),
+          deleteIssueCommentTool(backlog, helper),
+          exportDeletedCommentsTool(backlog, helper),
           getPrioritiesTool(backlog, helper),
           getCategoriesTool(backlog, helper),
           getCustomFieldsTool(backlog, helper),
