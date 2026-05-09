@@ -58,6 +58,19 @@ import { addVersionMilestoneTool } from './addVersionMilestone.js';
 import { updateVersionMilestoneTool } from './updateVersionMilestone.js';
 import { deleteVersionTool } from './deleteVersion.js';
 import { addDocumentTool } from './addDocument.js';
+// GW fork additions
+import { addStarTool } from './addStar.js';
+import { updateIssueCommentTool } from './updateIssueComment.js';
+import { deleteIssueCommentTool } from './deleteIssueComment.js';
+import { exportDeletedCommentsTool } from './exportDeletedComments.js';
+import { uploadAttachmentTool } from './uploadAttachment.js';
+import { addWikiAttachmentsTool } from './addWikiAttachments.js';
+import { deleteWikiTool } from './deleteWiki.js';
+import { deleteWikiAttachmentTool } from './deleteWikiAttachment.js';
+import { getWikiAttachmentsTool } from './getWikiAttachments.js';
+import { getWikiHistoryTool } from './getWikiHistory.js';
+import { getWikiStarsTool } from './getWikiStars.js';
+import { getWikiTagsTool } from './getWikiTags.js';
 
 export const allTools = (
   backlog: Backlog,
@@ -77,6 +90,7 @@ export const allTools = (
           getUserStarsCountTool(backlog, helper),
           getMyselfTool(backlog, helper),
           getUserRecentUpdatesTool(backlog, helper),
+          addStarTool(backlog, helper),
         ],
       },
       {
@@ -105,6 +119,10 @@ export const allTools = (
           deleteIssueTool(backlog, helper),
           getIssueCommentsTool(backlog, helper),
           addIssueCommentTool(backlog, helper),
+          updateIssueCommentTool(backlog, helper),
+          deleteIssueCommentTool(backlog, helper),
+          exportDeletedCommentsTool(backlog, helper),
+          uploadAttachmentTool(backlog, helper),
           getPrioritiesTool(backlog, helper),
           getCategoriesTool(backlog, helper),
           getCustomFieldsTool(backlog, helper),
@@ -132,6 +150,13 @@ export const allTools = (
           getWikiTool(backlog, helper),
           addWikiTool(backlog, helper),
           updateWikiTool(backlog, helper),
+          deleteWikiTool(backlog, helper),
+          getWikiHistoryTool(backlog, helper),
+          getWikiTagsTool(backlog, helper),
+          getWikiStarsTool(backlog, helper),
+          getWikiAttachmentsTool(backlog, helper),
+          addWikiAttachmentsTool(backlog, helper),
+          deleteWikiAttachmentTool(backlog, helper),
         ],
       },
       {
