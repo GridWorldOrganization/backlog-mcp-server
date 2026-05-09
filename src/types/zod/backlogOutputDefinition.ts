@@ -465,6 +465,22 @@ export const WikiCountSchema = z.object({
   count: z.number(),
 });
 
+// GW fork additions
+export const FileInfoSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  size: z.number(),
+});
+
+export const WikiHistorySchema = z.object({
+  pageId: z.number(),
+  version: z.number(),
+  name: z.string(),
+  content: z.string(),
+  createdUser: UserSchema,
+  created: z.string(),
+});
+
 export const DocumentSchema = z.object({
   id: z.number(),
   projectId: z.number(),
