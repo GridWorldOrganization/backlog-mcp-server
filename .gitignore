@@ -54,4 +54,5 @@ coverage/
 tmp/
 temp/
 
-src/version.ts.npmrc
+# MCPB bundle
+*.mcpb

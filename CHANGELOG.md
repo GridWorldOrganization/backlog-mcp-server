@@ -1,54 +1,59 @@
 # Changelog
 
-> Note: This fork (`@gridworld-jp/backlog-mcp-server`) reset its versioning to `0.1.0`. Entries below `0.9.1` belong to upstream `nulab/backlog-mcp-server` and are kept for reference.
-
-## [0.10.0] - 2026-04-18
-
-> Version jumps from 0.2.1 directly to 0.10.0. The upstream `nulab/backlog-mcp-server`
-> tags (`v0.3.0` through `v0.9.1`) exist in this fork's git history and `0.9.1` / `0.9.2`
-> are also on npm. Bumping to `0.10.0` clears both the git tag space and the npm
-> registry conflict in one move.
-
+## [0.12.0](https://github.com/nulab/backlog-mcp-server/compare/v0.11.1...v0.12.0) (2026-06-06)
 
 ### Features
 
-* **issue comments:** Add `delete_issue_comment` tool that records every deletion to `.backlog/deletions.log.jsonl` (JSON Lines, per-cwd audit log) *before* calling the Backlog API. Each entry captures a snapshot of the comment (content, author, timestamps) so deletions are recoverable.
-* **issue comments:** Add `export_deleted_comments` tool that reads the audit log and posts the selected (or all unexported) entries as a single consolidated comment on a target issue, then flags the exported entries. Supports variable argument selection — omit `entryIds` for all-unexported, or pass an explicit list like `["A", "C", "D"]` to cherry-pick. Any unknown / already-exported / duplicated id in the list throws before posting.
-* **delete safety:** `delete_issue_comment` refuses system-generated change-log records (`content === null && changeLog.length > 0`). Backlog's DELETE endpoint returns 200 on these but does NOT actually remove them — refusing upfront keeps the audit log aligned with reality. See `docs/design/delete-issue-comment-status-change-behavior.md` for the three-case experimental model.
-
-### Internals
-
-* New `src/utils/deletionLogger.ts` — JSONL append-only writes, per-entry UUID, safe line-level parse (one malformed line no longer kills the reader), atomic rewrite via temp file + `rename` for the export-mark step.
-* `export_deleted_comments` surfaces a reconciliation error when post succeeds but mark-exported fails, naming the posted `commentId` + unresolved entry IDs so the user can fix the log manually instead of double-posting.
-* Blockquote-prefixes the deleted content in exported comments so `##` headings / `---` separators in source material don't collide with the wrapper's markdown structure.
-
-### Design docs
-
-* `docs/design/delete-issue-comment-status-change-behavior.md` — experimental verification of Backlog's DELETE endpoint across text comments, status-change comments, and PATCH-then-DELETE hybrids. Documents the unified model: `DELETE` nulls `content`; envelope is destroyed only when `changeLog` is empty.
-
-## [0.2.1] - 2026-04-15
-
-Re-released as 0.2.1 because the `v0.2.0` git tag was already used in earlier
-fork-bootstrap history. Same content as 0.2.0 below, plus a CI fix:
-
-* **ci:** allow Web globals (FormData/Blob/File/URL/fetch) in eslint config; prettier auto-format pass.
-
-## [0.2.0] - 2026-04-15 (unreleased — superseded by 0.2.1)
-
-### Features
-
-* **wiki:** Add 7 Wiki MCP tools — `update_wiki`, `delete_wiki`, `get_wiki_history`, `get_wiki_stars`, `get_wiki_tags`, `get_wiki_attachments`, `add_wiki_attachments`, `delete_wiki_attachment` (full coverage of the public Wiki API).
-* **attachments:** Add `upload_attachment` for uploading local files to Backlog space; pair with `add_wiki_attachments` / issue tools to attach.
-* **stars:** Add `add_star` covering issue, comment, wiki, pull request, and PR comment targets.
+* add OAuth 2.0 authentication for remote MCP access ([36c9989](https://github.com/nulab/backlog-mcp-server/commit/36c99893dee9b3eb2c7053742fb5e44989eddf86))
+* format storePendingAuth and storeMcpRefreshToken functions for improved readability ([08e6904](https://github.com/nulab/backlog-mcp-server/commit/08e69045432ddc6f9c94747897030d0ad8c489bc))
+* refactor TokenStore to use factory function and update related tests ([f625370](https://github.com/nulab/backlog-mcp-server/commit/f625370ac5ca433e1a2f8b92f7905c33f7ca7ee4))
 
 ### Bug Fixes
 
-* **wiki:** `add_wiki` and `update_wiki` now auto-recover over-escaped `\n` sequences in `content`, so AI-pasted markdown no longer ships with literal backslash-n that breaks tables and code blocks.
+* add missing Node.js globals to ESLint config ([7d9873a](https://github.com/nulab/backlog-mcp-server/commit/7d9873a57dde9681f0342b26e111d13f06c4cfa0))
+* apply Host header check globally and require redirect_uri in token exchange ([97c5b2b](https://github.com/nulab/backlog-mcp-server/commit/97c5b2b6d00b18d5f64b5db2d23092c1b3441050))
+* harden OAuth security — client TTL, callback error relay, refresh rollback ([a780160](https://github.com/nulab/backlog-mcp-server/commit/a7801605c6f98c41eae8617733e967ab5a293405))
+* issue opaque MCP tokens instead of passing through Backlog tokens ([3c4ce43](https://github.com/nulab/backlog-mcp-server/commit/3c4ce431b276fa0f7b0cd4cc03fefb6ef4043836))
+* restrict /authorize endpoint to GET only ([76dee52](https://github.com/nulab/backlog-mcp-server/commit/76dee5297d03b824a9b6d58bf955a8af842f4f54))
 
-### For contributors
+## [0.11.1](https://github.com/nulab/backlog-mcp-server/compare/v0.11.0...v0.11.1) (2026-05-25)
 
-* New `normalizeMarkdownContent` utility with unit tests; wired into both wiki write paths.
-* Hardened Wiki tool tests; added integration tests for normalization in `addWiki.test.ts` / `updateWiki.test.ts`.
+### Features
+
+* add icon to mcpb manifest ([481e8f3](https://github.com/nulab/backlog-mcp-server/commit/481e8f328e82d14b2b132c73e9cadc579ac18dda))
+* add mcpb manifest for Desktop Extensions support ([ffa4371](https://github.com/nulab/backlog-mcp-server/commit/ffa4371340f7cb5e772891ca5a6b2b9f1f74ec85))
+* update entry point and environment variables in manifest.json ([2dcc301](https://github.com/nulab/backlog-mcp-server/commit/2dcc301569518159da31b6bc35d23a8950d64044))
+* update mcpb manifest to v0.3 ([acd4eda](https://github.com/nulab/backlog-mcp-server/commit/acd4eda824f14dd679d0413a31c7ca173512d366))
+
+### Bug Fixes
+
+* allow string values in customFields for text and date fields ([e921edb](https://github.com/nulab/backlog-mcp-server/commit/e921edbb3d04189712ec28118b989fae0c5099c8))
+* wrap customField value description with translation helper t() ([1fce25b](https://github.com/nulab/backlog-mcp-server/commit/1fce25b360c73f2d7ab93f37f072a1320be48860))
+
+## [0.11.0](https://github.com/nulab/backlog-mcp-server/compare/v0.10.0...v0.11.0) (2026-04-22)
+
+### Features
+
+* add Streamable HTTP transport ([6c8ea54](https://github.com/nulab/backlog-mcp-server/commit/6c8ea54bf2ceb0053de3255fe3a5e953e85962df)), closes [#21](https://github.com/nulab/backlog-mcp-server/issues/21) [#12](https://github.com/nulab/backlog-mcp-server/issues/12) [#21](https://github.com/nulab/backlog-mcp-server/issues/21)
+
+### Bug Fixes
+
+* replace NodeJS.ErrnoException with inline type to satisfy no-undef lint rule ([6502afd](https://github.com/nulab/backlog-mcp-server/commit/6502afdf8ca818cc91ebed96537b81030fef2c65))
+* resolve lint and prettier issues in httpMcpServer ([c6a2cca](https://github.com/nulab/backlog-mcp-server/commit/c6a2cca2dd9fd6c01898eacaad93cc4e7b2bdbf5))
+
+## [0.10.0](https://github.com/nulab/backlog-mcp-server/compare/v0.9.1...v0.10.0) (2026-04-13)
+
+### Features
+
+* add multi-organization support ([7f2d60a](https://github.com/nulab/backlog-mcp-server/commit/7f2d60a1ec0e47902231830257e58f1e98e761e6))
+* add test for rejecting unknown organizations in single-org mode ([ed81fac](https://github.com/nulab/backlog-mcp-server/commit/ed81facaee38228c21bf12c295779271139eef2b))
+* enhance composeToolHandler with type safety and clean up imports in tests ([b7f50cd](https://github.com/nulab/backlog-mcp-server/commit/b7f50cda124baa42942c68c3b7aabed9ebaee7a2))
+* support env-based multi-org backlog config ([63eb78e](https://github.com/nulab/backlog-mcp-server/commit/63eb78e25e037c0c3f9f0241f8704bc072d52207))
+
+### Bug Fixes
+
+* avoid NodeJS namespace in env typing ([bd0effb](https://github.com/nulab/backlog-mcp-server/commit/bd0effb0cb5bcedb3672bad48448e57405ac7df5))
+* **ci:** pin npm to 11.5.1 in release workflow ([54aece7](https://github.com/nulab/backlog-mcp-server/commit/54aece7883376cf31a73ccfaf3b778ef1de3e471))
 
 ## [0.9.1](https://github.com/nulab/backlog-mcp-server/compare/v0.9.0...v0.9.1) (2026-03-27)
 
