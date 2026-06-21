@@ -659,11 +659,20 @@ The server supports several command line options:
 - `--enable-toolsets <toolsets...>`: Specify which toolsets to enable (comma-separated or multiple arguments). Defaults to "all".
   Example: `--enable-toolsets space,project` or `--enable-toolsets issue --enable-toolsets git`
   Available toolsets: `space`, `project`, `issue`, `wiki`, `git`, `notifications`.
+- `--enable-tools <tools...>`: Specify individual tool names to enable. When set, only these tools are registered regardless of `--enable-toolsets`. Leave unset to enable all tools in active toolsets.
+  Example: `--enable-tools get_issue,add_issue,get_wiki`
+  Can also be set via environment variable: `ENABLE_TOOLS=get_issue,add_issue`
 
 Example:
 
 ```bash
 node build/index.js --optimize-response --max-tokens=100000 --prefix="backlog_" --enable-toolsets space,issue
+```
+
+Slim mode example (31 tools only):
+
+```bash
+node build/index.js --enable-tools get_users,add_star,get_user_recent_updates,get_project,get_issue,get_issues,count_issues,add_issue,update_issue,delete_issue,get_issue_comments,add_issue_comment,update_issue_comment,delete_issue_comment,get_priorities,get_categories,get_custom_fields,get_issue_types,get_resolutions,get_wiki_pages,get_wikis_count,get_wiki,add_wiki,update_wiki,delete_wiki,get_wiki_history,get_wiki_tags,get_wiki_stars,get_wiki_attachments,add_wiki_attachments,delete_wiki_attachment
 ```
 
 HTTP example:
@@ -754,6 +763,114 @@ Example response:
 
 - For multi-org mode, every organization must define both `BACKLOG_ORG_<NAME>_DOMAIN` and `BACKLOG_ORG_<NAME>_API_KEY`.
 - The `<NAME>` part is the organization name exposed through the `organization` tool input and `list_organizations`.
+
+## Tool Reference
+
+### Usage Modes
+
+| Mode | How | # Tools |
+|------|-----|---------|
+| **Full** | `--enable-toolsets all` (default) | 69 |
+| **Slim** | `--enable-tools get_users,add_star,...` (see table below) | 31 |
+
+### Slim Mode MCP Config
+
+```json
+{
+  "mcpServers": {
+    "backlog-slim": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@gridworld-jp/backlog-mcp-server",
+        "--enable-tools",
+        "get_users,add_star,get_user_recent_updates,get_project,get_issue,get_issues,count_issues,add_issue,update_issue,delete_issue,get_issue_comments,add_issue_comment,update_issue_comment,delete_issue_comment,get_priorities,get_categories,get_custom_fields,get_issue_types,get_resolutions,get_wiki_pages,get_wikis_count,get_wiki,add_wiki,update_wiki,delete_wiki,get_wiki_history,get_wiki_tags,get_wiki_stars,get_wiki_attachments,add_wiki_attachments,delete_wiki_attachment"
+      ],
+      "env": {
+        "BACKLOG_API_KEY": "your-api-key",
+        "BACKLOG_DOMAIN": "your-domain.backlog.com"
+      }
+    }
+  }
+}
+```
+
+### Full Tool List
+
+> **GJ独自**: Tools added in this GJ fork (not in upstream nulab/backlog-mcp-server).  
+> **Slim**: Included in the recommended slim preset.
+
+| No. | Tool Name | Toolset | GJ独自 | Slim |
+|-----|-----------|---------|--------|------|
+| 1 | `get_space` | space | | |
+| 2 | `get_space_activities` | space | | |
+| 3 | `get_users` | space | | ✓ |
+| 4 | `get_user_stars_count` | space | | |
+| 5 | `add_star` | space | ★ | ✓ |
+| 6 | `upload_attachment` | space | ★ | |
+| 7 | `get_myself` | space | | |
+| 8 | `get_user_recent_updates` | space | | ✓ |
+| 9 | `get_project_list` | project | | |
+| 10 | `add_project` | project | | |
+| 11 | `get_project` | project | | ✓ |
+| 12 | `update_project` | project | | |
+| 13 | `delete_project` | project | | |
+| 14 | `get_issue` | issue | | ✓ |
+| 15 | `get_issues` | issue | | ✓ |
+| 16 | `count_issues` | issue | | ✓ |
+| 17 | `add_issue` | issue | | ✓ |
+| 18 | `update_issue` | issue | | ✓ |
+| 19 | `delete_issue` | issue | | ✓ |
+| 20 | `get_issue_comments` | issue | | ✓ |
+| 21 | `add_issue_comment` | issue | | ✓ |
+| 22 | `update_issue_comment` | issue | ★ | ✓ |
+| 23 | `delete_issue_comment` | issue | ★ | ✓ |
+| 24 | `export_deleted_comments` | issue | ★ | |
+| 25 | `get_priorities` | issue | | ✓ |
+| 26 | `get_categories` | issue | | ✓ |
+| 27 | `get_custom_fields` | issue | | ✓ |
+| 28 | `get_issue_types` | issue | | ✓ |
+| 29 | `get_resolutions` | issue | | ✓ |
+| 30 | `get_watching_list_items` | issue | | |
+| 31 | `get_watching_list_count` | issue | | |
+| 32 | `add_watching` | issue | | |
+| 33 | `update_watching` | issue | | |
+| 34 | `delete_watching` | issue | | |
+| 35 | `mark_watching_as_read` | issue | | |
+| 36 | `get_version_milestone_list` | issue | | |
+| 37 | `add_version_milestone` | issue | | |
+| 38 | `update_version_milestone` | issue | | |
+| 39 | `delete_version` | issue | | |
+| 40 | `get_wiki_pages` | wiki | | ✓ |
+| 41 | `get_wikis_count` | wiki | | ✓ |
+| 42 | `get_wiki` | wiki | | ✓ |
+| 43 | `add_wiki` | wiki | | ✓ |
+| 44 | `update_wiki` | wiki | | ✓ |
+| 45 | `delete_wiki` | wiki | ★ | ✓ |
+| 46 | `get_wiki_history` | wiki | ★ | ✓ |
+| 47 | `get_wiki_tags` | wiki | ★ | ✓ |
+| 48 | `get_wiki_stars` | wiki | ★ | ✓ |
+| 49 | `get_wiki_attachments` | wiki | ★ | ✓ |
+| 50 | `add_wiki_attachments` | wiki | ★ | ✓ |
+| 51 | `delete_wiki_attachment` | wiki | ★ | ✓ |
+| 52 | `get_git_repositories` | git | | |
+| 53 | `get_git_repository` | git | | |
+| 54 | `get_pull_requests` | git | | |
+| 55 | `get_pull_requests_count` | git | | |
+| 56 | `get_pull_request` | git | | |
+| 57 | `add_pull_request` | git | | |
+| 58 | `update_pull_request` | git | | |
+| 59 | `get_pull_request_comments` | git | | |
+| 60 | `add_pull_request_comment` | git | | |
+| 61 | `update_pull_request_comment` | git | | |
+| 62 | `get_documents` | document | | |
+| 63 | `get_document_tree` | document | | |
+| 64 | `get_document` | document | | |
+| 65 | `add_document` | document | | |
+| 66 | `get_notifications` | notifications | | |
+| 67 | `count_notifications` | notifications | | |
+| 68 | `reset_unread_notification_count` | notifications | | |
+| 69 | `mark_notification_as_read` | notifications | | |
 
 ## License
 

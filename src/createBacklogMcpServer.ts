@@ -8,6 +8,7 @@ import { registerDynamicTools, registerTools } from './registerTools.js';
 import { organizationTools } from './tools/dynamicTools/organizations.js';
 import { dynamicTools } from './tools/dynamicTools/toolsets.js';
 import type { MCPOptions } from './types/mcp.js';
+import type { ToolsetGroup } from './types/toolsets.js';
 import type { BacklogClientRegistry } from './utils/backlogClientRegistry.js';
 import { createToolRegistrar } from './utils/toolRegistrar.js';
 import { buildToolsetGroup } from './utils/toolsetUtils.js';
@@ -23,9 +24,22 @@ export type CreateBacklogMcpServerConfig = {
   clientRegistry: BacklogClientRegistry;
   transHelper: TranslationHelper;
   enabledToolsets: string[];
+  enableTools?: string[];
   mcpOption: MCPOptions;
   dynamicToolsets: boolean;
 };
+
+function filterToolsByName(group: ToolsetGroup, allowedTools: string[]): ToolsetGroup {
+  if (allowedTools.length === 0) return group;
+  return {
+    toolsets: group.toolsets
+      .map(ts => ({
+        ...ts,
+        tools: ts.tools.filter(t => allowedTools.includes(t.name)),
+      }))
+      .filter(ts => ts.tools.length > 0),
+  };
+}
 
 /**
  * Builds a fresh MCP server instance with all Backlog tools registered.
@@ -38,6 +52,7 @@ export function createBacklogMcpServer({
   clientRegistry,
   transHelper,
   enabledToolsets,
+  enableTools = [],
   mcpOption,
   dynamicToolsets,
 }: CreateBacklogMcpServerConfig): BacklogMCPServer {
@@ -49,7 +64,8 @@ export function createBacklogMcpServer({
     })
   );
 
-  const toolsetGroup = buildToolsetGroup(backlog, transHelper, enabledToolsets);
+  const rawToolsetGroup = buildToolsetGroup(backlog, transHelper, enabledToolsets);
+  const toolsetGroup = filterToolsByName(rawToolsetGroup, enableTools);
   registerTools(server, toolsetGroup, mcpOption);
   registerDynamicTools(
     server,

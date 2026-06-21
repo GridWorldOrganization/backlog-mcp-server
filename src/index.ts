@@ -120,6 +120,11 @@ Available toolsets:
   - notifications: Tools for managing user notifications`,
     default: env.get('ENABLE_TOOLSETS').default('all').asArray(','),
   })
+  .option('enable-tools', {
+    type: 'array',
+    describe: 'Specify individual tool names to enable. When set, only these tools are registered (regardless of --enable-toolsets). Leave unset to enable all tools in active toolsets.',
+    default: env.get('ENABLE_TOOLS').default('').asArray(',').filter((s: string) => s.length > 0),
+  })
   .option('dynamic-toolsets', {
     type: 'boolean',
     describe:
@@ -150,6 +155,8 @@ const enabledToolsets = argv.dynamicToolsets
   ? (argv.enableToolsets as string[]).filter((a) => a !== 'all')
   : (argv.enableToolsets as string[]);
 
+const enableTools = (argv.enableTools as string[]).filter(s => s.length > 0);
+
 const mcpOption = { useFields: useFields, maxTokens, prefix };
 
 // Factory: creates a fresh MCP server with all tools registered.
@@ -162,6 +169,7 @@ const createServer = () =>
     clientRegistry,
     transHelper,
     enabledToolsets,
+    enableTools,
     mcpOption,
     dynamicToolsets: argv.dynamicToolsets,
   });
