@@ -91,6 +91,7 @@ export const allTools = (
           uploadAttachmentTool(backlog, helper),
           getMyselfTool(backlog, helper),
           getUserRecentUpdatesTool(backlog, helper),
+          addStarTool(backlog, helper),
         ],
       },
       {

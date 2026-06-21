@@ -29,15 +29,18 @@ export type CreateBacklogMcpServerConfig = {
   dynamicToolsets: boolean;
 };
 
-function filterToolsByName(group: ToolsetGroup, allowedTools: string[]): ToolsetGroup {
+function filterToolsByName(
+  group: ToolsetGroup,
+  allowedTools: string[]
+): ToolsetGroup {
   if (allowedTools.length === 0) return group;
   return {
     toolsets: group.toolsets
-      .map(ts => ({
+      .map((ts) => ({
         ...ts,
-        tools: ts.tools.filter(t => allowedTools.includes(t.name)),
+        tools: ts.tools.filter((t) => allowedTools.includes(t.name)),
       }))
-      .filter(ts => ts.tools.length > 0),
+      .filter((ts) => ts.tools.length > 0),
   };
 }
 
@@ -64,7 +67,11 @@ export function createBacklogMcpServer({
     })
   );
 
-  const rawToolsetGroup = buildToolsetGroup(backlog, transHelper, enabledToolsets);
+  const rawToolsetGroup = buildToolsetGroup(
+    backlog,
+    transHelper,
+    enabledToolsets
+  );
   const toolsetGroup = filterToolsByName(rawToolsetGroup, enableTools);
   registerTools(server, toolsetGroup, mcpOption);
   registerDynamicTools(
