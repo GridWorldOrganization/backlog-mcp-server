@@ -915,6 +915,23 @@ Example response:
 | 68 | `reset_unread_notification_count` | notifications | | |
 | 69 | `mark_notification_as_read` | notifications | | |
 
+## Resolving numeric projectId from a Backlog URL
+
+Issue/wiki tools require a **numeric `projectId`**, but humans and agents usually
+only have a URL or a project key. The helper script
+[`scripts/resolve_project.py`](./scripts/resolve_project.py) converts any Backlog
+URL (issue / wiki / `alias/wiki/{id}` / project) into its `projectKey` and numeric
+`projectId` using your own API key.
+
+```bash
+export BACKLOG_API_KEY=your-api-key
+python3 scripts/resolve_project.py https://your-space.backlog.com/view/PROJECT-123
+```
+
+A self-contained guide for reuse from another system (including the raw Backlog
+API contract for porting to any language) is in
+[`scripts/README.md`](./scripts/README.md).
+
 ## License
 
 This project is licensed under the [MIT License](./LICENSE).

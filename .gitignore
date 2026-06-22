@@ -56,3 +56,7 @@ temp/
 
 # MCPB bundle
 *.mcpb
+
+# Python
+__pycache__/
+*.pyc
