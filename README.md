@@ -893,9 +893,9 @@ Example response:
 | 46 | `get_wiki_history` | wiki | ★ | ✓ |
 | 47 | `get_wiki_tags` | wiki | ★ | ✓ |
 | 48 | `get_wiki_stars` | wiki | ★ | ✓ |
-| 49 | `get_wiki_attachments` | wiki | ★ | ✓ |
-| 50 | `add_wiki_attachments` | wiki | ★ | ✓ |
-| 51 | `delete_wiki_attachment` | wiki | ★ | ✓ |
+| 49 | `get_wiki_attachments` | wiki | ★ | |
+| 50 | `add_wiki_attachments` | wiki | ★ | |
+| 51 | `delete_wiki_attachment` | wiki | ★ | |
 | 52 | `get_git_repositories` | git | | |
 | 53 | `get_git_repository` | git | | |
 | 54 | `get_pull_requests` | git | | |
