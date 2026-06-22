@@ -1,21 +1,49 @@
-# Backlog MCP Server
+# Backlog MCP Server — Lightweight LLM-Ready Fork
 
 ![MIT License](https://img.shields.io/badge/license-MIT-green.svg)
-![Build](https://github.com/nulab/backlog-mcp-server/actions/workflows/ci.yml/badge.svg)
-![Last Commit](https://img.shields.io/github/last-commit/nulab/backlog-mcp-server.svg)
+![Build](https://github.com/GridWorldOrganization/backlog-mcp-server/actions/workflows/ci.yml/badge.svg)
+![Last Commit](https://img.shields.io/github/last-commit/GridWorldOrganization/backlog-mcp-server.svg)
 
 [📘 日本語でのご利用ガイド](./README.ja.md)
 
-A Model Context Protocol (MCP) server for interacting with the Backlog API. This server provides tools for managing projects, issues, wiki pages, and more in Backlog through AI agents like Claude Desktop / Cline / Cursor etc.
+A Model Context Protocol (MCP) server for [Nulab Backlog](https://backlog.com/), forked from [nulab/backlog-mcp-server](https://github.com/nulab/backlog-mcp-server) and optimized for **lightweight / low-context LLMs**.
+
+Works with any MCP-compatible AI agent: Claude Desktop, Cline, Cursor, ChatGPT (via MCP bridge), local models (Ollama, LM Studio), etc.
+
+## Why This Fork?
+
+The upstream server exposes **69 tools** — too many for small-context or weak LLMs that waste tokens scanning irrelevant tool definitions or pick the wrong tool.
+
+This fork adds:
+
+- **Slim preset (default, 18 tools)**: Only issue CRUD, comments, wiki CRUD, and essential master-data lookups. No flags needed — just install and go.
+- **Enhanced descriptions**: Every tool description includes *when* to use it, *which tools to call first* for required IDs, and *how tools chain together*. Weak LLMs no longer guess `issueTypeId: 1` — the description says "Call get_issue_types BEFORE add_issue to get valid IDs."
+- **Wiki tag discovery**: Documented the hidden `[tag]` name-prefix convention so AI agents can set tags via the API (no dedicated tag parameter exists).
+- **`--preset full`** to opt into all 69 tools when needed.
+- **`--enable-tools`** for custom per-tool filtering.
+- **GJ-exclusive tools** (★): `update_issue_comment`, `delete_issue_comment`, `export_deleted_comments`, `add_star`, `upload_attachment`, and 7 extended wiki tools not in upstream.
+- **`scripts/resolve_project.py`**: URL → numeric projectId resolver (standalone, stdlib-only Python). Fills the gap where issue/wiki tools require numeric IDs but humans only have URLs.
+
+## Slim Preset (Default — 18 tools)
+
+| Category | Tools |
+|----------|-------|
+| **Star** | `add_star` ★ |
+| **Issue** | `get_issue`, `get_issues`, `count_issues`, `add_issue`, `update_issue` |
+| **Comments** | `get_issue_comments`, `add_issue_comment`, `update_issue_comment` ★ |
+| **Master data** | `get_priorities`, `get_categories`, `get_issue_types`, `get_resolutions` |
+| **Wiki** | `get_wiki_pages`, `get_wikis_count`, `get_wiki`, `add_wiki`, `update_wiki` |
+
+> ★ = GJ-exclusive (not in upstream). Use `--preset full` for all 69 tools.
 
 ## Features
 
-- Project tools (create, read, update, delete)
-- Issue tracking and comments (create, update, delete, list)
-- Version/Milestone management (create, read, update, delete)
-- Wiki page support
-- Git repository and pull request tools
-- Notification tools
+- **Two presets**: Slim (18 tools, default) / Full (69 tools, `--preset full`)
+- **LLM-friendly descriptions**: Chaining hints, required-param sources, usage disambiguation
+- Issue tracking and comments (create, read, update, star)
+- Wiki pages with tag support via name-prefix convention
+- Project, Git/PR, Document, Notification tools (Full preset)
+- Multi-organization support, OAuth 2.0, Streamable HTTP transport
 - GraphQL-style field selection for optimized responses
 - Token limiting for large responses
 

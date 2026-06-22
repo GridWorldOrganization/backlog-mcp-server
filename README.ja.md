@@ -1,23 +1,51 @@
-# Backlog MCP Server（日本語版）
+# Backlog MCP Server — 軽量LLM対応フォーク
 
 ![MIT License](https://img.shields.io/badge/license-MIT-green.svg)
-![Build](https://github.com/nulab/backlog-mcp-server/actions/workflows/ci.yml/badge.svg)
-![Last Commit](https://img.shields.io/github/last-commit/nulab/backlog-mcp-server.svg)
+![Build](https://github.com/GridWorldOrganization/backlog-mcp-server/actions/workflows/ci.yml/badge.svg)
+![Last Commit](https://img.shields.io/github/last-commit/GridWorldOrganization/backlog-mcp-server.svg)
 
 [🇬🇧 English README](./README.md)
 
-Backlog API とやり取りするための Model Context Protocol（MCP）サーバーです。このサーバーは、Claude Desktop / Cline / Cursor などのAIエージェントを通じて、Backlog 上でプロジェクト、課題、Wikiページなどを管理するためのツールを提供します。
+[Nulab Backlog](https://backlog.com/) 用の Model Context Protocol（MCP）サーバー。[nulab/backlog-mcp-server](https://github.com/nulab/backlog-mcp-server) からフォークし、**軽量・低コンテキストLLM** 向けに最適化。
+
+Claude Desktop / Cline / Cursor / ChatGPT（MCPブリッジ経由）/ ローカルモデル（Ollama, LM Studio）等、MCP対応の全AIエージェントで動作。
+
+## このフォークの特徴
+
+上流は **69ツール** を公開 — 小コンテキスト・弱LLMにはツール定義の読み込みだけでトークンを浪費し、誤ったツール選択につながる。
+
+本フォークの追加点：
+
+- **Slimプリセット（デフォルト、18ツール）**: 課題CRUD・コメント・Wiki CRUD・必須マスタのみ。フラグ不要 — インストールしてそのまま使える
+- **強化されたdescription**: 各ツールの説明に「いつ使うか」「先に何を呼ぶか」「ツール間の連携方法」を明記。弱LLMが `issueTypeId: 1` を捏造しない — 「add_issue の前に get_issue_types を呼べ」と書いてある
+- **Wikiタグ発見**: 隠し仕様 `[タグ]` のname接頭辞規約を文書化。APIからタグ設定可能（専用パラメータは存在しない）
+- **`--preset full`** で全69ツールに切替
+- **`--enable-tools`** で個別ツール指定
+- **GJ独自ツール**（★）: `update_issue_comment`、`delete_issue_comment`、`export_deleted_comments`、`add_star`、`upload_attachment`、Wiki拡張7本（上流に無い）
+- **`scripts/resolve_project.py`**: URL→数値projectId変換（Python標準ライブラリのみ）。課題/Wikiツールが数値IDを要求するが人間はURLしか知らない問題を解決
+
+## Slimプリセット（デフォルト — 18ツール）
+
+| カテゴリ | ツール |
+|---------|--------|
+| **スター** | `add_star` ★ |
+| **課題** | `get_issue`, `get_issues`, `count_issues`, `add_issue`, `update_issue` |
+| **コメント** | `get_issue_comments`, `add_issue_comment`, `update_issue_comment` ★ |
+| **マスタ** | `get_priorities`, `get_categories`, `get_issue_types`, `get_resolutions` |
+| **Wiki** | `get_wiki_pages`, `get_wikis_count`, `get_wiki`, `add_wiki`, `update_wiki` |
+
+> ★ = GJ独自（上流に無い）。全69ツールを使うには `--preset full`。
 
 ## 主な機能
 
-- プロジェクトツール（作成、読み取り、更新、削除）
-- 課題とコメントの追跡（作成、更新、削除、一覧表示）
-- 発生バージョン/マイルストーンの管理（作成、読み取り、更新、削除）
-- Wikiページサポート
-- Gitリポジトリとプルリクエストツール
-- 通知ツール
-- 最適化されたレスポンスのためのGraphQLスタイルのフィールド選択
-- 大規模なレスポンスに対するトークン制限
+- **2プリセット**: Slim（18ツール、デフォルト）/ Full（69ツール、`--preset full`）
+- **LLMフレンドリーなdescription**: チェーンヒント・必須パラメータ取得元・使い分け明示
+- 課題・コメント管理（作成・読取・更新・スター）
+- Wikiページ管理（name接頭辞でタグ設定対応）
+- プロジェクト・Git/PR・ドキュメント・通知ツール（Fullプリセット）
+- マルチ組織対応、OAuth 2.0、Streamable HTTPトランスポート
+- GraphQLスタイルのフィールド選択
+- 大規模レスポンスのトークン制限
 
 ## インストール
 
@@ -214,7 +242,7 @@ CLI経由での有効化：
 
 以下のような Backlog 機能に対応するツールを提供しています：
 
-[Available Tools セクションへ](https://github.com/nulab/backlog-mcp-server?tab=readme-ov-file#available-tools)
+[Available Tools セクションへ](https://github.com/GridWorldOrganization/backlog-mcp-server?tab=readme-ov-file#tool-reference)
 
 ## 使用例
 
