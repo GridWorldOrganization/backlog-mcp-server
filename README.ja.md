@@ -1,3 +1,10 @@
+> ### 🚀 Powered by [GridJapan株式会社](https://ai.gridjapan.com/)
+> **GridAI** — 業務に AI を組み込み、開発・運用・営業を自動化する AI ソリューション。
+> 本リポジトリは GridJapan の AI 開発の一環として公開しています。
+> 詳細・お問い合わせ → **https://ai.gridjapan.com/**
+
+---
+
 # Backlog MCP Server — 軽量LLM対応フォーク
 
 ![MIT License](https://img.shields.io/badge/license-MIT-green.svg)
