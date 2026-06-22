@@ -19,125 +19,88 @@ Backlog API とやり取りするための Model Context Protocol（MCP）サー
 - 最適化されたレスポンスのためのGraphQLスタイルのフィールド選択
 - 大規模なレスポンスに対するトークン制限
 
-## 利用開始
+## インストール
 
-### 必要条件
+### 前提条件
 
-- Docker
-- APIアクセスが可能なBacklogアカウント
-- BacklogアカウントのAPIキー
+- Node.js 22以上（24推奨）
+- pnpm
+- Backlog APIキー
 
-### オプション1: Docker経由でのインストール
+### セットアップ
 
-このMCPサーバーを使用する最も簡単な方法は、MCP設定を利用することです：
-
-1. MCP設定を開きます
-2. MCP設定セクションに移動します
-3. 次の設定を追加します：
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "--pull",
-        "always",
-        "-i",
-        "--rm",
-        "-e",
-        "BACKLOG_DOMAIN",
-        "-e",
-        "BACKLOG_API_KEY",
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
-      "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key"
-      }
-    }
-  }
-}
-```
-
-`your-domain.backlog.com` を実際のBacklogドメインに、`your-api-key` を実際のBacklog APIキーに置き換えてください。
-
-✅ `--pull always` を使用できない場合は、次のコマンドで手動でイメージを更新できます：
-
-```
-docker pull ghcr.io/nulab/backlog-mcp-server:latest
-```
-
-### オプション2: npx経由でのインストール
-
-リポジトリをクローンせずに `npx` を使用してサーバーを直接実行することもできます。これは、完全なインストールなしでサーバーを実行する便利な方法です。
-
-1. MCP設定を開きます
-2. MCP設定セクションに移動します
-3. 次の設定を追加します：
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "npx",
-      "args": ["backlog-mcp-server"],
-      "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key"
-      }
-    }
-  }
-}
-```
-
-`your-domain.backlog.com` を実際のBacklogドメインに、`your-api-key` を実際のBacklog APIキーに置き換えてください。
-
-### オプション3: 手動セットアップ (Node.js)
-
-1. クローンしてインストール：
+1. クローンしてビルドします：
 
    ```bash
-   git clone https://github.com/nulab/backlog-mcp-server.git
+   git clone https://github.com/GridWorldOrganization/backlog-mcp-server.git
    cd backlog-mcp-server
-   npm install
-   npm run build
+   pnpm install
+   pnpm run build
    ```
 
-2. テンプレートから `.env` を作成し、必須の環境変数を設定します：
+2. お使いのMCPクライアント設定に登録します。ビルド済みの `build/index.js` への絶対パスを使用してください。
+
+   **デフォルト（Slim）— 25ツール、低コンテキスト使用量**
+
+   ```json
+   {
+     "mcpServers": {
+       "backlog": {
+         "command": "node",
+         "args": ["/absolute/path/to/backlog-mcp-server/build/index.js"],
+         "env": {
+           "BACKLOG_DOMAIN": "your-domain.backlog.com",
+           "BACKLOG_API_KEY": "your-api-key"
+         }
+       }
+     }
+   }
+   ```
+
+   **Full — 全69ツール**
+
+   ```json
+   {
+     "mcpServers": {
+       "backlog": {
+         "command": "node",
+         "args": ["/absolute/path/to/backlog-mcp-server/build/index.js", "--preset", "full"],
+         "env": {
+           "BACKLOG_DOMAIN": "your-domain.backlog.com",
+           "BACKLOG_API_KEY": "your-api-key"
+         }
+       }
+     }
+   }
+   ```
+
+   `/absolute/path/to/backlog-mcp-server` をリポジトリをクローンしたディレクトリに、`your-domain.backlog.com` を実際のBacklogドメインに、`your-api-key` を実際のBacklog APIキーに置き換えてください。
+
+   （任意）ローカル開発の場合は、`.env.example` から `.env` ファイルを作成し `pnpm run dev` を実行することもできます。
+
+### HTTPトランスポート（Streamable HTTP）
+
+デフォルトではサーバーは **stdio** を使用します。代わりに [MCP Streamable HTTP](https://modelcontextprotocol.io/) トランスポート（HTTP経由のJSON-RPC、stdioと同じツール）で実行するには、`--transport http` を付けて起動するか `MCP_TRANSPORT=http` を設定します。
 
 ```bash
-cp .env.example .env
+pnpm run build
+MCP_TRANSPORT=http MCP_HTTP_PORT=3333 node build/index.js
 ```
 
-`.env` に以下を設定してください：
+- **エンドポイント:** `http://<host>:<port><path>` への `POST`、`GET`、`DELETE`（デフォルトパスは `/mcp`）。
+- **セッション:** `initialize` の後、クライアントは以降のリクエストで（サーバーが返した）`mcp-session-id` ヘッダーを送信する必要があります。
+- **セキュリティ:** デフォルトのバインドは `127.0.0.1` です。認証とTLSなしにHTTPポートを信頼できないネットワークに公開しないでください。MCPツール経由でBacklog APIキーを完全に利用できてしまいます。
 
-- `BACKLOG_DOMAIN=your-domain.backlog.com`
-- `BACKLOG_API_KEY=your-api-key`
+環境変数（両方設定した場合はCLIフラグが優先されます）：
 
-3. ローカルで起動します：
-
-```bash
-npm run dev
-```
-
-4. MCPとして使用するJSONを設定します：
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "node",
-      "args": ["your-repository-location/build/index.js"],
-      "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key"
-      }
-    }
-  }
-}
-```
+| 変数 | 説明 |
+| ------------------------ | ------------------------------------------------------------------------------------------ |
+| `MCP_TRANSPORT`          | `stdio`（デフォルト）または `http` |
+| `MCP_HTTP_HOST`          | バインドアドレス（デフォルト `127.0.0.1`） |
+| `MCP_HTTP_PORT`          | ポート（デフォルト `3333`） |
+| `MCP_HTTP_PATH`          | URLパス（デフォルト `/mcp`） |
+| `MCP_HTTP_JSON_RESPONSE` | サポートされている場合にSSEよりJSONレスポンスを優先するには `true` |
+| `MCP_HTTP_ALLOWED_HOSTS` | `0.0.0.0` にバインドする際に許可する `Host` 値のカンマ区切りリスト（DNSリバインディング保護） |
 
 ### OAuth 2.0 認証（リモートMCP）
 
@@ -317,25 +280,14 @@ PROJECT-KEYプロジェクトの「repo-name」リポジトリで、ブランチ
 2. `.backlog-mcp-serverrc.json` 内のエントリ - サポートされる設定ファイル形式：.json、.yaml、.yml
 3. 組み込みのフォールバック値（英語）
 
-サンプル設定：
+サンプル設定（サーバーはホームディレクトリの `.backlog-mcp-serverrc.json` を自動的に読み込みます）：
 
 ```json
 {
   "mcpServers": {
     "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "BACKLOG_DOMAIN",
-        "-e",
-        "BACKLOG_API_KEY",
-        "-v",
-        "/yourcurrentdir/.backlog-mcp-serverrc.json:/root/.backlog-mcp-serverrc.json:ro",
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
+      "command": "node",
+      "args": ["/absolute/path/to/backlog-mcp-server/build/index.js"],
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
         "BACKLOG_API_KEY": "your-api-key"
@@ -354,13 +306,7 @@ PROJECT-KEYプロジェクトの「repo-name」リポジトリで、ブランチ
 例：
 
 ```bash
-docker run -i --rm ghcr.io/nulab/backlog-mcp-server node build/index.js --export-translations
-```
-
-または
-
-```bash
-npx github:nulab/backlog-mcp-server --export-translations
+node build/index.js --export-translations
 ```
 
 ### 日本語翻訳テンプレートの使用
@@ -388,19 +334,8 @@ translationConfig/.backlog-mcp-serverrc.json.example
 {
   "mcpServers": {
     "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "BACKLOG_DOMAIN",
-        "-e",
-        "BACKLOG_API_KEY",
-        "-e",
-        "BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION",
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
+      "command": "node",
+      "args": ["/absolute/path/to/backlog-mcp-server/build/index.js"],
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
         "BACKLOG_API_KEY": "your-api-key",
@@ -491,25 +426,8 @@ MAX_TOKENS=10000
 {
   "mcpServers": {
     "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "BACKLOG_DOMAIN",
-        "-e",
-        "BACKLOG_API_KEY",
-        "-e",
-        "MAX_TOKENS",
-        "-e",
-        "OPTIMIZE_RESPONSE",
-        "-e",
-        "PREFIX",
-        "-e",
-        "ENABLE_TOOLSETS",
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
+      "command": "node",
+      "args": ["/absolute/path/to/backlog-mcp-server/build/index.js"],
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
         "BACKLOG_API_KEY": "your-api-key",
@@ -529,7 +447,7 @@ MAX_TOKENS=10000
 ### テストの実行
 
 ```bash
-npm test
+pnpm test
 ```
 
 ### 新しいツールの追加

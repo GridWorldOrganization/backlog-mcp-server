@@ -19,144 +19,64 @@ A Model Context Protocol (MCP) server for interacting with the Backlog API. This
 - GraphQL-style field selection for optimized responses
 - Token limiting for large responses
 
-## Getting Started
+## Installation
 
-### Requirements
+### Prerequisites
 
-- Docker
-- A Backlog account with API access
-- API key from your Backlog account
+- Node.js 22+ (24 recommended)
+- pnpm
+- A Backlog API key
 
-### Option 1: Install via Docker
+### Setup
 
-The easiest way to use this MCP server is through MCP configurations:
-
-1. Open MCP settings
-2. Navigate to the MCP configuration section
-3. Add the following configuration:
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "--pull",
-        "always",
-        "-i",
-        "--rm",
-        "-e",
-        "BACKLOG_DOMAIN",
-        "-e",
-        "BACKLOG_API_KEY",
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
-      "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key"
-      }
-    }
-  }
-}
-```
-
-Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` with your Backlog API key.
-
-✅ If you cannot use --pull always, you can manually update the image using:
-
-```
-docker pull ghcr.io/nulab/backlog-mcp-server:latest
-```
-
-### Option 2: Install via npx
-
-You can also run the server directly using `npx` without cloning the repository. This is a convenient way to run the server without a full installation.
-
-1. Open MCP settings
-2. Navigate to the MCP configuration section
-3. Add one of the following configurations:
-
-**Default (Slim) — 31 tools, low context usage**
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "npx",
-      "args": ["-y", "@gridworld-jp/backlog-mcp-server"],
-      "env": {
-        "BACKLOG_API_KEY": "your-api-key",
-        "BACKLOG_DOMAIN": "your-domain.backlog.com"
-      }
-    }
-  }
-}
-```
-
-**Full — all 69 tools**
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "npx",
-      "args": ["-y", "@gridworld-jp/backlog-mcp-server", "--preset", "full"],
-      "env": {
-        "BACKLOG_API_KEY": "your-api-key",
-        "BACKLOG_DOMAIN": "your-domain.backlog.com"
-      }
-    }
-  }
-}
-```
-
-Replace `your-domain.backlog.com` with your Backlog domain and `your-api-key` with your Backlog API key.
-
-### Option 3: Manual Setup (Node.js)
-
-1. Clone and install:
+1. Clone and build:
 
    ```bash
-   git clone https://github.com/nulab/backlog-mcp-server.git
+   git clone https://github.com/GridWorldOrganization/backlog-mcp-server.git
    cd backlog-mcp-server
    pnpm install
    pnpm run build
    ```
 
-2. Create `.env` from template and set required variables:
+2. Register it in your MCP client config. Use the absolute path to the built `build/index.js`.
 
-```bash
-cp .env.example .env
-```
+   **Default (Slim) — 25 tools, low context usage**
 
-Set the following values in `.env`:
+   ```json
+   {
+     "mcpServers": {
+       "backlog": {
+         "command": "node",
+         "args": ["/absolute/path/to/backlog-mcp-server/build/index.js"],
+         "env": {
+           "BACKLOG_DOMAIN": "your-domain.backlog.com",
+           "BACKLOG_API_KEY": "your-api-key"
+         }
+       }
+     }
+   }
+   ```
 
-- `BACKLOG_DOMAIN=your-domain.backlog.com`
-- `BACKLOG_API_KEY=your-api-key`
+   **Full — all 69 tools**
 
-3. Run locally:
+   ```json
+   {
+     "mcpServers": {
+       "backlog": {
+         "command": "node",
+         "args": ["/absolute/path/to/backlog-mcp-server/build/index.js", "--preset", "full"],
+         "env": {
+           "BACKLOG_DOMAIN": "your-domain.backlog.com",
+           "BACKLOG_API_KEY": "your-api-key"
+         }
+       }
+     }
+   }
+   ```
 
-```bash
-pnpm run dev
-```
+   Replace `/absolute/path/to/backlog-mcp-server` with the directory where you cloned the repo, `your-domain.backlog.com` with your Backlog domain, and `your-api-key` with your Backlog API key.
 
-4. Set your json to use as MCP
-
-```json
-{
-  "mcpServers": {
-    "backlog": {
-      "command": "node",
-      "args": ["your-repository-location/build/index.js"],
-      "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key"
-      }
-    }
-  }
-}
-```
+   (Optional) For local development you can also create a `.env` file from `.env.example` and run `pnpm run dev`.
 
 ### HTTP transport (Streamable HTTP)
 
@@ -444,25 +364,14 @@ When the server starts, it determines the final description for each tool based 
 2. Entries in `.backlog-mcp-serverrc.json` - Supported configuration file formats: .json, .yaml, .yml
 3. Built-in fallback values (English)
 
-Sample config:
+Sample config (the server reads `.backlog-mcp-serverrc.json` from your home directory automatically):
 
 ```json
 {
   "mcpServers": {
     "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "BACKLOG_DOMAIN",
-        "-e",
-        "BACKLOG_API_KEY",
-        "-v",
-        "/yourcurrentdir/.backlog-mcp-serverrc.json:/root/.backlog-mcp-serverrc.json:ro",
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
+      "command": "node",
+      "args": ["/absolute/path/to/backlog-mcp-server/build/index.js"],
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
         "BACKLOG_API_KEY": "your-api-key"
@@ -481,13 +390,7 @@ This will print all tool descriptions to stdout, including any customizations yo
 Example:
 
 ```bash
-docker run -i --rm ghcr.io/nulab/backlog-mcp-server node build/index.js --export-translations
-```
-
-or
-
-```bash
-npx github:nulab/backlog-mcp-server --export-translations
+node build/index.js --export-translations
 ```
 
 ### Using a Japanese Translation Template
@@ -515,16 +418,8 @@ To override the TOOL_ADD_ISSUE_COMMENT_DESCRIPTION:
 {
   "mcpServers": {
     "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e", "BACKLOG_DOMAIN",
-        "-e", "BACKLOG_API_KEY",
-        "-e", "BACKLOG_MCP_TOOL_ADD_ISSUE_COMMENT_DESCRIPTION"
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
+      "command": "node",
+      "args": ["/absolute/path/to/backlog-mcp-server/build/index.js"],
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
         "BACKLOG_API_KEY": "your-api-key",
@@ -615,25 +510,8 @@ This section demonstrates advanced configuration using multiple environment vari
 {
   "mcpServers": {
     "backlog": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "BACKLOG_DOMAIN",
-        "-e",
-        "BACKLOG_API_KEY",
-        "-e",
-        "MAX_TOKENS",
-        "-e",
-        "OPTIMIZE_RESPONSE",
-        "-e",
-        "PREFIX",
-        "-e",
-        "ENABLE_TOOLSETS",
-        "ghcr.io/nulab/backlog-mcp-server"
-      ],
+      "command": "node",
+      "args": ["/absolute/path/to/backlog-mcp-server/build/index.js"],
       "env": {
         "BACKLOG_DOMAIN": "your-domain.backlog.com",
         "BACKLOG_API_KEY": "your-api-key",
@@ -675,7 +553,7 @@ The server supports several command line options:
 - `--optimize-response`: Enable GraphQL-style field selection
 - `--max-tokens=NUMBER`: Set maximum token limit for responses
 - `--prefix=STRING`: Optional string prefix to prepend to all tool names (default: "")
-- `--preset slim|full`: Tool preset. `slim` (default) loads 31 core tools for low context usage. `full` loads all 69 tools. Overridden by `--enable-tools` when that flag is set.
+- `--preset slim|full`: Tool preset. `slim` (default) loads 25 core tools for low context usage. `full` loads all 69 tools. Overridden by `--enable-tools` when that flag is set.
   Can also be set via environment variable: `PRESET=full`
 - `--enable-toolsets <toolsets...>`: Specify which toolsets to enable (comma-separated or multiple arguments). Defaults to "all".
   Example: `--enable-toolsets space,project` or `--enable-toolsets issue --enable-toolsets git`
@@ -690,7 +568,7 @@ Example:
 node build/index.js --optimize-response --max-tokens=100000 --prefix="backlog_" --enable-toolsets space,issue
 ```
 
-Default (slim, 31 tools) — no flags needed:
+Default (slim, 25 tools) — no flags needed:
 
 ```bash
 node build/index.js
@@ -797,21 +675,21 @@ Example response:
 
 | Mode | How | # Tools |
 |------|-----|---------|
-| **Default (Slim)** | No flags (default) | 31 |
+| **Default (Slim)** | No flags (default) | 25 |
 | **Full** | `--preset full` | 69 |
 
 > Default install includes Slim tools. Use `--preset full` to enable all.
 
 ### Default (Slim) MCP Config
 
-**Default (Slim) — 31 tools, low context usage**
+**Default (Slim) — 25 tools, low context usage**
 
 ```json
 {
   "mcpServers": {
     "backlog": {
-      "command": "npx",
-      "args": ["-y", "@gridworld-jp/backlog-mcp-server"],
+      "command": "node",
+      "args": ["/absolute/path/to/backlog-mcp-server/build/index.js"],
       "env": {
         "BACKLOG_API_KEY": "your-api-key",
         "BACKLOG_DOMAIN": "your-domain.backlog.com"
@@ -827,8 +705,8 @@ Example response:
 {
   "mcpServers": {
     "backlog": {
-      "command": "npx",
-      "args": ["-y", "@gridworld-jp/backlog-mcp-server", "--preset", "full"],
+      "command": "node",
+      "args": ["/absolute/path/to/backlog-mcp-server/build/index.js", "--preset", "full"],
       "env": {
         "BACKLOG_API_KEY": "your-api-key",
         "BACKLOG_DOMAIN": "your-domain.backlog.com"
