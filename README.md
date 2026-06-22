@@ -40,7 +40,7 @@ A Model Context Protocol (MCP) server for interacting with the Backlog API. This
 
 2. Register it in your MCP client config. Use the absolute path to the built `build/index.js`.
 
-   **Default (Slim) — 25 tools, low context usage**
+   **Default (Slim) — 22 tools, low context usage**
 
    ```json
    {
@@ -568,7 +568,7 @@ Example:
 node build/index.js --optimize-response --max-tokens=100000 --prefix="backlog_" --enable-toolsets space,issue
 ```
 
-Default (slim, 25 tools) — no flags needed:
+Default (slim, 22 tools) — no flags needed:
 
 ```bash
 node build/index.js
@@ -675,14 +675,14 @@ Example response:
 
 | Mode | How | # Tools |
 |------|-----|---------|
-| **Default (Slim)** | No flags (default) | 25 |
+| **Default (Slim)** | No flags (default) | 22 |
 | **Full** | `--preset full` | 69 |
 
 > Default install includes Slim tools. Use `--preset full` to enable all.
 
 ### Default (Slim) MCP Config
 
-**Default (Slim) — 25 tools, low context usage**
+**Default (Slim) — 22 tools, low context usage**
 
 ```json
 {
@@ -768,9 +768,9 @@ Example response:
 | 43 | `add_wiki` | wiki | | ✓ |
 | 44 | `update_wiki` | wiki | | ✓ |
 | 45 | `delete_wiki` | wiki | ★ | ✓ |
-| 46 | `get_wiki_history` | wiki | ★ | ✓ |
-| 47 | `get_wiki_tags` | wiki | ★ | ✓ |
-| 48 | `get_wiki_stars` | wiki | ★ | ✓ |
+| 46 | `get_wiki_history` | wiki | ★ | |
+| 47 | `get_wiki_tags` | wiki | ★ | |
+| 48 | `get_wiki_stars` | wiki | ★ | |
 | 49 | `get_wiki_attachments` | wiki | ★ | |
 | 50 | `add_wiki_attachments` | wiki | ★ | |
 | 51 | `delete_wiki_attachment` | wiki | ★ | |

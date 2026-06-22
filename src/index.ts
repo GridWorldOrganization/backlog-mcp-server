@@ -43,9 +43,6 @@ const SLIM_TOOLS = [
   'add_wiki',
   'update_wiki',
   'delete_wiki',
-  'get_wiki_history',
-  'get_wiki_tags',
-  'get_wiki_stars',
 ];
 
 // Swallow SIGPIPE and stdout/stderr EPIPE so the process doesn't crash when a
