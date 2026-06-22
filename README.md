@@ -849,7 +849,7 @@ Example response:
 | 2 | `get_space_activities` | space | | |
 | 3 | `get_users` | space | | |
 | 4 | `get_user_stars_count` | space | | |
-| 5 | `add_star` | space | ★ | |
+| 5 | `add_star` | space | ★ | ✓ |
 | 6 | `upload_attachment` | space | ★ | |
 | 7 | `get_myself` | space | | |
 | 8 | `get_user_recent_updates` | space | | |

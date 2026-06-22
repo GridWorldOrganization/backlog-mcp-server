@@ -21,6 +21,7 @@ import packageJson from '../package.json' with { type: 'json' };
 const { version } = packageJson;
 
 const SLIM_TOOLS = [
+  'add_star',
   'get_issue',
   'get_issues',
   'count_issues',
