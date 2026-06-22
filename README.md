@@ -847,15 +847,15 @@ Example response:
 |-----|-----------|---------|--------|------|
 | 1 | `get_space` | space | | |
 | 2 | `get_space_activities` | space | | |
-| 3 | `get_users` | space | | ✓ |
+| 3 | `get_users` | space | | |
 | 4 | `get_user_stars_count` | space | | |
-| 5 | `add_star` | space | ★ | ✓ |
+| 5 | `add_star` | space | ★ | |
 | 6 | `upload_attachment` | space | ★ | |
 | 7 | `get_myself` | space | | |
-| 8 | `get_user_recent_updates` | space | | ✓ |
+| 8 | `get_user_recent_updates` | space | | |
 | 9 | `get_project_list` | project | | |
 | 10 | `add_project` | project | | |
-| 11 | `get_project` | project | | ✓ |
+| 11 | `get_project` | project | | |
 | 12 | `update_project` | project | | |
 | 13 | `delete_project` | project | | |
 | 14 | `get_issue` | issue | | ✓ |
