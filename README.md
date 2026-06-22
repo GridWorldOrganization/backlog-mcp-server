@@ -75,17 +75,36 @@ You can also run the server directly using `npx` without cloning the repository.
 
 1. Open MCP settings
 2. Navigate to the MCP configuration section
-3. Add the following configuration:
+3. Add one of the following configurations:
+
+**Default (Slim) — 31 tools, low context usage**
 
 ```json
 {
   "mcpServers": {
     "backlog": {
       "command": "npx",
-      "args": ["backlog-mcp-server"],
+      "args": ["-y", "@gridworld-jp/backlog-mcp-server"],
       "env": {
-        "BACKLOG_DOMAIN": "your-domain.backlog.com",
-        "BACKLOG_API_KEY": "your-api-key"
+        "BACKLOG_API_KEY": "your-api-key",
+        "BACKLOG_DOMAIN": "your-domain.backlog.com"
+      }
+    }
+  }
+}
+```
+
+**Full — all 69 tools**
+
+```json
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "npx",
+      "args": ["-y", "@gridworld-jp/backlog-mcp-server", "--preset", "full"],
+      "env": {
+        "BACKLOG_API_KEY": "your-api-key",
+        "BACKLOG_DOMAIN": "your-domain.backlog.com"
       }
     }
   }
@@ -656,10 +675,12 @@ The server supports several command line options:
 - `--optimize-response`: Enable GraphQL-style field selection
 - `--max-tokens=NUMBER`: Set maximum token limit for responses
 - `--prefix=STRING`: Optional string prefix to prepend to all tool names (default: "")
+- `--preset slim|full`: Tool preset. `slim` (default) loads 31 core tools for low context usage. `full` loads all 69 tools. Overridden by `--enable-tools` when that flag is set.
+  Can also be set via environment variable: `PRESET=full`
 - `--enable-toolsets <toolsets...>`: Specify which toolsets to enable (comma-separated or multiple arguments). Defaults to "all".
   Example: `--enable-toolsets space,project` or `--enable-toolsets issue --enable-toolsets git`
   Available toolsets: `space`, `project`, `issue`, `wiki`, `git`, `notifications`.
-- `--enable-tools <tools...>`: Specify individual tool names to enable. When set, only these tools are registered regardless of `--enable-toolsets`. Leave unset to enable all tools in active toolsets.
+- `--enable-tools <tools...>`: Specify individual tool names to enable. When set, only these tools are registered (ignores `--enable-toolsets` and `--preset`).
   Example: `--enable-tools get_issue,add_issue,get_wiki`
   Can also be set via environment variable: `ENABLE_TOOLS=get_issue,add_issue`
 
@@ -669,10 +690,16 @@ Example:
 node build/index.js --optimize-response --max-tokens=100000 --prefix="backlog_" --enable-toolsets space,issue
 ```
 
-Slim mode example (31 tools only):
+Default (slim, 31 tools) — no flags needed:
 
 ```bash
-node build/index.js --enable-tools get_users,add_star,get_user_recent_updates,get_project,get_issue,get_issues,count_issues,add_issue,update_issue,delete_issue,get_issue_comments,add_issue_comment,update_issue_comment,delete_issue_comment,get_priorities,get_categories,get_custom_fields,get_issue_types,get_resolutions,get_wiki_pages,get_wikis_count,get_wiki,add_wiki,update_wiki,delete_wiki,get_wiki_history,get_wiki_tags,get_wiki_stars,get_wiki_attachments,add_wiki_attachments,delete_wiki_attachment
+node build/index.js
+```
+
+Full mode (all 69 tools):
+
+```bash
+node build/index.js --preset full
 ```
 
 HTTP example:
@@ -770,22 +797,38 @@ Example response:
 
 | Mode | How | # Tools |
 |------|-----|---------|
-| **Full** | `--enable-toolsets all` (default) | 69 |
-| **Slim** | `--enable-tools get_users,add_star,...` (see table below) | 31 |
+| **Default (Slim)** | No flags (default) | 31 |
+| **Full** | `--preset full` | 69 |
 
-### Slim Mode MCP Config
+> Default install includes Slim tools. Use `--preset full` to enable all.
+
+### Default (Slim) MCP Config
+
+**Default (Slim) — 31 tools, low context usage**
 
 ```json
 {
   "mcpServers": {
-    "backlog-slim": {
+    "backlog": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@gridworld-jp/backlog-mcp-server",
-        "--enable-tools",
-        "get_users,add_star,get_user_recent_updates,get_project,get_issue,get_issues,count_issues,add_issue,update_issue,delete_issue,get_issue_comments,add_issue_comment,update_issue_comment,delete_issue_comment,get_priorities,get_categories,get_custom_fields,get_issue_types,get_resolutions,get_wiki_pages,get_wikis_count,get_wiki,add_wiki,update_wiki,delete_wiki,get_wiki_history,get_wiki_tags,get_wiki_stars,get_wiki_attachments,add_wiki_attachments,delete_wiki_attachment"
-      ],
+      "args": ["-y", "@gridworld-jp/backlog-mcp-server"],
+      "env": {
+        "BACKLOG_API_KEY": "your-api-key",
+        "BACKLOG_DOMAIN": "your-domain.backlog.com"
+      }
+    }
+  }
+}
+```
+
+**Full — all 69 tools**
+
+```json
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "npx",
+      "args": ["-y", "@gridworld-jp/backlog-mcp-server", "--preset", "full"],
       "env": {
         "BACKLOG_API_KEY": "your-api-key",
         "BACKLOG_DOMAIN": "your-domain.backlog.com"
@@ -798,9 +841,9 @@ Example response:
 ### Full Tool List
 
 > **GJ独自**: Tools added in this GJ fork (not in upstream nulab/backlog-mcp-server).  
-> **Slim**: Included in the recommended slim preset.
+> **Default (Slim)**: Included in the default slim preset. Use `--preset full` to enable all 69 tools.
 
-| No. | Tool Name | Toolset | GJ独自 | Slim |
+| No. | Tool Name | Toolset | GJ独自 | Default (Slim) |
 |-----|-----------|---------|--------|------|
 | 1 | `get_space` | space | | |
 | 2 | `get_space_activities` | space | | |

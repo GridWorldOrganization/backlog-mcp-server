@@ -20,6 +20,17 @@ import packageJson from '../package.json' with { type: 'json' };
 
 const { version } = packageJson;
 
+const SLIM_TOOLS = [
+  'get_users', 'add_star', 'get_user_recent_updates',
+  'get_project',
+  'get_issue', 'get_issues', 'count_issues', 'add_issue', 'update_issue', 'delete_issue',
+  'get_issue_comments', 'add_issue_comment', 'update_issue_comment', 'delete_issue_comment',
+  'get_priorities', 'get_categories', 'get_custom_fields', 'get_issue_types', 'get_resolutions',
+  'get_wiki_pages', 'get_wikis_count', 'get_wiki', 'add_wiki', 'update_wiki',
+  'delete_wiki', 'get_wiki_history', 'get_wiki_tags', 'get_wiki_stars', 'get_wiki_attachments',
+  'add_wiki_attachments', 'delete_wiki_attachment',
+];
+
 // Swallow SIGPIPE and stdout/stderr EPIPE so the process doesn't crash when a
 // client disconnects mid-stream. Node.js emits EPIPE as both a Unix signal and
 // as an error event on stdout/stderr streams — both must be handled.
@@ -123,12 +134,18 @@ Available toolsets:
   .option('enable-tools', {
     type: 'array',
     describe:
-      'Specify individual tool names to enable. When set, only these tools are registered (regardless of --enable-toolsets). Leave unset to enable all tools in active toolsets.',
+      'Specify individual tool names to enable. When set, only these tools are registered (regardless of --enable-toolsets and --preset). Leave unset to rely on --preset.',
     default: env
       .get('ENABLE_TOOLS')
       .default('')
       .asArray(',')
       .filter((s: string) => s.length > 0),
+  })
+  .option('preset', {
+    type: 'string',
+    choices: ['slim', 'full'] as const,
+    describe: 'Tool preset: "slim" (31 core tools, default) or "full" (all 69 tools)',
+    default: env.get('PRESET').default('slim').asString(),
   })
   .option('dynamic-toolsets', {
     type: 'boolean',
@@ -160,7 +177,14 @@ const enabledToolsets = argv.dynamicToolsets
   ? (argv.enableToolsets as string[]).filter((a) => a !== 'all')
   : (argv.enableToolsets as string[]);
 
-const enableTools = (argv.enableTools as string[]).filter((s) => s.length > 0);
+// Determine active tool list
+// Priority: --enable-tools (explicit) > --preset
+const explicitTools = (argv.enableTools as string[]).filter(s => s.length > 0);
+const enableTools = explicitTools.length > 0
+  ? explicitTools
+  : argv.preset === 'full'
+    ? []          // empty = no filter = all tools
+    : SLIM_TOOLS; // default: slim
 
 const mcpOption = { useFields: useFields, maxTokens, prefix };
 
