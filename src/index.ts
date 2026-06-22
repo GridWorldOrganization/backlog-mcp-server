@@ -27,11 +27,9 @@ const SLIM_TOOLS = [
   'count_issues',
   'add_issue',
   'update_issue',
-  'delete_issue',
   'get_issue_comments',
   'add_issue_comment',
   'update_issue_comment',
-  'delete_issue_comment',
   'get_priorities',
   'get_categories',
   'get_custom_fields',
@@ -42,7 +40,6 @@ const SLIM_TOOLS = [
   'get_wiki',
   'add_wiki',
   'update_wiki',
-  'delete_wiki',
 ];
 
 // Swallow SIGPIPE and stdout/stderr EPIPE so the process doesn't crash when a
