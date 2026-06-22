@@ -32,7 +32,6 @@ const SLIM_TOOLS = [
   'update_issue_comment',
   'get_priorities',
   'get_categories',
-  'get_custom_fields',
   'get_issue_types',
   'get_resolutions',
   'get_wiki_pages',

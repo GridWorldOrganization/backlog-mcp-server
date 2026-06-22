@@ -40,7 +40,7 @@ Backlog API とやり取りするための Model Context Protocol（MCP）サー
 
 2. お使いのMCPクライアント設定に登録します。ビルド済みの `build/index.js` への絶対パスを使用してください。
 
-   **デフォルト（Slim）— 19ツール、低コンテキスト使用量**
+   **デフォルト（Slim）— 18ツール、低コンテキスト使用量**
 
    ```json
    {

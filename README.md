@@ -40,7 +40,7 @@ A Model Context Protocol (MCP) server for interacting with the Backlog API. This
 
 2. Register it in your MCP client config. Use the absolute path to the built `build/index.js`.
 
-   **Default (Slim) — 19 tools, low context usage**
+   **Default (Slim) — 18 tools, low context usage**
 
    ```json
    {
@@ -568,7 +568,7 @@ Example:
 node build/index.js --optimize-response --max-tokens=100000 --prefix="backlog_" --enable-toolsets space,issue
 ```
 
-Default (slim, 19 tools) — no flags needed:
+Default (slim, 18 tools) — no flags needed:
 
 ```bash
 node build/index.js
@@ -675,14 +675,14 @@ Example response:
 
 | Mode | How | # Tools |
 |------|-----|---------|
-| **Default (Slim)** | No flags (default) | 19 |
+| **Default (Slim)** | No flags (default) | 18 |
 | **Full** | `--preset full` | 69 |
 
 > Default install includes Slim tools. Use `--preset full` to enable all.
 
 ### Default (Slim) MCP Config
 
-**Default (Slim) — 19 tools, low context usage**
+**Default (Slim) — 18 tools, low context usage**
 
 ```json
 {
@@ -749,7 +749,7 @@ Example response:
 | 24 | `export_deleted_comments` | issue | ★ | |
 | 25 | `get_priorities` | issue | | ✓ |
 | 26 | `get_categories` | issue | | ✓ |
-| 27 | `get_custom_fields` | issue | | ✓ |
+| 27 | `get_custom_fields` | issue | | |
 | 28 | `get_issue_types` | issue | | ✓ |
 | 29 | `get_resolutions` | issue | | ✓ |
 | 30 | `get_watching_list_items` | issue | | |
