@@ -55,7 +55,7 @@ export const getIssueCommentsTool = (
     name: 'get_issue_comments',
     description: t(
       'TOOL_GET_ISSUE_COMMENTS_DESCRIPTION',
-      'Returns list of comments for an issue'
+      'Returns list of comments for an issue. Each comment includes an id that can be used with add_star (commentId) or update_issue_comment.'
     ),
     schema: z.object(getIssueCommentsSchema(t)),
     outputSchema: IssueCommentSchema,

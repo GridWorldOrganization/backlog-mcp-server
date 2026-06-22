@@ -43,7 +43,7 @@ export const updateIssueCommentTool = (
     name: 'update_issue_comment',
     description: t(
       'TOOL_UPDATE_ISSUE_COMMENT_DESCRIPTION',
-      'Updates an existing comment on an issue. Only the comment author can update it.'
+      'Updates an existing comment on an issue. Only the comment author can update it. Use get_issue_comments to find the commentId.'
     ),
     schema: z.object(updateIssueCommentSchema(t)),
     outputSchema: IssueCommentSchema,

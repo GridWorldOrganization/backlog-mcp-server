@@ -125,7 +125,7 @@ export const countIssuesTool = (
 > => {
   return {
     name: 'count_issues',
-    description: t('TOOL_COUNT_ISSUES_DESCRIPTION', 'Returns count of issues'),
+    description: t('TOOL_COUNT_ISSUES_DESCRIPTION', 'Returns only the count of issues matching filter conditions, without returning issue details. Lighter than get_issues when you just need a number.'),
     schema: z.object(countIssuesSchema(t)),
     outputSchema: IssueCountSchema,
     handler: async ({ customFields, ...rest }) => {

@@ -51,7 +51,7 @@ export const addStarTool = (
     name: 'add_star',
     description: t(
       'TOOL_ADD_STAR_DESCRIPTION',
-      'Adds a star to an issue, comment, wiki, pull request, or pull request comment. Exactly one target ID must be provided.'
+      'Adds a star to an issue, comment, wiki, pull request, or pull request comment. Provide exactly one target ID. Use get_issue_comments to find a commentId.'
     ),
     schema: z.object(addStarSchema(t)),
     outputSchema: AddStarResultSchema,

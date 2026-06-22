@@ -43,7 +43,7 @@ export const getWikiPagesTool = (
     name: 'get_wiki_pages',
     description: t(
       'TOOL_GET_WIKI_PAGES_DESCRIPTION',
-      'Returns list of Wiki pages'
+      'Returns list of Wiki pages in a project. Each result includes the page id needed by get_wiki and update_wiki.'
     ),
     schema: z.object(getWikiPagesSchema(t)),
     outputSchema: WikiListItemSchema,

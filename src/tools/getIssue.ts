@@ -31,7 +31,7 @@ export const getIssueTool = (
     name: 'get_issue',
     description: t(
       'TOOL_GET_ISSUE_DESCRIPTION',
-      'Returns information about a specific issue'
+      'Returns full details of a single issue by its ID or key (e.g. "PROJECT-123"). Use this when you already know which issue to inspect.'
     ),
     outputSchema: IssueSchema,
     schema: z.object(getIssueSchema(t)),

@@ -124,7 +124,7 @@ export const addIssueTool = (
     name: 'add_issue',
     description: t(
       'TOOL_ADD_ISSUE_DESCRIPTION',
-      'Creates a new issue in the specified project.'
+      'Creates a new issue. Required: projectId (number), summary (string), issueTypeId (from get_issue_types), priorityId (from get_priorities). Call get_issue_types and get_priorities first to get valid IDs.'
     ),
     schema: z.object(addIssueSchema(t)),
     outputSchema: IssueSchema,

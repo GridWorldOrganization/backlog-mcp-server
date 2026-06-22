@@ -37,7 +37,7 @@ export const getCategoriesTool = (
     name: 'get_categories',
     description: t(
       'TOOL_GET_CATEGORIES_DESCRIPTION',
-      'Returns list of categories for a project'
+      'Returns list of categories for a project. Categories are optional when creating issues. Requires projectIdOrKey.'
     ),
     schema: z.object(getCategoriesSchema(t)),
     importantFields: ['id', 'projectId', 'name'],

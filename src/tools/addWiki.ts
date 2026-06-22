@@ -36,7 +36,7 @@ export const addWikiTool = (
 > => {
   return {
     name: 'add_wiki',
-    description: t('TOOL_ADD_WIKI_DESCRIPTION', 'Creates a new wiki page'),
+    description: t('TOOL_ADD_WIKI_DESCRIPTION', 'Creates a new wiki page in a project. Requires projectId (number), name, and content. To set tags, prefix the name with [tag1][tag2] (e.g. "[Design][API] Page Title").'),
     schema: z.object(addWikiSchema(t)),
     outputSchema: WikiSchema,
     importantFields: ['id', 'name', 'content', 'createdUser'],

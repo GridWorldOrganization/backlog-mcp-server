@@ -157,7 +157,7 @@ export const updateIssueTool = (
     name: 'update_issue',
     description: t(
       'TOOL_UPDATE_ISSUE_DESCRIPTION',
-      'Updates an existing issue'
+      'Updates an existing issue. Specify the issue by issueId (number) or issueKey (string, e.g. "PROJECT-123"). Only include fields you want to change.'
     ),
     schema: z.object(updateIssueSchema(t)),
     outputSchema: IssueSchema,

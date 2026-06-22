@@ -151,7 +151,7 @@ export const getIssuesTool = (
 > => {
   return {
     name: 'get_issues',
-    description: t('TOOL_GET_ISSUES_DESCRIPTION', 'Returns list of issues'),
+    description: t('TOOL_GET_ISSUES_DESCRIPTION', 'Searches and returns a list of issues matching filter conditions (project, status, assignee, keyword, etc.). Use this to find issues; use get_issue for a single known issue.'),
     schema: z.object(getIssuesSchema(t)),
     importantFields: [
       'projectId',

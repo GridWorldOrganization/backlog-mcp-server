@@ -21,7 +21,7 @@ export const getWikiTool = (
     name: 'get_wiki',
     description: t(
       'TOOL_GET_WIKI_DESCRIPTION',
-      'Returns information about a specific wiki page'
+      'Returns full content and metadata of a single wiki page by its numeric wikiId. Use get_wiki_pages to find page IDs.'
     ),
     schema: z.object(getWikiSchema(t)),
     outputSchema: WikiSchema,

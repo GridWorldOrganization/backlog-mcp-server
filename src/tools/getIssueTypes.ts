@@ -37,7 +37,7 @@ export const getIssueTypesTool = (
     name: 'get_issue_types',
     description: t(
       'TOOL_GET_ISSUE_TYPES_DESCRIPTION',
-      'Returns list of issue types for a project'
+      'Returns issue types (e.g. Bug, Task, Feature) with their IDs for a project. Call this BEFORE add_issue to get a valid issueTypeId. Requires projectIdOrKey.'
     ),
     schema: z.object(getIssueTypesSchema(t)),
     outputSchema: IssueTypeSchema,

@@ -17,7 +17,7 @@ export const getPrioritiesTool = (
     name: 'get_priorities',
     description: t(
       'TOOL_GET_PRIORITIES_DESCRIPTION',
-      'Returns list of priorities'
+      'Returns the list of priority levels (e.g. High, Normal, Low) with their IDs. Call this BEFORE add_issue to get a valid priorityId. This is a space-wide master list (no project parameter needed).'
     ),
     schema: z.object(getPrioritiesSchema(t)),
     outputSchema: PrioritySchema,

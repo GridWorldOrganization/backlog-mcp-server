@@ -47,7 +47,7 @@ export const addIssueCommentTool = (
     name: 'add_issue_comment',
     description: t(
       'TOOL_ADD_ISSUE_COMMENT_DESCRIPTION',
-      'Adds a comment to an issue'
+      'Adds a new comment to an issue. Specify the issue by issueId or issueKey.'
     ),
     schema: z.object(addIssueCommentSchema(t)),
     outputSchema: IssueCommentSchema,

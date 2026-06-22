@@ -37,7 +37,7 @@ export const getWikisCountTool = (
     name: 'get_wikis_count',
     description: t(
       'TOOL_GET_WIKIS_COUNT_DESCRIPTION',
-      'Returns count of wiki pages in a project'
+      'Returns the count of wiki pages in a project without returning page details. Lighter than get_wiki_pages when you just need a number.'
     ),
     schema: z.object(getWikisCountSchema(t)),
     outputSchema: WikiCountSchema,

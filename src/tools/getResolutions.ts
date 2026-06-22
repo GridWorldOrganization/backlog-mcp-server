@@ -17,7 +17,7 @@ export const getResolutionsTool = (
     name: 'get_resolutions',
     description: t(
       'TOOL_GET_RESOLUTIONS_DESCRIPTION',
-      'Returns list of issue resolutions'
+      'Returns the list of resolution statuses (e.g. Fixed, Won\'t Fix, Duplicate) with their IDs. Used with update_issue to set resolutionId when closing an issue. Space-wide master list.'
     ),
     schema: z.object(getResolutionsSchema(t)),
     outputSchema: ResolutionSchema,

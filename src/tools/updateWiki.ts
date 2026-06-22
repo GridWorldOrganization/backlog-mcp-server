@@ -44,7 +44,7 @@ export const updateWikiTool = (
     name: 'update_wiki',
     description: t(
       'TOOL_UPDATE_WIKI_DESCRIPTION',
-      'Updates an existing wiki page'
+      'Updates an existing wiki page by wikiId. Only include fields you want to change (name, content, mailNotify). To set or change tags, prefix the name with [tag1][tag2].'
     ),
     schema: z.object(updateWikiSchema(t)),
     outputSchema: WikiSchema,
