@@ -1,6 +1,7 @@
 import { Backlog } from 'backlog-js';
 import { getCurrentAccessToken } from '../auth/backlogAuthContext.js';
 import { getCurrentOrganization } from './backlogOrganizationContext.js';
+import { logger } from './logger.js';
 
 export type BacklogOrganizationInfo = {
   name: string;
@@ -33,12 +34,35 @@ export function createBacklogClientRegistry(
     return multiOrgRegistry;
   }
 
-  const domain = env.BACKLOG_DOMAIN;
+  let domain = env.BACKLOG_DOMAIN;
   const apiKey = env.BACKLOG_API_KEY;
 
-  if (!domain || !apiKey) {
+  // Backward compatibility: BACKLOG_HOST → BACKLOG_DOMAIN (renamed in v0.13.0)
+  if (!domain && env.BACKLOG_HOST) {
+    domain = env.BACKLOG_HOST;
+    logger.warn('BACKLOG_HOST is deprecated and will be removed in a future version. Rename to BACKLOG_DOMAIN.');
+  }
+
+  if (!domain && !apiKey) {
     throw new Error(
-      'Configure either BACKLOG_ORG_<NAME>_DOMAIN and BACKLOG_ORG_<NAME>_API_KEY with BACKLOG_DEFAULT_ORG, or both BACKLOG_DOMAIN and BACKLOG_API_KEY.'
+      'BACKLOG_DOMAIN and BACKLOG_API_KEY are both missing.\n' +
+      '  Hint: If using ${VAR} placeholders in .mcp.json, ensure the MCP client was launched from a shell that sourced your profile (~/.zshrc).\n' +
+      '  Hint: Or use --env-file /path/to/.env to load credentials directly.\n' +
+      '  Hint: Or set the values directly in your MCP client config.'
+    );
+  }
+  if (!domain) {
+    throw new Error(
+      'BACKLOG_DOMAIN is not set.\n' +
+      '  Hint: Set BACKLOG_DOMAIN=your-space.backlog.com in your MCP client config.\n' +
+      '  Hint: If upgrading from v0.12.x, note that BACKLOG_HOST was renamed to BACKLOG_DOMAIN.'
+    );
+  }
+  if (!apiKey) {
+    throw new Error(
+      'BACKLOG_API_KEY is not set.\n' +
+      '  Hint: If using ${VAR} in .mcp.json, the variable may not be resolved. Check with: echo $BACKLOG_API_KEY\n' +
+      '  Hint: Or use --env-file /path/to/.env to bypass MCP client env expansion.'
     );
   }
 

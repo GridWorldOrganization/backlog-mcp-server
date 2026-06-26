@@ -62,10 +62,23 @@ process.on('unhandledRejection', (reason) => {
   process.exit(1);
 });
 
-try {
-  process.loadEnvFile();
-} catch {
-  // .env file is optional
+// --env-file support: load a specific .env file before anything else.
+// This bypasses the MCP client's ${VAR} expansion, which often fails
+// when the client process hasn't sourced the user's shell profile.
+const envFileIndex = process.argv.indexOf('--env-file');
+if (envFileIndex !== -1 && process.argv[envFileIndex + 1]) {
+  try {
+    process.loadEnvFile(process.argv[envFileIndex + 1]);
+  } catch (err) {
+    logger.error({ path: process.argv[envFileIndex + 1], err }, 'Failed to load --env-file');
+    process.exit(1);
+  }
+} else {
+  try {
+    process.loadEnvFile();
+  } catch {
+    // .env file is optional
+  }
 }
 
 const oauthConfig = getBacklogOAuthConfig();
@@ -164,7 +177,58 @@ Available toolsets:
       'Enable dynamic toolsets such as enable_toolset, list_available_toolsets, etc.',
     default: env.get('ENABLE_DYNAMIC_TOOLSETS').default('false').asBool(),
   })
+  .option('env-file', {
+    type: 'string',
+    describe: 'Path to a .env file to load (bypasses MCP client env var expansion)',
+  })
+  .option('check', {
+    type: 'boolean',
+    describe: 'Validate environment and exit (startup diagnostic)',
+    default: false,
+  })
   .parseSync();
+
+if (argv.check) {
+  const nodeVersion = process.version;
+  const nodeMajor = parseInt(nodeVersion.slice(1), 10);
+  const domain = process.env.BACKLOG_DOMAIN;
+  const domainLegacy = process.env.BACKLOG_HOST;
+  const apiKey = process.env.BACKLOG_API_KEY;
+  const checks: Array<{ status: string; message: string }> = [];
+
+  checks.push(
+    nodeMajor >= 22
+      ? { status: 'OK', message: `Node.js ${nodeVersion} (>= 22 required)` }
+      : { status: 'FAIL', message: `Node.js ${nodeVersion} (>= 22 required)` }
+  );
+
+  if (domain) {
+    checks.push({ status: 'OK', message: `BACKLOG_DOMAIN = ${domain}` });
+  } else if (domainLegacy) {
+    checks.push({ status: 'WARN', message: `BACKLOG_HOST = ${domainLegacy} (deprecated, rename to BACKLOG_DOMAIN)` });
+  } else {
+    checks.push({ status: 'FAIL', message: 'BACKLOG_DOMAIN is not set' });
+  }
+
+  if (apiKey) {
+    checks.push({ status: 'OK', message: `BACKLOG_API_KEY = set (${apiKey.length} chars)` });
+  } else {
+    checks.push({ status: 'FAIL', message: 'BACKLOG_API_KEY is not set' });
+  }
+
+  if (argv.envFile) {
+    checks.push({ status: 'OK', message: `--env-file = ${argv.envFile}` });
+  }
+
+  const hasFail = checks.some((c) => c.status === 'FAIL');
+  for (const c of checks) {
+    // eslint-disable-next-line no-console
+    console.log(`[${c.status}] ${c.message}`);
+  }
+  // eslint-disable-next-line no-console
+  console.log(`\nResult: ${hasFail ? 'FAIL — fix issues above before starting' : 'PASS — server should start correctly'}`);
+  process.exit(hasFail ? 1 : 0);
+}
 
 const clientRegistry = oauthConfig
   ? createOAuthBacklogClientRegistry(oauthConfig.backlogDomain)
