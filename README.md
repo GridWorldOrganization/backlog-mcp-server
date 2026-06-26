@@ -838,6 +838,41 @@ A self-contained guide for reuse from another system (including the raw Backlog
 API contract for porting to any language) is in
 [`scripts/README.md`](./scripts/README.md).
 
+## Troubleshooting
+
+### MCP server fails to start after `git pull && pnpm run build`
+
+**Symptom:** Claude Code / Cline shows `-32000` error or "Failed to reconnect" for the Backlog MCP server after updating.
+
+**Root cause:** Environment variable names can change between versions. For example, `BACKLOG_HOST` was renamed to `BACKLOG_DOMAIN` in v0.13.0. Your `.mcp.json` (or MCP client config) still references the old name, so the server receives an empty value and crashes.
+
+**Fix:** Check this README's Installation section for the current env var names and update your `.mcp.json` accordingly.
+
+| Old (pre-v0.13.0) | Current (v0.13.0+) |
+|--------------------|---------------------|
+| `BACKLOG_HOST` | `BACKLOG_DOMAIN` |
+
+### Environment variables not resolved (`${VAR}` stays empty)
+
+**Symptom:** The server crashes immediately with "Configure either BACKLOG_ORG\_\<NAME\>\_DOMAIN ... or both BACKLOG_DOMAIN and BACKLOG_API_KEY."
+
+**Root cause:** MCP clients (Claude Code, Cline, etc.) resolve `${VAR}` from the **process environment** of the client itself. If the client was launched from a context that didn't source your shell profile (`~/.zshrc`, `~/.bash_profile`), the variables are empty.
+
+**Fix:**
+1. Launch your MCP client from a terminal that has sourced your shell profile
+2. Or hardcode the values directly in `.mcp.json` (less secure but reliable)
+3. Verify with: `echo $BACKLOG_API_KEY` — if empty, run `source ~/.zshrc` and restart the client
+
+### Diagnostic checklist
+
+When the Backlog MCP server won't connect, check in order:
+
+1. **Build exists?** — `ls build/index.js` (if missing, run `pnpm install && pnpm run build`)
+2. **Env vars set?** — `echo $BACKLOG_API_KEY` and `echo $BACKLOG_DOMAIN` (if empty, source your shell profile)
+3. **Env var names match?** — Compare `.mcp.json` env keys against this README's examples
+4. **Node version?** — `node --version` (requires Node.js 22+)
+5. **Server starts standalone?** — `BACKLOG_DOMAIN=xxx BACKLOG_API_KEY=yyy node build/index.js` (should hang waiting for stdin, not crash)
+
 ## License
 
 This project is licensed under the [MIT License](./LICENSE).

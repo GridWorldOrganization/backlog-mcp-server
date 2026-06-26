@@ -597,6 +597,41 @@ BACKLOG_API_KEY=your-api-key
 - 複数組織モードでは、各組織に対して `BACKLOG_ORG_<NAME>_DOMAIN` と `BACKLOG_ORG_<NAME>_API_KEY` の両方を定義する必要があります
 - `<NAME>` の部分が、`organization`入力や `list_organizations` に表示される組織名になります
 
+## トラブルシューティング
+
+### `git pull && pnpm run build` 後にMCPサーバーが起動しない
+
+**症状:** Claude Code / Cline で `-32000` エラーや「Failed to reconnect」と表示される。
+
+**原因:** バージョンアップで環境変数名が変わることがある。例: v0.13.0 で `BACKLOG_HOST` → `BACKLOG_DOMAIN` に変更。`.mcp.json` が古い変数名のままだとサーバーが即死する。
+
+**対処:** このREADMEのインストールセクションで現在の環境変数名を確認し、`.mcp.json` を更新する。
+
+| 旧（v0.13.0未満） | 現在（v0.13.0以降） |
+|-------------------|---------------------|
+| `BACKLOG_HOST` | `BACKLOG_DOMAIN` |
+
+### 環境変数が展開されない（`${VAR}` が空のまま）
+
+**症状:** サーバーが "Configure either BACKLOG_ORG\_\<NAME\>\_DOMAIN ... or both BACKLOG_DOMAIN and BACKLOG_API_KEY." で即時クラッシュ。
+
+**原因:** MCPクライアント（Claude Code, Cline等）は `${VAR}` を**クライアントプロセス自身の環境変数**から解決する。シェルプロファイル（`~/.zshrc` 等）を読み込んでいない環境から起動すると変数が空になる。
+
+**対処:**
+1. シェルプロファイルが読み込まれたターミナルからMCPクライアントを起動する
+2. または `.mcp.json` に値を直接書く（セキュリティは下がるが確実）
+3. 確認方法: `echo $BACKLOG_API_KEY` — 空なら `source ~/.zshrc` してクライアントを再起動
+
+### 診断チェックリスト
+
+Backlog MCPサーバーが接続できない場合、以下の順で確認:
+
+1. **ビルド済み?** — `ls build/index.js`（なければ `pnpm install && pnpm run build`）
+2. **環境変数?** — `echo $BACKLOG_API_KEY` と `echo $BACKLOG_DOMAIN`（空ならシェルプロファイルを source）
+3. **変数名一致?** — `.mcp.json` の env キーとこのREADMEの例を照合
+4. **Node.jsバージョン?** — `node --version`（22以上が必要）
+5. **単体起動?** — `BACKLOG_DOMAIN=xxx BACKLOG_API_KEY=yyy node build/index.js`（stdin待ちになれば正常。クラッシュなら設定ミス）
+
 ## ライセンス
 
 このプロジェクトは [MITライセンス](./LICENSE) のもとでライセンスされています。
