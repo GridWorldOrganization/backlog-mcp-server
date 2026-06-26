@@ -589,6 +589,13 @@ The server supports several command line options:
 - `--enable-tools <tools...>`: Specify individual tool names to enable. When set, only these tools are registered (ignores `--enable-toolsets` and `--preset`).
   Example: `--enable-tools get_issue,add_issue,get_wiki`
   Can also be set via environment variable: `ENABLE_TOOLS=get_issue,add_issue`
+- `--env-file PATH`: Load environment variables from a specific `.env` file instead of the working directory. This bypasses MCP client `${VAR}` expansion issues — the server reads credentials directly from the file.
+  Example: `--env-file /path/to/backlog.env`
+- `--check`: Validate environment configuration and exit. Reports OK/WARN/FAIL for each required variable (BACKLOG_DOMAIN, BACKLOG_API_KEY, Node.js version). Exits 0 on pass, 1 on fail.
+
+#### Backward Compatibility
+
+- `BACKLOG_HOST` is accepted as an alias for `BACKLOG_DOMAIN` (renamed in v0.13.0). A deprecation warning is logged when `BACKLOG_HOST` is used.
 
 Example:
 

@@ -503,6 +503,13 @@ pnpm test
 - `--enable-toolsets <toolsets...>`: 有効にするツールセットを指定します（カンマ区切りまたは複数の引数）。デフォルトは "all" です。
   例：`--enable-toolsets space,project` または `--enable-toolsets issue --enable-toolsets git`
   利用可能なツールセット：`space`、`project`、`issue`、`wiki`、`git`、`notifications`。
+- `--env-file PATH`: 指定した `.env` ファイルから環境変数を読み込む。MCPクライアントの `${VAR}` 展開問題を回避し、サーバーが直接認証情報を読む。
+  例：`--env-file /path/to/backlog.env`
+- `--check`: 環境設定を検証して終了。必須変数（BACKLOG_DOMAIN, BACKLOG_API_KEY, Node.jsバージョン）のOK/WARN/FAILを表示。成功で終了コード0、失敗で1。
+
+#### 後方互換性
+
+- `BACKLOG_HOST` は `BACKLOG_DOMAIN` のエイリアスとして受け入れられます（v0.13.0で名称変更）。使用時にdeprecation警告がログに出力されます。
 
 例：
 
